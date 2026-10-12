@@ -1,0 +1,57 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.31903.59
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{C0633DDA-1B02-49BB-B28C-6114D82667BD}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SalaryNet.API", "src\SalaryNet.API\SalaryNet.API.csproj", "{89C59918-0865-41C2-89A3-C4C665177B5E}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SalaryNet.Application", "src\SalaryNet.Application\SalaryNet.Application.csproj", "{03B1449F-FF4F-4DD7-84BB-C003E8C05311}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SalaryNet.Domain", "src\SalaryNet.Domain\SalaryNet.Domain.csproj", "{AB180E1E-73AD-443B-86C2-D4B67DE756D6}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SalaryNet.Infrastructure", "src\SalaryNet.Infrastructure\SalaryNet.Infrastructure.csproj", "{723D9F12-C9D7-4086-9ABF-D95CF7F740C3}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{2A795621-0D90-4ABB-872C-1E06A021C922}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SalaryNet.Tests", "tests\SalaryNet.Tests\SalaryNet.Tests.csproj", "{729EEA6C-E554-48AA-AF72-B497A203C87E}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{89C59918-0865-41C2-89A3-C4C665177B5E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{89C59918-0865-41C2-89A3-C4C665177B5E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{89C59918-0865-41C2-89A3-C4C665177B5E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{89C59918-0865-41C2-89A3-C4C665177B5E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{03B1449F-FF4F-4DD7-84BB-C003E8C05311}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{03B1449F-FF4F-4DD7-84BB-C003E8C05311}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{03B1449F-FF4F-4DD7-84BB-C003E8C05311}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{03B1449F-FF4F-4DD7-84BB-C003E8C05311}.Release|Any CPU.Build.0 = Release|Any CPU
+		{AB180E1E-73AD-443B-86C2-D4B67DE756D6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AB180E1E-73AD-443B-86C2-D4B67DE756D6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AB180E1E-73AD-443B-86C2-D4B67DE756D6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AB180E1E-73AD-443B-86C2-D4B67DE756D6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{723D9F12-C9D7-4086-9ABF-D95CF7F740C3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{723D9F12-C9D7-4086-9ABF-D95CF7F740C3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{723D9F12-C9D7-4086-9ABF-D95CF7F740C3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{723D9F12-C9D7-4086-9ABF-D95CF7F740C3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{729EEA6C-E554-48AA-AF72-B497A203C87E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{729EEA6C-E554-48AA-AF72-B497A203C87E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{729EEA6C-E554-48AA-AF72-B497A203C87E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{729EEA6C-E554-48AA-AF72-B497A203C87E}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{89C59918-0865-41C2-89A3-C4C665177B5E} = {C0633DDA-1B02-49BB-B28C-6114D82667BD}
+		{03B1449F-FF4F-4DD7-84BB-C003E8C05311} = {C0633DDA-1B02-49BB-B28C-6114D82667BD}
+		{AB180E1E-73AD-443B-86C2-D4B67DE756D6} = {C0633DDA-1B02-49BB-B28C-6114D82667BD}
+		{723D9F12-C9D7-4086-9ABF-D95CF7F740C3} = {C0633DDA-1B02-49BB-B28C-6114D82667BD}
+		{729EEA6C-E554-48AA-AF72-B497A203C87E} = {2A795621-0D90-4ABB-872C-1E06A021C922}
+	EndGlobalSection
+EndGlobal
