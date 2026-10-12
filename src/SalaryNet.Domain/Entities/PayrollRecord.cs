@@ -27,6 +27,8 @@ public sealed class PayrollRecord : Entity
         Month = month;
         GrossSalary = breakdown.GrossSalary;
         Bonus = breakdown.Bonus;
+        IncomeTax = breakdown.IncomeTax;
+        SocialSecurity = breakdown.SocialSecurity;
         Deductions = breakdown.TotalDeductions;
         NetSalary = breakdown.NetSalary;
         GeneratedAt = generatedAt;
@@ -38,6 +40,8 @@ public sealed class PayrollRecord : Entity
 
     public Guid EmployeeId { get; private init; }
 
+    public Employee? Employee { get; private init; }
+
     public int Year { get; private init; }
 
     public int Month { get; private init; }
@@ -47,6 +51,11 @@ public sealed class PayrollRecord : Entity
 
     public decimal Bonus { get; private init; }
 
+    public decimal IncomeTax { get; private init; }
+
+    public decimal SocialSecurity { get; private init; }
+
+    /// <summary><see cref="IncomeTax"/> plus <see cref="SocialSecurity"/>.</summary>
     public decimal Deductions { get; private init; }
 
     public decimal NetSalary { get; private init; }

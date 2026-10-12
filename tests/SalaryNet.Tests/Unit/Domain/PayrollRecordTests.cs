@@ -29,6 +29,8 @@ public class PayrollRecordTests
         record.Month.Should().Be(5);
         record.GrossSalary.Should().Be(10_500m);
         record.Bonus.Should().Be(500m);
+        record.IncomeTax.Should().Be(1_200m);
+        record.SocialSecurity.Should().Be(600m);
         record.Deductions.Should().Be(1_800m);
         record.NetSalary.Should().Be(8_700m);
         record.GeneratedAt.Should().Be(TestData.Now.UtcDateTime);

@@ -34,7 +34,7 @@ internal static class Guard
 
     public static string Email(string? value, string paramName, int maxLength)
     {
-        var normalized = RequiredText(value, paramName, maxLength).ToLowerInvariant();
+        var normalized = EmailNormalizer.Normalize(RequiredText(value, paramName, maxLength));
 
         // MailAddress also accepts display-name forms such as "John <a@b.com>"; require the bare address.
         if (!MailAddress.TryCreate(normalized, out var address) || address.Address != normalized)

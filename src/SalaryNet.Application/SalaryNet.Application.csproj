@@ -6,6 +6,11 @@
   </ItemGroup>
 
   <ItemGroup>
+    <InternalsVisibleTo Include="SalaryNet.Tests" />
+    <InternalsVisibleTo Include="DynamicProxyGenAssembly2" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\SalaryNet.Domain\SalaryNet.Domain.csproj" />
   </ItemGroup>
 

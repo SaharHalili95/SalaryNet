@@ -18,6 +18,8 @@ public sealed class AttendanceLog : Entity
 
     public Guid EmployeeId { get; private init; }
 
+    public Employee? Employee { get; private init; }
+
     public DateTime CheckIn { get; private init; }
 
     public DateTime? CheckOut { get; private set; }
