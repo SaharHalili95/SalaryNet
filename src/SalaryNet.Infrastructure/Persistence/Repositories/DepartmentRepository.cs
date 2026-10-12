@@ -16,7 +16,7 @@ internal sealed class DepartmentRepository(SalaryNetDbContext db) : IDepartmentR
         db.Departments.AnyAsync(d => d.Name == name && d.Id != excludingId, cancellationToken);
 
     public async Task<IReadOnlyList<DepartmentSummary>> ListWithHeadcountAsync(CancellationToken cancellationToken) =>
-        await Summaries(db.Departments.AsNoTracking()).OrderBy(s => s.Department.Name).ToListAsync(cancellationToken);
+        await Summaries(db.Departments.AsNoTracking().OrderBy(d => d.Name)).ToListAsync(cancellationToken);
 
     public Task<DepartmentSummary?> GetSummaryAsync(Guid id, CancellationToken cancellationToken) =>
         Summaries(db.Departments.AsNoTracking().Where(d => d.Id == id)).FirstOrDefaultAsync(cancellationToken);
