@@ -1,5 +1,6 @@
 name: salarynet
 
+# Local, fully containerised stack. The secrets below are for local development only.
 services:
   sqlserver:
     image: mcr.microsoft.com/mssql/server:2022-CU16-ubuntu-22.04
@@ -18,6 +19,31 @@ services:
       timeout: 5s
       retries: 12
       start_period: 20s
+
+  api:
+    build:
+      context: .
+      dockerfile: src/SalaryNet.API/Dockerfile
+    profiles: [full]
+    depends_on:
+      sqlserver:
+        condition: service_healthy
+    environment:
+      ConnectionStrings__SalaryNet: "Server=sqlserver,1433;Database=SalaryNet;User Id=sa;Password=SalaryNet_Dev_2026!;TrustServerCertificate=True"
+      Jwt__SigningKey: "local-docker-signing-key-change-me-0123456789"
+      Database__InitializeOnStartup: "true"
+      DemoData__Enabled: "true"
+      Swagger__Enabled: "true"
+    ports:
+      - "5080:8080"
+
+  web:
+    build: ./web
+    profiles: [full]
+    depends_on:
+      - api
+    ports:
+      - "8080:80"
 
 volumes:
   sqlserver-data:
