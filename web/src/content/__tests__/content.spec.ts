@@ -3,6 +3,7 @@ import { resolve } from 'node:path'
 import { describe, expect, it } from 'vitest'
 import { flows, nodes } from '../architecture'
 import type { Localized } from '../localized'
+import { componentDetails } from '../components'
 import { glossary } from '../glossary'
 import { issues } from '../troubleshooting'
 import { lanes } from '../architecture'
@@ -26,6 +27,10 @@ describe('architecture content', () => {
     for (const node of nodes) expect(bothLanguages(node.label) && bothLanguages(node.plain), node.id).toBe(true)
     for (const lane of lanes) expect(bothLanguages(lane.analogy), lane.id).toBe(true)
     for (const g of glossary) expect(bothLanguages(g.meaning), g.term).toBe(true)
+    for (const node of nodes) {
+      const d = componentDetails[node.id]
+      expect(d.tech.length > 0 && [d.job, d.from, d.to, d.how].every(bothLanguages), node.id).toBe(true)
+    }
   })
 
   // The guides cite real files; this keeps them honest when code moves.

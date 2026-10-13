@@ -6,6 +6,7 @@ import { computed, onBeforeUnmount, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { isDemoMode } from '@/api'
 import { flows, lanes, nodes, type DiagramNode, type NodeId } from '@/content/architecture'
+import { componentDetails } from '@/content/components'
 import { glossary } from '@/content/glossary'
 import { pick } from '@/content/localized'
 import type { Locale } from '@/i18n'
@@ -39,6 +40,15 @@ const step = computed(() => flow.value.steps[stepIndex.value]!)
 const activeNode = computed(() => byId.get(step.value.node)!)
 const visited = computed(() => new Set<NodeId>(flow.value.steps.slice(0, stepIndex.value + 1).map((s) => s.node)))
 const involved = computed(() => new Set<NodeId>(flow.value.steps.map((s) => s.node)))
+
+/** A box the reader clicked; otherwise the card follows the step being played. */
+const pinned = ref<NodeId | null>(null)
+const detailNode = computed(() => byId.get(pinned.value ?? activeNode.value.id)!)
+const detail = computed(() => componentDetails[detailNode.value.id])
+function pin(id: NodeId) {
+  stop()
+  pinned.value = pinned.value === id ? null : id
+}
 
 /** The edge into the current step, drawn from the previous step's node. */
 const arrow = computed(() => {
@@ -83,16 +93,19 @@ function play() {
 
 function go(delta: number) {
   stop()
+  pinned.value = null
   stepIndex.value = Math.min(Math.max(stepIndex.value + delta, 0), flow.value.steps.length - 1)
 }
 
 function select(index: number) {
   stop()
+  pinned.value = null
   stepIndex.value = index
 }
 
 watch(flowId, () => {
   stop()
+  pinned.value = null
   stepIndex.value = 0
 })
 onBeforeUnmount(stop)
@@ -168,8 +181,9 @@ const layerChain = computed(() => {
           <line v-if="arrow" :key="`${flowId}-${stepIndex}`" :x1="arrow.x1" :y1="arrow.y1" :x2="arrow.x2" :y2="arrow.y2"
             class="edge" marker-end="url(#arrowhead)" />
 
-          <g v-for="node in nodes" :key="node.id"
-            :class="['node', { active: node.id === activeNode.id, visited: visited.has(node.id), idle: !involved.has(node.id) }]">
+          <g v-for="node in nodes" :key="node.id" role="button" tabindex="0" :aria-label="pick(node.label, lang)"
+            :class="['node', { active: node.id === activeNode.id, visited: visited.has(node.id), idle: !involved.has(node.id), pinned: node.id === pinned }]"
+            @click="pin(node.id)" @keydown.enter.prevent="pin(node.id)" @keydown.space.prevent="pin(node.id)">
             <rect :x="nodeBox(node).x" :y="nodeBox(node).y" :width="NODE_WIDTH" :height="NODE_HEIGHT" rx="8" />
             <text :x="nodeBox(node).x + NODE_WIDTH / 2" :y="nodeBox(node).y + NODE_HEIGHT / 2 + 5" text-anchor="middle">
               {{ pick(node.label, lang) }}
@@ -177,6 +191,22 @@ const layerChain = computed(() => {
           </g>
         </svg>
       </div>
+
+      <p class="muted hint"><i class="pi pi-hand-pointer" /> {{ t('architecture.clickHint') }}</p>
+
+      <article class="detail" aria-live="polite">
+        <header>
+          <h3>{{ pick(detailNode.label, lang) }}</h3>
+          <code>{{ detail.tech }}</code>
+        </header>
+        <dl>
+          <dt>{{ t('architecture.detailJob') }}</dt><dd>{{ pick(detail.job, lang) }}</dd>
+          <dt>{{ t('architecture.detailFrom') }}</dt><dd>{{ pick(detail.from, lang) }}</dd>
+          <dt>{{ t('architecture.detailTo') }}</dt><dd>{{ pick(detail.to, lang) }}</dd>
+          <dt>{{ t('architecture.detailHow') }}</dt><dd>{{ pick(detail.how, lang) }}</dd>
+          <dt>{{ t('architecture.code') }}</dt><dd><code class="path">{{ detailNode.code }}</code></dd>
+        </dl>
+      </article>
 
       <div class="controls">
         <Button :icon="rtl ? 'pi pi-chevron-right' : 'pi pi-chevron-left'" :label="t('architecture.previous')" text
@@ -205,6 +235,26 @@ const layerChain = computed(() => {
       </ol>
 
       <p v-if="isDemoMode" class="muted demo-note"><Tag severity="info" value="Demo" /> {{ t('architecture.demoNote') }}</p>
+    </section>
+
+    <section class="panel catalog">
+      <h2>{{ t('architecture.catalogTitle') }}</h2>
+      <p class="muted">{{ t('architecture.catalogIntro') }}</p>
+      <div class="cards">
+        <article v-for="node in nodes" :key="node.id" class="card">
+          <header>
+            <span class="lane-chip">{{ pick(lanes[node.lane]!.title, lang) }}</span>
+            <h3>{{ pick(node.label, lang) }}</h3>
+            <code>{{ componentDetails[node.id].tech }}</code>
+          </header>
+          <dl>
+            <dt>{{ t('architecture.detailJob') }}</dt><dd>{{ pick(componentDetails[node.id].job, lang) }}</dd>
+            <dt>{{ t('architecture.detailFrom') }}</dt><dd>{{ pick(componentDetails[node.id].from, lang) }}</dd>
+            <dt>{{ t('architecture.detailTo') }}</dt><dd>{{ pick(componentDetails[node.id].to, lang) }}</dd>
+            <dt>{{ t('architecture.detailHow') }}</dt><dd>{{ pick(componentDetails[node.id].how, lang) }}</dd>
+          </dl>
+        </article>
+      </div>
     </section>
 
     <section class="panel glossary">
@@ -255,6 +305,8 @@ const layerChain = computed(() => {
 .lane-title { fill: var(--app-text-muted); font-size: 13px; font-weight: 600; }
 .node rect { fill: var(--app-surface); stroke: var(--app-border); stroke-width: 1.5; transition: fill 0.25s, stroke 0.25s; }
 .node text { fill: var(--app-text); font-size: 13px; font-weight: 550; }
+.node { cursor: pointer; outline: none; }
+.node:focus-visible rect, .node.pinned rect { stroke: var(--chart-series-2); stroke-width: 3; }
 .node.idle { opacity: 0.35; }
 .node.visited rect { stroke: var(--chart-series-1); }
 .node.active rect { fill: var(--chart-series-1); stroke: var(--chart-series-1); }
@@ -264,6 +316,23 @@ const layerChain = computed(() => {
 @keyframes dash { to { stroke-dashoffset: -22; } }
 @media (prefers-reduced-motion: reduce) { .edge { animation: none; } }
 
+.hint { margin: 0.75rem 0 0.5rem; font-size: 0.8125rem; display: flex; gap: 0.5rem; align-items: center; }
+.detail { border: 1px solid var(--chart-series-1); border-radius: 10px; padding: 0.875rem 1rem; background: color-mix(in srgb, var(--chart-series-1) 6%, transparent); }
+.detail header, .card header { display: flex; flex-wrap: wrap; align-items: baseline; gap: 0.5rem 0.75rem; margin-bottom: 0.5rem; }
+.detail h3, .card h3 { margin: 0; font-size: 1rem; }
+.detail header code, .card header code { font-size: 0.75rem; color: var(--app-text-muted); }
+.detail dl, .card dl { margin: 0; display: grid; grid-template-columns: max-content 1fr; gap: 0.375rem 1rem; line-height: 1.55; }
+.detail dt, .card dt { font-weight: 600; color: var(--app-text-muted); }
+.detail dd, .card dd { margin: 0; }
+.path { font-size: 0.75rem; word-break: break-all; }
+.catalog { margin-top: 1rem; }
+.catalog > p { margin: 0 0 0.75rem; }
+.cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 0.75rem; }
+.card { border: 1px solid var(--app-border); border-radius: 10px; padding: 0.875rem 1rem; background: var(--app-bg); }
+.card dl { grid-template-columns: 1fr; gap: 0.125rem; }
+.card dd { margin-bottom: 0.375rem; }
+.lane-chip { font-size: 0.6875rem; text-transform: uppercase; letter-spacing: 0.04em; color: var(--chart-series-1); width: 100%; }
+@media (max-width: 640px) { .detail dl { grid-template-columns: 1fr; } .detail dd { margin-bottom: 0.375rem; } }
 .controls { display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap; margin: 0.75rem 0; }
 .step-count { margin-inline-start: auto; }
 
