@@ -149,3 +149,29 @@ export interface DashboardSummary {
   employmentTypes: { employmentType: EmploymentType; count: number }[]
   monthlyTrend: PayrollPeriodTotals[]
 }
+
+export interface UserAccount {
+  id: string
+  email: string
+  role: UserRole
+  employeeId: string | null
+  employeeName: string | null
+  isActive: boolean
+  isLockedOut: boolean
+  lockoutEndsAt: string | null
+  failedLoginCount: number
+  createdAt: string
+}
+
+export interface UserQuery extends PageQuery {
+  search?: string
+  role?: UserRole
+  isActive?: boolean
+}
+
+export interface CreateUserRequest {
+  email: string
+  password: string
+  role: UserRole
+  employeeId: string | null
+}

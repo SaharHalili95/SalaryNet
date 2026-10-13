@@ -11,7 +11,10 @@ export interface DemoPayroll {
   incomeTax: number; socialSecurity: number; deductions: number; netSalary: number; generatedAt: string
 }
 export interface DemoAttendance { id: string; employeeId: string; checkIn: string; checkOut: string | null; totalHours: number }
-export interface DemoUser { id: string; email: string; role: UserRole; employeeId: string | null }
+export interface DemoUser {
+  id: string; email: string; role: UserRole; employeeId: string | null; password: string
+  isActive: boolean; failedLoginCount: number; lockoutEndsAt: string | null; createdAt: string
+}
 
 export interface DemoDatabase {
   departments: DemoDepartment[]
@@ -22,6 +25,8 @@ export interface DemoDatabase {
 }
 
 export const DEMO_PASSWORD = 'Demo123!'
+export const MAX_FAILED_LOGINS = 5
+export const LOCKOUT_MINUTES = 15
 export const DEMO_ACCOUNTS = {
   admin: 'admin@salarynet.demo',
   hr: 'hr@salarynet.demo',
@@ -120,10 +125,13 @@ export function createDemoDatabase(now: Date = new Date()): DemoDatabase {
     }
   }
 
+  const account = (email: string, role: UserRole, employeeId: string | null): DemoUser => ({
+    id: newId(), email, role, employeeId, password: DEMO_PASSWORD, isActive: true, failedLoginCount: 0, lockoutEndsAt: null, createdAt,
+  })
   db.users = [
-    { id: newId(), email: DEMO_ACCOUNTS.admin, role: 'Admin', employeeId: null },
-    { id: newId(), email: DEMO_ACCOUNTS.hr, role: 'HR', employeeId: null },
-    { id: newId(), email: DEMO_ACCOUNTS.employee, role: 'Employee', employeeId: db.employees[0]!.id },
+    account(DEMO_ACCOUNTS.admin, 'Admin', null),
+    account(DEMO_ACCOUNTS.hr, 'HR', null),
+    account(DEMO_ACCOUNTS.employee, 'Employee', db.employees[0]!.id),
   ]
 
   return db

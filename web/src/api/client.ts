@@ -14,6 +14,10 @@ import type {
   SaveDepartmentRequest,
   SaveEmployeeRequest,
   User,
+  UserAccount,
+  UserQuery,
+  CreateUserRequest,
+  UserRole,
 } from './types'
 
 /**
@@ -23,6 +27,7 @@ import type {
 export interface SalaryNetApi {
   login(email: string, password: string): Promise<LoginResponse>
   me(): Promise<User>
+  changePassword(currentPassword: string, newPassword: string): Promise<void>
   dashboard(): Promise<DashboardSummary>
   employees: {
     search(query: EmployeeQuery): Promise<PagedResult<Employee>>
@@ -43,6 +48,14 @@ export interface SalaryNetApi {
     get(id: string): Promise<PayrollRecord>
     generate(request: GeneratePayrollRequest): Promise<PayrollRecord>
     runMonth(year: number, month: number): Promise<MonthlyPayrollResult>
+  }
+  users: {
+    search(query: UserQuery): Promise<PagedResult<UserAccount>>
+    create(request: CreateUserRequest): Promise<UserAccount>
+    changeRole(id: string, role: UserRole, employeeId: string | null): Promise<UserAccount>
+    setActive(id: string, isActive: boolean): Promise<UserAccount>
+    unlock(id: string): Promise<UserAccount>
+    resetPassword(id: string, newPassword: string): Promise<UserAccount>
   }
   attendance: {
     search(query: AttendanceQuery): Promise<PagedResult<AttendanceLog>>

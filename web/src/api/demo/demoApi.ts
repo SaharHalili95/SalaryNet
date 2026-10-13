@@ -1,9 +1,9 @@
 import type { SalaryNetApi, TokenProvider } from '../client'
 import { ApiError, businessRule, conflict, forbidden, notFound, validation } from '../errors'
 import type {
-  AttendanceLog, Department, Employee, PagedResult, PayrollRecord, SaveEmployeeRequest, User,
+  AttendanceLog, Department, Employee, PagedResult, PayrollRecord, SaveEmployeeRequest, User, UserAccount, UserRole,
 } from '../types'
-import { createDemoDatabase, DEMO_PASSWORD, newId, type DemoDatabase, type DemoUser } from './demoData'
+import { createDemoDatabase, LOCKOUT_MINUTES, MAX_FAILED_LOGINS, newId, type DemoDatabase, type DemoUser } from './demoData'
 import { calculatePayroll } from './payrollCalculator'
 
 const TOKEN_PREFIX = 'demo.'
@@ -21,6 +21,41 @@ export function createDemoApi(getToken: TokenProvider, db: DemoDatabase = create
     const user = token?.startsWith(TOKEN_PREFIX) ? db.users.find((u) => u.id === token.slice(TOKEN_PREFIX.length)) : undefined
     if (!user) throw new ApiError(401, 'Unauthorized', 'Please sign in again.')
     return user
+  }
+  const isLocked = (u: DemoUser) => !!u.lockoutEndsAt && new Date(u.lockoutEndsAt) > new Date()
+  function checkPasswordPolicy(password: string, field: string) {
+    if (password.length < 8 || !/[A-Z]/.test(password) || !/[a-z]/.test(password) || !/[0-9]/.test(password)) {
+      throw validation({ [field]: ['Use at least 8 characters with an uppercase letter, a lowercase letter and a digit.'] })
+    }
+  }
+  function requireAdmin() {
+    const u = caller()
+    if (u.role !== 'Admin') throw forbidden()
+    return u
+  }
+  function toAccount(u: DemoUser): UserAccount {
+    const e = db.employees.find((x) => x.id === u.employeeId)
+    const locked = isLocked(u)
+    return {
+      id: u.id, email: u.email, role: u.role, employeeId: u.employeeId, employeeName: e ? `${e.firstName} ${e.lastName}` : null,
+      isActive: u.isActive, isLockedOut: locked, lockoutEndsAt: locked ? u.lockoutEndsAt : null,
+      failedLoginCount: u.failedLoginCount, createdAt: u.createdAt,
+    }
+  }
+  function account(id: string) {
+    const u = db.users.find((x) => x.id === id)
+    if (!u) throw notFound(`User '${id}'`)
+    return u
+  }
+  function checkRoleLink(role: UserRole, employeeId: string | null, excludingId?: string) {
+    if (role === 'Employee' && !employeeId) throw validation({ EmployeeId: ['Choose the employee this account belongs to.'] })
+    if (role !== 'Employee' && employeeId) throw validation({ EmployeeId: ['Only employee accounts can be linked to an employee.'] })
+    if (employeeId && db.users.some((u) => u.employeeId === employeeId && u.id !== excludingId)) {
+      throw conflict('This employee already has an account.')
+    }
+  }
+  function notSelf(id: string, action: string) {
+    if (caller().id === id) throw businessRule(`You cannot ${action}. Ask another administrator.`)
   }
   const isStaff = (u: DemoUser) => u.role === 'Admin' || u.role === 'HR'
   function requireStaff() {
@@ -92,9 +127,29 @@ export function createDemoApi(getToken: TokenProvider, db: DemoDatabase = create
 
   return {
     async login(email, password) {
+      // Mirrors the backend: unknown, inactive and locked accounts share one generic 401.
+      const generic = () => new ApiError(401, 'Unauthorized', 'Invalid email or password.')
       const user = db.users.find((u) => u.email === email.trim().toLowerCase())
-      if (!user || password !== DEMO_PASSWORD) throw new ApiError(401, 'Unauthorized', 'Invalid email or password.')
+      if (!user || !user.isActive || isLocked(user)) throw generic()
+      if (password !== user.password) {
+        user.failedLoginCount += 1
+        if (user.failedLoginCount >= MAX_FAILED_LOGINS) {
+          user.lockoutEndsAt = new Date(Date.now() + LOCKOUT_MINUTES * 60_000).toISOString()
+          user.failedLoginCount = 0
+        }
+        throw generic()
+      }
+      user.failedLoginCount = 0
+      user.lockoutEndsAt = null
       return delay({ accessToken: TOKEN_PREFIX + user.id, expiresAt: new Date(Date.now() + 3_600_000).toISOString(), user: toUser(user) })
+    },
+    async changePassword(currentPassword, newPassword) {
+      const user = caller()
+      if (currentPassword !== user.password) throw validation({ CurrentPassword: ['The current password is incorrect.'] })
+      checkPasswordPolicy(newPassword, 'NewPassword')
+      if (newPassword === currentPassword) throw validation({ NewPassword: ['The new password must be different from the current one.'] })
+      user.password = newPassword
+      return delay(undefined)
     },
     async me() {
       return delay(toUser(caller()))
@@ -265,6 +320,59 @@ export function createDemoApi(getToken: TokenProvider, db: DemoDatabase = create
             ...calculatePayroll(e.employmentType, e.baseSalary, 0), generatedAt: new Date().toISOString() })
         }
         return delay({ year, month, generated: pending.length, skipped: active.length - pending.length })
+      },
+    },
+    users: {
+      async search(q) {
+        requireAdmin()
+        const term = q.search?.trim().toLowerCase()
+        const rows = db.users
+          .map(toAccount)
+          .filter((u) => (!term || `${u.email} ${u.employeeName ?? ''}`.toLowerCase().includes(term)) &&
+            (!q.role || u.role === q.role) && (q.isActive === undefined || u.isActive === q.isActive))
+          .sort((a, b) => a.role.localeCompare(b.role) || a.email.localeCompare(b.email))
+        return delay(page(rows, q.page, q.pageSize))
+      },
+      async create(r) {
+        requireAdmin()
+        if (!EMAIL_PATTERN.test(r.email ?? '')) throw validation({ Email: ["'Email' is not a valid email address."] })
+        checkPasswordPolicy(r.password ?? '', 'Password')
+        const email = r.email.trim().toLowerCase()
+        if (db.users.some((u) => u.email === email)) throw conflict(`An account with email '${r.email.trim()}' already exists.`)
+        checkRoleLink(r.role, r.employeeId)
+        const u: DemoUser = { id: newId(), email, role: r.role, employeeId: r.employeeId, password: r.password,
+          isActive: true, failedLoginCount: 0, lockoutEndsAt: null, createdAt: new Date().toISOString() }
+        db.users.push(u)
+        return delay(toAccount(u))
+      },
+      async changeRole(id, role, employeeId) {
+        requireAdmin()
+        notSelf(id, 'change your own role')
+        const u = account(id)
+        checkRoleLink(role, employeeId, id)
+        Object.assign(u, { role, employeeId })
+        return delay(toAccount(u))
+      },
+      async setActive(id, isActive) {
+        requireAdmin()
+        if (!isActive) notSelf(id, 'deactivate your own account')
+        const u = account(id)
+        if (u.isActive === isActive) throw businessRule(`User is already ${isActive ? 'active' : 'inactive'}.`)
+        u.isActive = isActive
+        return delay(toAccount(u))
+      },
+      async unlock(id) {
+        requireAdmin()
+        const u = account(id)
+        Object.assign(u, { failedLoginCount: 0, lockoutEndsAt: null })
+        return delay(toAccount(u))
+      },
+      async resetPassword(id, newPassword) {
+        requireAdmin()
+        checkPasswordPolicy(newPassword, 'NewPassword')
+        const u = account(id)
+        Object.assign(u, { password: newPassword, failedLoginCount: 0, lockoutEndsAt: null })
+        return delay(toAccount(u))
       },
     },
     attendance: {

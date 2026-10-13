@@ -19,7 +19,7 @@ const loading = ref(false)
 const error = ref<string | null>(null)
 
 const demoAccounts = [
-  { label: 'Admin', icon: 'pi pi-shield', email: DEMO_ACCOUNTS.admin, hint: 'Full access, manages departments' },
+  { label: 'Admin', icon: 'pi pi-shield', email: DEMO_ACCOUNTS.admin, hint: 'Full access, manages users and departments' },
   { label: 'HR', icon: 'pi pi-briefcase', email: DEMO_ACCOUNTS.hr, hint: 'Employees, payroll, attendance' },
   { label: 'Employee', icon: 'pi pi-user', email: DEMO_ACCOUNTS.employee, hint: 'Own payslips and clock in/out' },
 ]
@@ -79,7 +79,9 @@ async function signIn(withEmail = email.value, withPassword = password.value) {
           <label for="password">Password</label>
           <Password v-model="password" input-id="password" :feedback="false" toggle-mask autocomplete="current-password" fluid />
         </div>
-        <Message v-if="error" severity="error" :closable="false">{{ error }}</Message>
+        <Message v-if="error" severity="error" :closable="false">
+          {{ error }} After 5 failed attempts the account locks for 15 minutes.
+        </Message>
         <Button type="submit" label="Sign in" icon="pi pi-sign-in" :loading="loading" fluid />
         <p class="hint muted">Demo password for every account: <code>{{ DEMO_PASSWORD }}</code></p>
       </form>

@@ -32,6 +32,7 @@ export function createHttpApi(baseUrl: string, getToken: TokenProvider, onUnauth
   return {
     login: (email, password) => post('/auth/login', { email, password }),
     me: () => get('/auth/me'),
+    changePassword: (currentPassword, newPassword) => post('/auth/change-password', { currentPassword, newPassword }),
     dashboard: () => get('/dashboard/summary'),
     employees: {
       search: (q) => get('/employees', { ...q }),
@@ -52,6 +53,14 @@ export function createHttpApi(baseUrl: string, getToken: TokenProvider, onUnauth
       get: (id) => get(`/payroll/${id}`),
       generate: (r) => post('/payroll', r),
       runMonth: (year, month) => post('/payroll/run', { year, month }),
+    },
+    users: {
+      search: (q) => get('/users', { ...q }),
+      create: (r) => post('/users', r),
+      changeRole: (id, role, employeeId) => request('PUT', `/users/${id}/role`, { role, employeeId }),
+      setActive: (id, isActive) => post(`/users/${id}/${isActive ? 'activate' : 'deactivate'}`),
+      unlock: (id) => post(`/users/${id}/unlock`),
+      resetPassword: (id, newPassword) => post(`/users/${id}/reset-password`, { newPassword }),
     },
     attendance: {
       search: (q) => get('/attendance', { ...q }),

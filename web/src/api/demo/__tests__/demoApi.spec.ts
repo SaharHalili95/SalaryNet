@@ -1,7 +1,7 @@
 import { beforeEach, describe, expect, it } from 'vitest'
 import { ApiError } from '../../errors'
 import { createDemoApi } from '../demoApi'
-import { DEMO_ACCOUNTS, DEMO_PASSWORD } from '../demoData'
+import { DEMO_ACCOUNTS, DEMO_PASSWORD, MAX_FAILED_LOGINS } from '../demoData'
 
 describe('demo API authorization', () => {
   let token: string | null
@@ -62,5 +62,42 @@ describe('demo API authorization', () => {
     await expect(api.attendance.checkIn()).rejects.toMatchObject({ status: 409 })
     const closed = await api.attendance.checkOut()
     expect(closed.isOpen).toBe(false)
+  })
+
+  it('locks an account after repeated failures until an admin unlocks it', async () => {
+    for (let i = 0; i < MAX_FAILED_LOGINS; i++) {
+      await expect(api.login(DEMO_ACCOUNTS.hr, 'Wrong1234')).rejects.toMatchObject({ status: 401 })
+    }
+    await expect(api.login(DEMO_ACCOUNTS.hr, DEMO_PASSWORD)).rejects.toMatchObject({ status: 401 })
+
+    await signIn(DEMO_ACCOUNTS.admin)
+    const hr = (await api.users.search({ search: 'hr@' })).items[0]!
+    expect(hr.isLockedOut).toBe(true)
+    await api.users.unlock(hr.id)
+
+    await expect(api.login(DEMO_ACCOUNTS.hr, DEMO_PASSWORD)).resolves.toMatchObject({ user: { role: 'HR' } })
+  })
+
+  it('restricts user administration to admins', async () => {
+    await signIn(DEMO_ACCOUNTS.hr)
+
+    await expect(api.users.search({})).rejects.toMatchObject({ status: 403 })
+  })
+
+  it('rejects weak passwords and prevents admins from deactivating themselves', async () => {
+    await signIn(DEMO_ACCOUNTS.admin)
+    const me = await api.me()
+
+    await expect(api.users.create({ email: 'weak@salarynet.demo', password: 'password', role: 'HR', employeeId: null }))
+      .rejects.toMatchObject({ status: 400 })
+    await expect(api.users.setActive(me.id, false)).rejects.toMatchObject({ status: 422 })
+  })
+
+  it('changes the password only with the correct current password', async () => {
+    await signIn(DEMO_ACCOUNTS.employee)
+
+    await expect(api.changePassword('nope', 'Rotated123')).rejects.toMatchObject({ status: 400 })
+    await api.changePassword(DEMO_PASSWORD, 'Rotated123')
+    await expect(api.login(DEMO_ACCOUNTS.employee, 'Rotated123')).resolves.toBeDefined()
   })
 })

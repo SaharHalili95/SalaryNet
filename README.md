@@ -16,9 +16,10 @@ It covers the core flows of a payroll product: employees and departments, monthl
 - **Rich domain model**: entities protect their own invariants (private setters, factory methods, guard clauses). `TotalHours` is derived at check-out and cannot be set from outside.
 - **Payroll engine**: a documented progressive tax and social-security calculator, unit-tested against hand-calculated values.
 - **Database-enforced rules**: a unique composite index on `(EmployeeId, Year, Month)` prevents duplicate payslips even under concurrent requests (covered by an integration test that fires 5 parallel requests). A filtered unique index allows only one open shift per employee.
+- **Account security**: per-account lockout after repeated failed sign-ins, a password policy, admin unlock and reset, and deactivation without deleting history.
 - **Security**: JWT authentication, `Admin` / `HR` / `Employee` role policies, and resource-level authorization that blocks IDOR. An employee who asks for someone else's payslip gets `404`, and a spoofed `employeeId` filter is ignored.
 - **Consistent errors**: every failure is returned as RFC 7807 `ProblemDetails` with a `traceId`. Validation errors come back per field from FluentValidation.
-- **Tests**: 97 xUnit test methods (unit tests with Moq and FluentAssertions, plus integration tests with `WebApplicationFactory` against a real SQL Server in Testcontainers) and Vitest tests on the front end.
+- **Tests**: 132 xUnit test methods (162 test cases) (unit tests with Moq and FluentAssertions, plus integration tests with `WebApplicationFactory` against a real SQL Server in Testcontainers) and Vitest tests on the front end.
 
 ## Architecture
 
@@ -78,6 +79,10 @@ flowchart LR
 | One open shift per employee | Filtered unique index plus a service check |
 | Employees see only their own payroll and attendance | Services read the employee id from the token's claims, never from the request |
 | Departments can be changed only by Admin, and deleted only when empty | Role policy plus a service check |
+| 5 failed sign-ins in a row lock the account for 15 minutes; failures during a lockout do not extend it | `User.RegisterFailedLogin`, admin can unlock or reset the password |
+| Unknown, inactive and locked accounts get the same generic `401` | `AuthService.LoginAsync` (no account enumeration) |
+| Passwords need 8+ characters with upper case, lower case and a digit | FluentValidation `PasswordPolicy` |
+| Admins cannot deactivate themselves or change their own role | `UserService` (`422`) |
 
 ### Payroll calculation
 
@@ -100,6 +105,10 @@ Social security is 3.5% up to 7,500 and 12% from 7,500 up to a 50,000 ceiling. N
 | --- | --- | --- |
 | `POST` | `/api/auth/login` | Anonymous |
 | `GET` | `/api/auth/me` | Any signed-in user |
+| `POST` | `/api/auth/change-password` | Any signed-in user |
+| `GET` / `POST` | `/api/users` | Admin |
+| `PUT` | `/api/users/{id}/role` | Admin |
+| `POST` | `/api/users/{id}/deactivate`, `/activate`, `/unlock`, `/reset-password` | Admin |
 | `GET` | `/api/employees?search=&departmentId=&employmentType=&isActive=&sortBy=&sortDirection=&page=&pageSize=` | Admin, HR |
 | `GET` | `/api/employees/me` | Employee |
 | `GET` | `/api/employees/{id}` | Admin, HR, or the employee themself |

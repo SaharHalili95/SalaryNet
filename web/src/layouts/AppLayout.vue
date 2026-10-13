@@ -6,12 +6,14 @@ import { computed, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { isDemoMode } from '@/api'
 import type { UserRole } from '@/api/types'
+import ChangePasswordDialog from '@/components/ChangePasswordDialog.vue'
 import { useAuthStore } from '@/stores/auth'
 
 const auth = useAuthStore()
 const router = useRouter()
 const route = useRoute()
 const mobileOpen = ref(false)
+const passwordOpen = ref(false)
 
 const nav: { to: string; label: string; icon: string; roles?: UserRole[] }[] = [
   { to: '/dashboard', label: 'Dashboard', icon: 'pi pi-chart-bar', roles: ['Admin', 'HR'] },
@@ -19,6 +21,7 @@ const nav: { to: string; label: string; icon: string; roles?: UserRole[] }[] = [
   { to: '/departments', label: 'Departments', icon: 'pi pi-sitemap', roles: ['Admin', 'HR'] },
   { to: '/payroll', label: 'Payroll', icon: 'pi pi-wallet' },
   { to: '/attendance', label: 'Attendance', icon: 'pi pi-clock' },
+  { to: '/users', label: 'Users', icon: 'pi pi-shield', roles: ['Admin'] },
 ]
 
 const visibleNav = computed(() => nav.filter((item) => !item.roles || auth.hasRole(item.roles)))
@@ -67,12 +70,14 @@ function logout() {
             <strong>{{ auth.user?.displayName }}</strong>
             <Tag :value="auth.user?.role" :severity="roleSeverity" />
           </div>
+          <Button icon="pi pi-key" text rounded aria-label="Change password" v-tooltip.bottom="'Change password'" @click="passwordOpen = true" />
           <Button icon="pi pi-sign-out" text rounded aria-label="Sign out" v-tooltip.bottom="'Sign out'" @click="logout" />
         </div>
       </header>
       <main class="content">
         <RouterView />
       </main>
+      <ChangePasswordDialog v-model:visible="passwordOpen" />
     </div>
   </div>
 </template>
