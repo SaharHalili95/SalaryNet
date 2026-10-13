@@ -102,3 +102,31 @@ describe('demo API authorization', () => {
     await expect(api.login(DEMO_ACCOUNTS.employee, 'Rotated123')).resolves.toBeDefined()
   })
 })
+
+describe('randomChange', () => {
+  it('keeps headcount between 35 and 45 and never removes the demo employee', async () => {
+    const { createDemoDatabase, randomChange } = await import('../demoData')
+    const db = createDemoDatabase()
+    const demoEmployeeId = db.users.find((u) => u.role === 'Employee')!.employeeId
+
+    for (let i = 0; i < 300; i++) {
+      randomChange(db)
+      const active = db.employees.filter((e) => e.isActive).length
+      expect(active).toBeGreaterThanOrEqual(35)
+      expect(active).toBeLessThanOrEqual(45)
+    }
+
+    expect(db.employees.find((e) => e.id === demoEmployeeId)!.isActive).toBe(true)
+  })
+
+  it('records a departure as deactivation so payroll history remains', async () => {
+    const { createDemoDatabase, randomChange } = await import('../demoData')
+    const db = createDemoDatabase()
+    const before = db.employees.length
+
+    const change = randomChange(db, () => 0.99)
+
+    expect(change.kind).toBe('leave')
+    expect(db.employees.length).toBe(before)
+  })
+})

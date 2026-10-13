@@ -166,3 +166,50 @@ export function createDemoDatabase(now: Date = new Date()): DemoDatabase {
 
   return db
 }
+
+export interface DemoChange {
+  kind: 'hire' | 'leave'
+  name: string
+  department: string
+}
+
+const MIN_HEADCOUNT = 35
+const MAX_HEADCOUNT = 45
+
+/**
+ * One random staffing change so the demo company feels alive: a new hire or a departure.
+ * Departures deactivate rather than delete, so payroll history stays intact.
+ */
+export function randomChange(db: DemoDatabase, random: () => number = Math.random, now: Date = new Date()): DemoChange {
+  const pick = <T>(items: T[]) => items[Math.floor(random() * items.length)]!
+  const active = db.employees.filter((e) => e.isActive)
+  const canHire = active.length < MAX_HEADCOUNT
+  const canLeave = active.length > MIN_HEADCOUNT
+  const hire = canHire && (!canLeave || random() < 0.5)
+
+  if (hire) {
+    const department = pick(db.departments)
+    const [, , min, max] = departmentSpecs.find(([name]) => name === department.name) ?? ['', '', 10_000, 20_000]
+    const first = pick(firstNames)
+    const last = pick(lastNames)
+    db.employees.push({
+      id: newId(),
+      firstName: first,
+      lastName: last,
+      email: `${first}.${last}.${Date.now().toString(36)}@salarynet.demo`.toLowerCase(),
+      departmentId: department.id,
+      baseSalary: roundToHundreds(min + (max - min) * random()),
+      employmentType: 'FullTime',
+      isActive: true,
+      createdAt: now.toISOString(),
+    })
+    return { kind: 'hire', name: `${first} ${last}`, department: department.name }
+  }
+
+  // The demo employee account must always be able to sign in and see its own data.
+  const linked = new Set(db.users.map((u) => u.employeeId))
+  const leaver = pick(active.filter((e) => !linked.has(e.id)))
+  leaver.isActive = false
+  const department = db.departments.find((d) => d.id === leaver.departmentId)?.name ?? ''
+  return { kind: 'leave', name: `${leaver.firstName} ${leaver.lastName}`, department }
+}
