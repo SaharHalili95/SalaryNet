@@ -19,4 +19,14 @@ public sealed class AuthController(IAuthService auth) : ControllerBase
     [Authorize]
     public Task<UserDto> Me(CancellationToken cancellationToken) =>
         auth.GetCurrentUserAsync(cancellationToken);
+
+    [HttpPost("change-password")]
+    [Authorize]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType<ValidationProblemDetails>(StatusCodes.Status400BadRequest)]
+    public async Task<IActionResult> ChangePassword(ChangePasswordRequest request, CancellationToken cancellationToken)
+    {
+        await auth.ChangePasswordAsync(request, cancellationToken);
+        return NoContent();
+    }
 }

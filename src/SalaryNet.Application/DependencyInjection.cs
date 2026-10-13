@@ -6,6 +6,7 @@ using SalaryNet.Application.Dashboard;
 using SalaryNet.Application.Departments;
 using SalaryNet.Application.Employees;
 using SalaryNet.Application.Payroll;
+using SalaryNet.Application.Users;
 using SalaryNet.Domain.Services;
 
 namespace SalaryNet.Application;
@@ -23,6 +24,7 @@ public static class DependencyInjection
         services.AddScoped<IPayrollService, PayrollService>();
         services.AddScoped<IAttendanceService, AttendanceService>();
         services.AddScoped<IDashboardService, DashboardService>();
+        services.AddScoped<IUserService, UserService>();
 
         return services;
     }

@@ -40,9 +40,9 @@ public abstract class IntegrationTestBase(SqlServerContainerFixture sql) : IAsyn
 
     protected Task<HttpClient> AsEmployeeAsync() => LoginAsync(DemoDataSeeder.EmployeeEmail);
 
-    protected async Task<HttpClient> LoginAsync(string email)
+    protected async Task<HttpClient> LoginAsync(string email, string password = DemoPassword)
     {
-        var response = await Anonymous.PostAsJsonAsync("/api/auth/login", new LoginRequest(email, DemoPassword));
+        var response = await Anonymous.PostAsJsonAsync("/api/auth/login", new LoginRequest(email, password));
         response.EnsureSuccessStatusCode();
         var login = (await response.Content.ReadFromJsonAsync<LoginResponse>(Json))!;
 

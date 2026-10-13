@@ -1,4 +1,6 @@
+using SalaryNet.Application.Auth;
 using SalaryNet.Application.Employees;
+using SalaryNet.Application.Users;
 using SalaryNet.Application.Payroll;
 using SalaryNet.Domain.Enums;
 
@@ -57,5 +59,32 @@ public class ValidatorTests
         var result = new GeneratePayrollRequestValidator().Validate(new GeneratePayrollRequest(Guid.NewGuid(), year, month, bonus));
 
         result.IsValid.Should().BeFalse();
+    }
+
+    [Theory]
+    [InlineData("Short1", false)]
+    [InlineData("alllowercase1", false)]
+    [InlineData("ALLUPPERCASE1", false)]
+    [InlineData("NoDigitsHere", false)]
+    [InlineData("Valid123", true)]
+    public void ResetPasswordRequest_EnforcesPasswordPolicy(string password, bool expectedValid)
+    {
+        new ResetPasswordRequestValidator().Validate(new ResetPasswordRequest(password)).IsValid.Should().Be(expectedValid);
+    }
+
+    [Fact]
+    public void ChangePasswordRequest_SameAsCurrent_Fails()
+    {
+        var result = new ChangePasswordRequestValidator().Validate(new ChangePasswordRequest("Valid123", "Valid123"));
+
+        result.IsValid.Should().BeFalse();
+    }
+
+    [Fact]
+    public void CreateUserRequest_EmployeeRoleWithoutEmployee_Fails()
+    {
+        var result = new CreateUserRequestValidator().Validate(new CreateUserRequest("a@salarynet.test", "Valid123", UserRole.Employee, null));
+
+        result.Errors.Should().Contain(e => e.PropertyName == nameof(CreateUserRequest.EmployeeId));
     }
 }
