@@ -37,7 +37,8 @@ export function createDemoApi(getToken: TokenProvider, db: DemoDatabase = create
     const e = db.employees.find((x) => x.id === u.employeeId)
     const locked = isLocked(u)
     return {
-      id: u.id, email: u.email, role: u.role, employeeId: u.employeeId, employeeName: e ? `${e.firstName} ${e.lastName}` : null,
+      id: u.id, email: u.email, displayName: u.displayName, role: u.role, employeeId: u.employeeId,
+      employeeName: e ? `${e.firstName} ${e.lastName}` : null,
       isActive: u.isActive, isLockedOut: locked, lockoutEndsAt: locked ? u.lockoutEndsAt : null,
       failedLoginCount: u.failedLoginCount, createdAt: u.createdAt,
     }
@@ -90,7 +91,8 @@ export function createDemoApi(getToken: TokenProvider, db: DemoDatabase = create
   }
   function toUser(u: DemoUser): User {
     const e = db.employees.find((x) => x.id === u.employeeId)
-    return { ...u, displayName: e ? `${e.firstName} ${e.lastName}` : u.email }
+    return { id: u.id, email: u.email, role: u.role, employeeId: u.employeeId,
+      displayName: e ? `${e.firstName} ${e.lastName}` : (u.displayName ?? u.email) }
   }
 
   function page<T>(items: T[], pageNo = 1, pageSize = 20): PagedResult<T> {
@@ -328,7 +330,7 @@ export function createDemoApi(getToken: TokenProvider, db: DemoDatabase = create
         const term = q.search?.trim().toLowerCase()
         const rows = db.users
           .map(toAccount)
-          .filter((u) => (!term || `${u.email} ${u.employeeName ?? ''}`.toLowerCase().includes(term)) &&
+          .filter((u) => (!term || `${u.email} ${u.displayName ?? ''} ${u.employeeName ?? ''}`.toLowerCase().includes(term)) &&
             (!q.role || u.role === q.role) && (q.isActive === undefined || u.isActive === q.isActive))
           .sort((a, b) => a.role.localeCompare(b.role) || a.email.localeCompare(b.email))
         return delay(page(rows, q.page, q.pageSize))
@@ -340,7 +342,10 @@ export function createDemoApi(getToken: TokenProvider, db: DemoDatabase = create
         const email = r.email.trim().toLowerCase()
         if (db.users.some((u) => u.email === email)) throw conflict(`An account with email '${r.email.trim()}' already exists.`)
         checkRoleLink(r.role, r.employeeId)
-        const u: DemoUser = { id: newId(), email, role: r.role, employeeId: r.employeeId, password: r.password,
+        if (r.role !== 'Employee' && !r.displayName?.trim()) {
+          throw validation({ DisplayName: ['Enter the name of the person who uses this account.'] })
+        }
+        const u: DemoUser = { id: newId(), email, displayName: r.displayName?.trim() || null, role: r.role, employeeId: r.employeeId, password: r.password,
           isActive: true, failedLoginCount: 0, lockoutEndsAt: null, createdAt: new Date().toISOString() }
         db.users.push(u)
         return delay(toAccount(u))

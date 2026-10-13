@@ -5,7 +5,7 @@ import Message from 'primevue/message'
 import Password from 'primevue/password'
 import { ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import { DEMO_ACCOUNTS, DEMO_PASSWORD } from '@/api/demo/demoData'
+import { DEMO_ACCOUNTS, DEMO_ADMIN_PASSWORD, DEMO_PASSWORD } from '@/api/demo/demoData'
 import { ApiError } from '@/api/errors'
 import { useAuthStore } from '@/stores/auth'
 
@@ -19,9 +19,9 @@ const loading = ref(false)
 const error = ref<string | null>(null)
 
 const demoAccounts = [
-  { label: 'Admin', icon: 'pi pi-shield', email: DEMO_ACCOUNTS.admin, hint: 'Full access, manages users and departments' },
-  { label: 'HR', icon: 'pi pi-briefcase', email: DEMO_ACCOUNTS.hr, hint: 'Employees, payroll, attendance' },
-  { label: 'Employee', icon: 'pi pi-user', email: DEMO_ACCOUNTS.employee, hint: 'Own payslips and clock in/out' },
+  { label: 'Admin', icon: 'pi pi-shield', email: DEMO_ACCOUNTS.admin, password: DEMO_ADMIN_PASSWORD, hint: 'Full access, manages users and departments' },
+  { label: 'HR', icon: 'pi pi-briefcase', email: DEMO_ACCOUNTS.hr, password: DEMO_PASSWORD, hint: 'Employees, payroll, attendance' },
+  { label: 'Employee', icon: 'pi pi-user', email: DEMO_ACCOUNTS.employee, password: DEMO_PASSWORD, hint: 'Own payslips and clock in/out' },
 ]
 
 async function signIn(withEmail = email.value, withPassword = password.value) {
@@ -62,7 +62,7 @@ async function signIn(withEmail = email.value, withPassword = password.value) {
 
         <div class="demo-grid">
           <button v-for="a in demoAccounts" :key="a.label" type="button" class="demo-account" :disabled="loading"
-            @click="signIn(a.email, DEMO_PASSWORD)">
+            @click="signIn(a.email, a.password)">
             <i :class="a.icon" />
             <strong>{{ a.label }}</strong>
             <span>{{ a.hint }}</span>
@@ -83,7 +83,9 @@ async function signIn(withEmail = email.value, withPassword = password.value) {
           {{ error }} After 5 failed attempts the account locks for 15 minutes.
         </Message>
         <Button type="submit" label="Sign in" icon="pi pi-sign-in" :loading="loading" fluid />
-        <p class="hint muted">Demo password for every account: <code>{{ DEMO_PASSWORD }}</code></p>
+        <p class="hint muted">
+          Demo passwords: admin <code>{{ DEMO_ADMIN_PASSWORD }}</code>, HR and employee <code>{{ DEMO_PASSWORD }}</code>
+        </p>
       </form>
     </section>
   </div>

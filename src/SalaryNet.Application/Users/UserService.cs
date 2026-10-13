@@ -38,7 +38,8 @@ internal sealed class UserService(
             await EnsureEmployeeCanBeLinkedAsync(employeeId, excludingUserId: null, cancellationToken);
         }
 
-        var user = User.Create(request.Email, passwordHasher.Hash(request.Password), request.Role, request.EmployeeId, clock);
+        var user = User.Create(
+            request.Email, passwordHasher.Hash(request.Password), request.Role, request.EmployeeId, clock, request.DisplayName);
         users.Add(user);
         await unitOfWork.SaveChangesAsync(cancellationToken);
 

@@ -6,6 +6,8 @@ public sealed class DemoDataOptions
 
     public bool Enabled { get; init; }
 
-    /// <summary>Shared password for the demo accounts. Demo data is fictional and never used in production.</summary>
+    /// <summary>Password for the HR and employee demo accounts. Demo data is fictional and never used in production.</summary>
     public string Password { get; init; } = "Demo123!";
+
+    public string AdminPassword { get; init; } = "Admin1234";
 }

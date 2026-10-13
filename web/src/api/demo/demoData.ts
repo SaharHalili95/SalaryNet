@@ -12,7 +12,7 @@ export interface DemoPayroll {
 }
 export interface DemoAttendance { id: string; employeeId: string; checkIn: string; checkOut: string | null; totalHours: number }
 export interface DemoUser {
-  id: string; email: string; role: UserRole; employeeId: string | null; password: string
+  id: string; email: string; displayName: string | null; role: UserRole; employeeId: string | null; password: string
   isActive: boolean; failedLoginCount: number; lockoutEndsAt: string | null; createdAt: string
 }
 
@@ -25,6 +25,7 @@ export interface DemoDatabase {
 }
 
 export const DEMO_PASSWORD = 'Demo123!'
+export const DEMO_ADMIN_PASSWORD = 'Admin1234'
 export const MAX_FAILED_LOGINS = 5
 export const LOCKOUT_MINUTES = 15
 export const DEMO_ACCOUNTS = {
@@ -66,14 +67,27 @@ export const newId = () => {
 
 const roundToHundreds = (n: number) => Math.round(n / 100) * 100
 
+const addMonths = (year: number, month0: number, delta: number) => new Date(Date.UTC(year, month0 + delta, 1))
+
+/**
+ * Mirrors DemoDataSeeder.cs: hires spread over five years, recent joiners and two leavers,
+ * an annual raise three months ago and a quarter-end bonus round, with payslips issued on the 1st.
+ */
 export function createDemoDatabase(now: Date = new Date()): DemoDatabase {
   const random = mulberry32(2026)
-  const createdAt = now.toISOString()
+  const y = now.getUTCFullYear()
+  const m = now.getUTCMonth()
+  const monthKey = (d: Date) => d.getUTCFullYear() * 12 + d.getUTCMonth()
+  const currentKey = y * 12 + m
+  const founded = addMonths(y, m, -72).toISOString()
   const db: DemoDatabase = { departments: [], employees: [], payroll: [], attendance: [], users: [] }
 
-  db.departments = departmentSpecs.map(([name, description]) => ({ id: newId(), name, description, createdAt }))
+  db.departments = departmentSpecs.map(([name, description]) => ({ id: newId(), name, description, createdAt: founded }))
 
   const count = Math.floor((firstNames.length * 4) / 3)
+  const recentHires = 5
+  const history: { hiredKey: number; leftKey: number | null }[] = []
+
   for (let i = 0; i < count; i++) {
     const spec = departmentSpecs[i % departmentSpecs.length]!
     const first = firstNames[i % firstNames.length]!
@@ -84,6 +98,13 @@ export function createDemoDatabase(now: Date = new Date()): DemoDatabase {
     if (i === 0) type = 'FullTime'
     if (type === 'PartTime') salary = roundToHundreds(salary * 0.6)
 
+    const isRecentHire = i >= count - 2 - recentHires && i < count - 2
+    const isLeaver = i >= count - 2
+    const monthsAgo = i === 0 ? 36 : isRecentHire ? Math.floor(random() * 6) : 7 + Math.floor(random() * 53)
+    const hired = addMonths(y, m, -monthsAgo)
+    hired.setUTCDate(1 + Math.floor(random() * 27))
+    hired.setUTCHours(9)
+
     db.employees.push({
       id: newId(),
       firstName: first,
@@ -92,29 +113,38 @@ export function createDemoDatabase(now: Date = new Date()): DemoDatabase {
       departmentId: db.departments[i % db.departments.length]!.id,
       baseSalary: salary,
       employmentType: type,
-      isActive: i < count - 2,
-      createdAt,
+      isActive: !isLeaver,
+      createdAt: hired.toISOString(),
     })
+    history.push({ hiredKey: monthKey(hired), leftKey: isLeaver ? currentKey - 2 : null })
   }
 
-  const active = db.employees.filter((e) => e.isActive)
-  for (let offset = 6; offset >= 1; offset--) {
-    const period = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth() - offset, 1))
-    for (const employee of active) {
-      const bonus = Math.floor(random() * 6) === 0 ? (5 + Math.floor(random() * 26)) * 100 : 0
-      const breakdown = calculatePayroll(employee.employmentType, employee.baseSalary, bonus)
+  const raiseKey = currentKey - 3
+  db.employees.forEach((employee, index) => {
+    const { hiredKey, leftKey } = history[index]!
+    const beforeRaise = roundToHundreds(employee.baseSalary / 1.04)
+    for (let offset = 6; offset >= 1; offset--) {
+      const period = addMonths(y, m, -offset)
+      const key = monthKey(period)
+      if (key < hiredKey || (leftKey !== null && key > leftKey)) continue
+      const salary = key < raiseKey && hiredKey < raiseKey ? beforeRaise : employee.baseSalary
+      const quarterEnd = (period.getUTCMonth() + 1) % 3 === 0
+      const r = Math.floor(random() * 10)
+      const bonus = quarterEnd && r < 4 ? (15 + Math.floor(random() * 46)) * 100 : r === 0 ? (5 + Math.floor(random() * 11)) * 100 : 0
+      const issued = addMonths(y, m, -offset + 1)
+      issued.setUTCHours(8)
       db.payroll.push({
         id: newId(), employeeId: employee.id, year: period.getUTCFullYear(), month: period.getUTCMonth() + 1,
-        bonus, ...breakdown, generatedAt: createdAt,
+        bonus, ...calculatePayroll(employee.employmentType, salary, bonus), generatedAt: issued.toISOString(),
       })
     }
-  }
+  })
 
-  const today = Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate())
-  for (const employee of active.filter((e) => e.employmentType !== 'Contractor')) {
+  const today = Date.UTC(y, m, now.getUTCDate())
+  for (const employee of db.employees.filter((e) => e.isActive && e.employmentType !== 'Contractor')) {
     for (let day = 14; day >= 1; day--) {
       const date = new Date(today - day * 86_400_000)
-      if (date.getUTCDay() === 5 || date.getUTCDay() === 6) continue
+      if (date.getUTCDay() === 5 || date.getUTCDay() === 6 || date < new Date(employee.createdAt.slice(0, 10))) continue
       const checkIn = new Date(date.getTime() + (5 * 60 + Math.floor(random() * 120)) * 60_000)
       const minutes = employee.employmentType === 'PartTime' ? 240 + Math.floor(random() * 90) : 480 + Math.floor(random() * 120)
       db.attendance.push({
@@ -125,13 +155,13 @@ export function createDemoDatabase(now: Date = new Date()): DemoDatabase {
     }
   }
 
-  const account = (email: string, role: UserRole, employeeId: string | null): DemoUser => ({
-    id: newId(), email, role, employeeId, password: DEMO_PASSWORD, isActive: true, failedLoginCount: 0, lockoutEndsAt: null, createdAt,
+  const account = (email: string, password: string, role: UserRole, employeeId: string | null, displayName: string | null): DemoUser => ({
+    id: newId(), email, displayName, role, employeeId, password, isActive: true, failedLoginCount: 0, lockoutEndsAt: null, createdAt: founded,
   })
   db.users = [
-    account(DEMO_ACCOUNTS.admin, 'Admin', null),
-    account(DEMO_ACCOUNTS.hr, 'HR', null),
-    account(DEMO_ACCOUNTS.employee, 'Employee', db.employees[0]!.id),
+    account(DEMO_ACCOUNTS.admin, DEMO_ADMIN_PASSWORD, 'Admin', null, 'Eyal Shamir'),
+    account(DEMO_ACCOUNTS.hr, DEMO_PASSWORD, 'HR', null, 'Michal Barak'),
+    account(DEMO_ACCOUNTS.employee, DEMO_PASSWORD, 'Employee', db.employees[0]!.id, null),
   ]
 
   return db

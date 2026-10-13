@@ -9,14 +9,16 @@ public sealed class User : Entity
 {
     public const int EmailMaxLength = 256;
     public const int PasswordHashMaxLength = 512;
+    public const int DisplayNameMaxLength = 100;
     public const int MaxFailedLogins = 5;
 
     public static readonly TimeSpan LockoutDuration = TimeSpan.FromMinutes(15);
 
-    private User(Guid id, string email, string passwordHash, UserRole role, Guid? employeeId, DateTime createdAt)
+    private User(Guid id, string email, string passwordHash, UserRole role, Guid? employeeId, string? displayName, DateTime createdAt)
         : base(id)
     {
         Email = email;
+        DisplayName = displayName;
         PasswordHash = passwordHash;
         Role = role;
         EmployeeId = employeeId;
@@ -36,6 +38,9 @@ public sealed class User : Entity
 
     public UserRole Role { get; private set; }
 
+    /// <summary>Name shown for staff accounts; employee accounts use the linked employee's name instead.</summary>
+    public string? DisplayName { get; private set; }
+
     public Guid? EmployeeId { get; private set; }
 
     /// <summary>Inactive accounts cannot sign in. Deactivation keeps the account for audit history.</summary>
@@ -48,7 +53,13 @@ public sealed class User : Entity
 
     public DateTime CreatedAt { get; private init; }
 
-    public static User Create(string email, string passwordHash, UserRole role, Guid? employeeId, TimeProvider clock)
+    public static User Create(
+        string email,
+        string passwordHash,
+        UserRole role,
+        Guid? employeeId,
+        TimeProvider clock,
+        string? displayName = null)
     {
         ArgumentNullException.ThrowIfNull(clock);
         ValidateRoleLink(role, employeeId);
@@ -59,6 +70,7 @@ public sealed class User : Entity
             Guard.RequiredText(passwordHash, nameof(PasswordHash), PasswordHashMaxLength),
             role,
             employeeId,
+            NormalizeDisplayName(displayName),
             clock.GetUtcNow().UtcDateTime);
     }
 
@@ -128,6 +140,12 @@ public sealed class User : Entity
         }
 
         IsActive = true;
+    }
+
+    private static string? NormalizeDisplayName(string? displayName)
+    {
+        var name = Guard.OptionalText(displayName, nameof(DisplayName), DisplayNameMaxLength);
+        return name.Length == 0 ? null : name;
     }
 
     private void ClearLockout()

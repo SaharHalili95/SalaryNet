@@ -44,6 +44,7 @@ internal sealed class UserRepository(SalaryNetDbContext db) : IUserRepository
             var term = query.Search.Trim();
             items = items.Where(i =>
                 i.User.Email.Contains(term)
+                || (i.User.DisplayName != null && i.User.DisplayName.Contains(term))
                 || (i.Employee != null && (i.Employee.FirstName + " " + i.Employee.LastName).Contains(term)));
         }
 

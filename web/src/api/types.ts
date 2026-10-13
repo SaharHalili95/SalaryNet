@@ -153,6 +153,7 @@ export interface DashboardSummary {
 export interface UserAccount {
   id: string
   email: string
+  displayName: string | null
   role: UserRole
   employeeId: string | null
   employeeName: string | null
@@ -174,4 +175,5 @@ export interface CreateUserRequest {
   password: string
   role: UserRole
   employeeId: string | null
+  displayName: string | null
 }

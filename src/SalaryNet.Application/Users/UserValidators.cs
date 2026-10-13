@@ -16,6 +16,9 @@ public sealed class CreateUserRequestValidator : AbstractValidator<CreateUserReq
             .WithMessage("Choose the employee this account belongs to.");
         RuleFor(r => r.EmployeeId).Null().When(r => r.Role != UserRole.Employee)
             .WithMessage("Only employee accounts can be linked to an employee.");
+        RuleFor(r => r.DisplayName).NotEmpty().When(r => r.Role != UserRole.Employee)
+            .WithMessage("Enter the name of the person who uses this account.");
+        RuleFor(r => r.DisplayName).MaximumLength(User.DisplayNameMaxLength);
     }
 }
 

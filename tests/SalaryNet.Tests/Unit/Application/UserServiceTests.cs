@@ -65,7 +65,7 @@ public class UserServiceTests
         User? added = null;
         _users.Setup(u => u.Add(It.IsAny<User>())).Callback<User>(u => added = Store(u));
 
-        var result = await CreateSut().CreateAsync(new CreateUserRequest("new@salarynet.test", "Passw0rd!", UserRole.HR, null), CancellationToken.None);
+        var result = await CreateSut().CreateAsync(new CreateUserRequest("new@salarynet.test", "Passw0rd!", UserRole.HR, null, "New Person"), CancellationToken.None);
 
         added!.PasswordHash.Should().Be("hash:Passw0rd!");
         result.Email.Should().Be("new@salarynet.test");

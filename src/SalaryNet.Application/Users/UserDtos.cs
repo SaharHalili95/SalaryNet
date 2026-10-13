@@ -6,6 +6,7 @@ namespace SalaryNet.Application.Users;
 public sealed record UserAccountDto(
     Guid Id,
     string Email,
+    string? DisplayName,
     UserRole Role,
     Guid? EmployeeId,
     string? EmployeeName,
@@ -24,6 +25,7 @@ public sealed record UserAccountDto(
         return new UserAccountDto(
             user.Id,
             user.Email,
+            user.DisplayName,
             user.Role,
             user.EmployeeId,
             item.EmployeeName,
@@ -35,7 +37,7 @@ public sealed record UserAccountDto(
     }
 }
 
-public sealed record CreateUserRequest(string Email, string Password, UserRole Role, Guid? EmployeeId);
+public sealed record CreateUserRequest(string Email, string Password, UserRole Role, Guid? EmployeeId, string? DisplayName = null);
 
 public sealed record ChangeRoleRequest(UserRole Role, Guid? EmployeeId);
 

@@ -13,6 +13,7 @@ namespace SalaryNet.Tests.Integration.Infrastructure;
 public abstract class IntegrationTestBase(SqlServerContainerFixture sql) : IAsyncLifetime
 {
     protected const string DemoPassword = "Demo123!";
+    protected const string AdminPassword = "Admin1234";
 
     protected static readonly JsonSerializerOptions Json = new(JsonSerializerDefaults.Web)
     {
@@ -34,7 +35,7 @@ public abstract class IntegrationTestBase(SqlServerContainerFixture sql) : IAsyn
 
     public async Task DisposeAsync() => await _factory.DisposeAsync();
 
-    protected Task<HttpClient> AsAdminAsync() => LoginAsync(DemoDataSeeder.AdminEmail);
+    protected Task<HttpClient> AsAdminAsync() => LoginAsync(DemoDataSeeder.AdminEmail, AdminPassword);
 
     protected Task<HttpClient> AsHrAsync() => LoginAsync(DemoDataSeeder.HrEmail);
 

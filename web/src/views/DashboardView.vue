@@ -60,7 +60,8 @@ const trendChart = computed(() => (t: ChartTokens): ChartConfiguration<'line'> =
       },
       scales: {
         x: { ...axisDefaults(t), grid: { display: false } },
-        y: { ...axisDefaults(t), beginAtZero: true, ticks: { ...axisDefaults(t).ticks, callback: (v) => formatMoneyCompact(Number(v)) } },
+        // Totals move by a few percent month to month; a zero baseline would flatten that into straight lines.
+        y: { ...axisDefaults(t), grace: '10%', ticks: { ...axisDefaults(t).ticks, callback: (v) => formatMoneyCompact(Number(v)) } },
       },
     },
   }
@@ -178,7 +179,10 @@ const typeTotal = computed(() => summary.value?.employmentTypes.reduce((s, t) =>
 </template>
 
 <style scoped>
-.tiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1rem; margin-bottom: 1rem; }
+/* Fixed 4 / 2 / 1 columns so a lone tile never wraps onto its own row. */
+.tiles { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 1rem; margin-bottom: 1rem; }
+@media (max-width: 1100px) { .tiles { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 560px) { .tiles { grid-template-columns: 1fr; } }
 .grid { display: grid; grid-template-columns: 2fr 1fr; gap: 1rem; }
 .full { grid-column: 1 / -1; }
 .panel-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem; }

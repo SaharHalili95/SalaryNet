@@ -78,7 +78,7 @@ internal sealed class AuthService(
 
     private async Task<UserDto> ToDtoAsync(User user, CancellationToken cancellationToken)
     {
-        var displayName = user.Email;
+        var displayName = user.DisplayName ?? user.Email;
         if (user.EmployeeId is { } employeeId
             && await employees.GetByIdAsync(employeeId, cancellationToken) is { } employee)
         {

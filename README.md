@@ -165,7 +165,7 @@ cd web && npm run dev:demo
 
 | Role | Email | Password |
 | --- | --- | --- |
-| Admin | `admin@salarynet.demo` | `Demo123!` |
+| Admin | `admin@salarynet.demo` | `Admin1234` |
 | HR | `hr@salarynet.demo` | `Demo123!` |
 | Employee | `noa.cohen@salarynet.demo` | `Demo123!` |
 

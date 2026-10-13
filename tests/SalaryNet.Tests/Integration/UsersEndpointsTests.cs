@@ -40,7 +40,7 @@ public class UsersEndpointsTests(SqlServerContainerFixture sql) : IntegrationTes
     {
         var admin = await AsAdminAsync();
 
-        var response = await admin.PostAsJsonAsync("/api/users", new CreateUserRequest("auditor@salarynet.demo", StrongPassword, UserRole.HR, null), Json);
+        var response = await admin.PostAsJsonAsync("/api/users", new CreateUserRequest("auditor@salarynet.demo", StrongPassword, UserRole.HR, null, "Ruth Auditor"), Json);
         var login = await Anonymous.PostAsJsonAsync("/api/auth/login", new LoginRequest("auditor@salarynet.demo", StrongPassword));
 
         response.StatusCode.Should().Be(HttpStatusCode.Created);
@@ -52,10 +52,31 @@ public class UsersEndpointsTests(SqlServerContainerFixture sql) : IntegrationTes
     {
         var admin = await AsAdminAsync();
 
-        var response = await admin.PostAsJsonAsync("/api/users", new CreateUserRequest("weak@salarynet.demo", "password", UserRole.HR, null), Json);
+        var response = await admin.PostAsJsonAsync("/api/users", new CreateUserRequest("weak@salarynet.demo", "password", UserRole.HR, null, "Weak Password"), Json);
 
         response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
         (await ReadAsync<ProblemDetailsResponse>(response)).Errors.Should().ContainKey("Password");
+    }
+
+    [Fact]
+    public async Task Create_StaffAccountWithoutName_Returns400()
+    {
+        var admin = await AsAdminAsync();
+
+        var response = await admin.PostAsJsonAsync("/api/users", new CreateUserRequest("nameless@salarynet.demo", StrongPassword, UserRole.HR, null), Json);
+
+        response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
+        (await ReadAsync<ProblemDetailsResponse>(response)).Errors.Should().ContainKey("DisplayName");
+    }
+
+    [Fact]
+    public async Task Me_ForStaffAccount_ReturnsDisplayName()
+    {
+        var admin = await AsAdminAsync();
+
+        var me = await admin.GetFromJsonAsync<UserDto>("/api/auth/me", Json);
+
+        me!.DisplayName.Should().Be("Eyal Shamir");
     }
 
     [Fact]
@@ -168,7 +189,7 @@ public class UsersEndpointsTests(SqlServerContainerFixture sql) : IntegrationTes
 
     private static async Task<UserAccountDto> CreateHrUserAsync(HttpClient admin, string email)
     {
-        var response = await admin.PostAsJsonAsync("/api/users", new CreateUserRequest(email, StrongPassword, UserRole.HR, null), Json);
+        var response = await admin.PostAsJsonAsync("/api/users", new CreateUserRequest(email, StrongPassword, UserRole.HR, null, "Test Person"), Json);
         response.EnsureSuccessStatusCode();
         return await ReadAsync<UserAccountDto>(response);
     }

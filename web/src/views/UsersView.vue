@@ -94,10 +94,10 @@ async function run(action: () => Promise<UserAccount>, message: string) {
 const createOpen = ref(false)
 const creating = ref(false)
 const createErrors = ref<Record<string, string>>({})
-const createForm = reactive({ email: '', password: '', role: 'HR' as UserRole, employeeId: null as string | null })
+const createForm = reactive({ email: '', displayName: '', password: '', role: 'HR' as UserRole, employeeId: null as string | null })
 
 async function openCreate() {
-  Object.assign(createForm, { email: '', password: '', role: 'HR', employeeId: null })
+  Object.assign(createForm, { email: '', displayName: '', password: '', role: 'HR', employeeId: null })
   createErrors.value = {}
   createOpen.value = true
   await ensureEmployees()
@@ -110,6 +110,7 @@ async function create() {
     const u = await api().users.create({
       ...createForm,
       employeeId: createForm.role === 'Employee' ? createForm.employeeId : null,
+      displayName: createForm.role === 'Employee' ? null : createForm.displayName,
     })
     toast.add({ severity: 'success', summary: 'Account created', detail: u.email, life: 3000 })
     createOpen.value = false
@@ -225,7 +226,7 @@ onMounted(load)
           <template #body="{ data }">
             <div class="name">
               <strong>{{ data.email }} <span v-if="isSelf(data)" class="muted">(you)</span></strong>
-              <span class="muted">{{ data.employeeName ?? 'Staff account' }}</span>
+              <span class="muted">{{ data.employeeName ?? data.displayName ?? 'Staff account' }}</span>
             </div>
           </template>
         </Column>
@@ -270,6 +271,11 @@ onMounted(load)
         <div class="field full">
           <label for="user-role">Role</label>
           <Select input-id="user-role" v-model="createForm.role" :options="roles" option-label="label" option-value="value" />
+        </div>
+        <div v-if="createForm.role !== 'Employee'" class="field full">
+          <label for="user-name">Full name</label>
+          <InputText id="user-name" v-model="createForm.displayName" :invalid="!!createErrors.displayName" />
+          <small v-if="createErrors.displayName" class="error">{{ createErrors.displayName }}</small>
         </div>
         <div v-if="createForm.role === 'Employee'" class="field full">
           <label for="user-employee">Employee</label>

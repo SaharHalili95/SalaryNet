@@ -1,14 +1,15 @@
 import { beforeEach, describe, expect, it } from 'vitest'
 import { ApiError } from '../../errors'
 import { createDemoApi } from '../demoApi'
-import { DEMO_ACCOUNTS, DEMO_PASSWORD, MAX_FAILED_LOGINS } from '../demoData'
+import { DEMO_ACCOUNTS, DEMO_ADMIN_PASSWORD, DEMO_PASSWORD, MAX_FAILED_LOGINS } from '../demoData'
 
 describe('demo API authorization', () => {
   let token: string | null
   const api = createDemoApi(() => token)
 
   const signIn = async (email: string) => {
-    token = (await api.login(email, DEMO_PASSWORD)).accessToken
+    const password = email === DEMO_ACCOUNTS.admin ? DEMO_ADMIN_PASSWORD : DEMO_PASSWORD
+    token = (await api.login(email, password)).accessToken
   }
 
   beforeEach(() => {
@@ -88,7 +89,7 @@ describe('demo API authorization', () => {
     await signIn(DEMO_ACCOUNTS.admin)
     const me = await api.me()
 
-    await expect(api.users.create({ email: 'weak@salarynet.demo', password: 'password', role: 'HR', employeeId: null }))
+    await expect(api.users.create({ email: 'weak@salarynet.demo', password: 'password', role: 'HR', employeeId: null, displayName: 'Weak' }))
       .rejects.toMatchObject({ status: 400 })
     await expect(api.users.setActive(me.id, false)).rejects.toMatchObject({ status: 422 })
   })
