@@ -110,6 +110,14 @@ watch(flowId, () => {
 })
 onBeforeUnmount(stop)
 
+const dockerRows = [
+  { key: 'live', needs: false },
+  { key: 'local', needs: true },
+  { key: 'integration', needs: true },
+  { key: 'unit', needs: false },
+  { key: 'demo', needs: false },
+]
+
 /* Layer overview: dependencies point inward. */
 // The flex row already mirrors in RTL, so the order stays Browser → API → Application → Domain in both languages.
 const layerChain = [lanes[0]!, lanes[1]!, lanes[2]!, lanes[3]!]
@@ -235,6 +243,37 @@ const layerChain = [lanes[0]!, lanes[1]!, lanes[2]!, lanes[3]!]
       <p v-if="isDemoMode" class="muted demo-note"><Tag severity="info" value="Demo" /> {{ t('architecture.demoNote') }}</p>
     </section>
 
+    <section class="panel hosting">
+      <h2>{{ t('architecture.hostingTitle') }}</h2>
+      <p class="muted">{{ t('architecture.hostingIntro') }}</p>
+      <ol class="hosting-steps">
+        <li v-for="n in 4" :key="n"><span class="badge">{{ n }}</span><span>{{ t(`architecture.hostingStep${n}`) }}</span></li>
+      </ol>
+
+      <h3>{{ t('architecture.hostingDesignTitle') }}</h3>
+      <div class="impls">
+        <div class="impl iface"><code>SalaryNetApi</code></div>
+        <div class="impl-pair">
+          <div class="impl"><code>httpApi.ts</code><span>{{ t('architecture.hostingHttp') }}</span></div>
+          <div class="impl demo"><code>demoApi.ts</code><span>{{ t('architecture.hostingDemo') }}</span></div>
+        </div>
+      </div>
+      <p class="muted">{{ t('architecture.hostingDesignNote') }}</p>
+      <p class="honest"><i class="pi pi-info-circle" /> {{ t('architecture.hostingHonest') }}</p>
+
+      <h3>{{ t('architecture.dockerTitle') }}</h3>
+      <table class="docker">
+        <thead><tr><th>{{ t('architecture.dockerWhat') }}</th><th>{{ t('architecture.dockerNeeds') }}</th></tr></thead>
+        <tbody>
+          <tr v-for="row in dockerRows" :key="row.key">
+            <td>{{ t(`architecture.dockerRows.${row.key}`) }}</td>
+            <td><Tag :severity="row.needs ? 'warn' : 'success'" :value="row.needs ? t('architecture.dockerYes') : t('architecture.dockerNo')" /></td>
+          </tr>
+        </tbody>
+      </table>
+      <p class="muted">{{ t('architecture.dockerNote') }}</p>
+    </section>
+
     <section class="panel catalog">
       <h2>{{ t('architecture.catalogTitle') }}</h2>
       <p class="muted">{{ t('architecture.catalogIntro') }}</p>
@@ -323,6 +362,21 @@ const layerChain = [lanes[0]!, lanes[1]!, lanes[2]!, lanes[3]!]
 .detail dt, .card dt { font-weight: 600; color: var(--app-text-muted); }
 .detail dd, .card dd { margin: 0; }
 .path { font-size: 0.75rem; word-break: break-all; }
+.hosting { margin-top: 1rem; }
+.hosting > p { margin: 0 0 0.75rem; line-height: 1.6; }
+.hosting h3 { margin: 1.25rem 0 0.5rem; font-size: 0.95rem; }
+.hosting-steps { list-style: none; margin: 0; padding: 0; display: grid; gap: 0.5rem; }
+.hosting-steps li { display: flex; gap: 0.75rem; align-items: flex-start; line-height: 1.55; }
+.impls { display: flex; flex-direction: column; align-items: center; gap: 0.5rem; margin-bottom: 0.5rem; }
+.impl-pair { display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; width: 100%; }
+.impl { display: flex; flex-direction: column; gap: 0.25rem; padding: 0.625rem 0.75rem; border: 1px solid var(--app-border); border-radius: 8px; background: var(--app-bg); line-height: 1.5; }
+.impl.iface { border-color: var(--chart-series-1); padding: 0.375rem 1rem; }
+.impl.demo { border-style: dashed; }
+.honest { display: flex; gap: 0.5rem; align-items: flex-start; padding: 0.625rem 0.75rem; border-radius: 8px; background: color-mix(in srgb, var(--chart-series-1) 8%, transparent); line-height: 1.6; }
+.docker { width: 100%; border-collapse: collapse; margin-bottom: 0.5rem; }
+.docker th, .docker td { text-align: start; padding: 0.4rem 0.5rem; border-bottom: 1px solid var(--app-border); }
+.docker th { color: var(--app-text-muted); font-weight: 550; font-size: 0.8125rem; }
+@media (max-width: 640px) { .impl-pair { grid-template-columns: 1fr; } }
 .catalog { margin-top: 1rem; }
 .catalog > p { margin: 0 0 0.75rem; }
 .cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 0.75rem; }

@@ -132,6 +132,24 @@ Social security is 3.5% up to 7,500 and 12% from 7,500 up to a 50,000 ceiling. N
 
 Full interactive documentation is available in Swagger at `/swagger`.
 
+## Live demo vs. the full stack
+
+The public site has no server behind it. GitHub Pages only serves static files; the Vue app then runs in the visitor's browser in demo mode.
+
+- The UI talks to one interface, `SalaryNetApi`, with two implementations: `httpApi.ts` calls the real ASP.NET Core API and SQL Server, and `demoApi.ts` runs an in-browser copy of the same rules (roles, lockout, duplicate checks, tax calculation).
+- Each visitor gets a private fictional company in memory, so visitors never affect each other and a reload starts fresh.
+- On the live site the C# code itself does not run. The .NET server is proven by this repository, its test suite, and CI that runs the tests against a real SQL Server on every push. A front-end test pins the demo tax calculation to the C# results.
+
+| What | Needs Docker |
+| --- | --- |
+| Live site, portfolio, LinkedIn, CV | No |
+| Full system on your machine (`localhost:8080`) | Yes |
+| Integration tests (`dotnet test`) | Yes |
+| Unit tests and front-end tests | No |
+| Front end alone in demo mode (`npm run dev:demo`) | No |
+
+Stopping Docker loses nothing: local data lives in a Docker volume and returns on the next `docker compose --profile full up`.
+
 ## Running locally
 
 ### Everything in Docker

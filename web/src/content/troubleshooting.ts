@@ -120,6 +120,18 @@ export const issues: Issue[] = [
     fix: [{ en: 'Move the employees to another department first (edit each employee), then delete.', he: 'להעביר את העובדים למחלקה אחרת קודם (עריכת כל עובד), ואז למחוק.' }],
   },
   {
+    id: 'demo-reset',
+    category: 'development',
+    title: { en: 'My changes disappeared after refreshing the live demo', he: 'השינויים שלי נעלמו אחרי רענון באתר החי' },
+    symptom: { en: 'Employees, payslips or accounts you created are gone after a reload.', he: 'עובדים, תלושים או חשבונות שיצרתם נעלמו אחרי טעינה מחדש.' },
+    cause: { en: 'The public site has no server or database: it runs an in-browser copy of the rules, and each visitor gets a fresh fictional company in memory.', he: 'לאתר הציבורי אין שרת ומסד נתונים: הוא מריץ בדפדפן עותק של הכללים, וכל מבקר מקבל חברה בדויה חדשה בזיכרון.' },
+    fix: [
+      { en: 'This is by design, so visitors can never affect each other.', he: 'זה מכוון, כדי שמבקרים לעולם לא ישפיעו זה על זה.' },
+      { en: 'To keep data, run the full system locally with Docker: docker compose --profile full up', he: 'כדי לשמור נתונים, להריץ את המערכת המלאה מקומית עם Docker: docker compose --profile full up' },
+    ],
+    code: 'web/src/api/demo/demoApi.ts',
+  },
+  {
     id: 'api-down',
     category: 'development',
     title: { en: '"Could not reach the server" when running locally', he: '"אין חיבור לשרת" בהרצה מקומית' },
