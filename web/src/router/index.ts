@@ -28,9 +28,10 @@ const routes: RouteRecordRaw[] = [
           const auth = useAuthStore()
           // Resolve the landing page only after sign-in; otherwise staff would be sent to the employee page.
           if (!auth.isAuthenticated) return { name: 'login' }
-          return auth.isStaff ? { name: 'dashboard' } : { name: 'attendance' }
+          return auth.isStaff ? { name: 'dashboard' } : { name: 'me' }
         },
       },
+      { path: 'me', name: 'me', component: () => import('@/views/MyOverviewView.vue'), meta: { roles: ['Employee'], title: 'nav.myOverview' } },
       { path: 'dashboard', name: 'dashboard', component: () => import('@/views/DashboardView.vue'), meta: { roles: staff, title: 'nav.dashboard' } },
       { path: 'employees', name: 'employees', component: () => import('@/views/EmployeesView.vue'), meta: { roles: staff, title: 'nav.employees' } },
       { path: 'departments', name: 'departments', component: () => import('@/views/DepartmentsView.vue'), meta: { roles: staff, title: 'nav.departments' } },

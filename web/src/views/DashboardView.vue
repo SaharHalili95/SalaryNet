@@ -7,8 +7,11 @@ import { useI18n } from 'vue-i18n'
 import { api } from '@/api'
 import type { DashboardSummary } from '@/api/types'
 import ChartCanvas, { type ChartTokens } from '@/components/ChartCanvas.vue'
+import AdminFocusPanel from '@/components/AdminFocusPanel.vue'
+import HrFocusPanel from '@/components/HrFocusPanel.vue'
 import StatTile from '@/components/StatTile.vue'
 import { useLocalizedData } from '@/i18n/useLocalizedData'
+import { useAuthStore } from '@/stores/auth'
 import { formatMoney, formatMoneyCompact, formatMonthShort, formatPeriod } from '@/utils/format'
 import { useApiError } from '@/utils/useApiError'
 
@@ -19,6 +22,7 @@ const handleError = useApiError()
 const { t, locale } = useI18n()
 const rtl = computed(() => locale.value === 'he')
 const { term } = useLocalizedData()
+const auth = useAuthStore()
 
 onMounted(async () => {
   try {
@@ -113,7 +117,7 @@ const typeTotal = computed(() => summary.value?.employmentTypes.reduce((s, t) =>
     <div class="page-header">
       <div>
         <h1>{{ t('dashboard.title') }}</h1>
-        <p>{{ t('dashboard.subtitle') }}</p>
+        <p>{{ auth.isAdmin ? t('dashboard.subtitleAdmin') : t('dashboard.subtitleHr') }}</p>
       </div>
     </div>
 
@@ -122,6 +126,8 @@ const typeTotal = computed(() => summary.value?.employmentTypes.reduce((s, t) =>
     </div>
 
     <template v-else>
+      <AdminFocusPanel v-if="auth.isAdmin" />
+      <HrFocusPanel v-else :active-employees="summary.activeEmployees" />
       <div class="tiles">
         <StatTile icon="pi pi-users" :label="t('dashboard.activeEmployees')" :value="String(summary.activeEmployees)"
           :caption="t('dashboard.totals', { total: summary.totalEmployees, departments: summary.departmentCount })" />

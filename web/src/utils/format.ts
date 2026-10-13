@@ -1,4 +1,4 @@
-import { intlLocale } from '@/i18n'
+import { currentLocale, intlLocale } from '@/i18n'
 
 // Intl formatters are relatively expensive to build, so keep one per locale.
 const cache = new Map<string, Intl.NumberFormat | Intl.DateTimeFormat>()
@@ -33,7 +33,7 @@ export const formatTime = (iso: string) =>
 export const formatHours = (hours: number) => {
   const h = Math.floor(hours)
   const m = Math.round((hours - h) * 60)
-  return `${h}h ${String(m).padStart(2, '0')}m`
+  return currentLocale() === 'he' ? `${h} ש׳ ${String(m).padStart(2, '0')} ד׳` : `${h}h ${String(m).padStart(2, '0')}m`
 }
 
 export const monthOptions = () =>

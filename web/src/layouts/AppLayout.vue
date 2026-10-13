@@ -21,6 +21,7 @@ const mobileOpen = ref(false)
 const passwordOpen = ref(false)
 
 const nav: { to: string; label: string; icon: string; roles?: UserRole[] }[] = [
+  { to: '/me', label: 'nav.myOverview', icon: 'pi pi-home', roles: ['Employee'] },
   { to: '/dashboard', label: 'nav.dashboard', icon: 'pi pi-chart-bar', roles: ['Admin', 'HR'] },
   { to: '/employees', label: 'nav.employees', icon: 'pi pi-users', roles: ['Admin', 'HR'] },
   { to: '/departments', label: 'nav.departments', icon: 'pi pi-sitemap', roles: ['Admin', 'HR'] },
