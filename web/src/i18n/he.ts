@@ -33,6 +33,7 @@ const he: typeof en = {
     myOverview: 'הסקירה שלי',
     architecture: 'איך זה עובד',
     troubleshooting: 'פתרון תקלות',
+    about: 'סיכום הפרויקט',
     signIn: 'כניסה',
     openMenu: 'פתיחת תפריט',
     changePassword: 'החלפת סיסמה',
@@ -316,6 +317,12 @@ const he: typeof en = {
     code: 'קוד',
     demoNote: 'באתר הדמו החי הכללים האלה רצים בתוך הדפדפן, כדי שאפשר יהיה לארח אותו בחינם. בהרצה מקומית הם רצים בשרת ה-‎.NET שמוצג כאן.',
     diagramLabel: 'תרשים של מסלול הבקשה דרך שכבות המערכת',
+  },
+  about: {
+    title: 'סיכום הפרויקט',
+    subtitle: 'מה יש ב-SalaryNet ואיך הוא נבנה, במקום אחד.',
+    liveSite: 'האתר החי',
+    code: 'קוד המקור ב-GitHub',
   },
   troubleshooting: {
     title: 'פתרון תקלות',

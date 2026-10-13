@@ -74,6 +74,7 @@ async function signIn(withEmail = email.value, withPassword = password.value) {
       <div class="guides">
         <RouterLink :to="{ name: 'architecture' }" class="guide-link"><i class="pi pi-share-alt" /> {{ t('nav.architecture') }}</RouterLink>
         <RouterLink :to="{ name: 'troubleshooting' }" class="guide-link"><i class="pi pi-wrench" /> {{ t('nav.troubleshooting') }}</RouterLink>
+        <RouterLink :to="{ name: 'about' }" class="guide-link"><i class="pi pi-book" /> {{ t('nav.about') }}</RouterLink>
       </div>
     </section>
 

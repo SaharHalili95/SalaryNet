@@ -32,6 +32,7 @@ const nav: { to: string; label: string; icon: string; roles?: UserRole[] }[] = [
 const guideNav = [
   { to: '/architecture', label: 'nav.architecture', icon: 'pi pi-share-alt' },
   { to: '/troubleshooting', label: 'nav.troubleshooting', icon: 'pi pi-wrench' },
+  { to: '/about', label: 'nav.about', icon: 'pi pi-book' },
 ]
 
 // Signed-out visitors (e.g. recruiters) can still read the architecture and troubleshooting guides.

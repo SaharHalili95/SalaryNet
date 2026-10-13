@@ -5,6 +5,7 @@ import { flows, nodes } from '../architecture'
 import type { Localized } from '../localized'
 import { componentDetails } from '../components'
 import { glossary } from '../glossary'
+import { summarySections } from '../projectSummary'
 import { issues } from '../troubleshooting'
 import { lanes } from '../architecture'
 
@@ -52,6 +53,15 @@ describe('troubleshooting content', () => {
   it('only cites code paths that exist in the repository', () => {
     for (const issue of issues.filter((i) => i.code)) {
       expect(existsSync(resolve(repoRoot, issue.code!)), issue.code).toBe(true)
+    }
+  })
+})
+
+describe('project summary content', () => {
+  it('is fully written in English and Hebrew', () => {
+    for (const section of summarySections) {
+      expect(bothLanguages(section.title), section.id).toBe(true)
+      expect(section.items.every(bothLanguages), section.id).toBe(true)
     }
   })
 })

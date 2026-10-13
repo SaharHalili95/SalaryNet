@@ -39,6 +39,7 @@ const routes: RouteRecordRaw[] = [
       { path: 'users', name: 'users', component: () => import('@/views/UsersView.vue'), meta: { roles: ['Admin'], title: 'nav.users' } },
       { path: 'architecture', name: 'architecture', component: () => import('@/views/ArchitectureView.vue'), meta: { public: true, title: 'nav.architecture' } },
       { path: 'troubleshooting', name: 'troubleshooting', component: () => import('@/views/TroubleshootingView.vue'), meta: { public: true, title: 'nav.troubleshooting' } },
+      { path: 'about', name: 'about', component: () => import('@/views/AboutView.vue'), meta: { public: true, title: 'nav.about' } },
       { path: 'attendance', name: 'attendance', component: () => import('@/views/AttendanceView.vue'), meta: { title: 'nav.attendance' } },
     ],
   },

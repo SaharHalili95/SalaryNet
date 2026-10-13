@@ -31,6 +31,7 @@ export default {
     myOverview: 'My overview',
     architecture: 'How it works',
     troubleshooting: 'Troubleshooting',
+    about: 'About this project',
     signIn: 'Sign in',
     openMenu: 'Open menu',
     changePassword: 'Change password',
@@ -314,6 +315,12 @@ export default {
     code: 'Code',
     demoNote: 'On the live demo these rules run inside your browser so it can be hosted for free; locally they run on the .NET server shown here.',
     diagramLabel: 'Diagram of the request path through the system layers',
+  },
+  about: {
+    title: 'About this project',
+    subtitle: 'What SalaryNet contains and how it was built, in one place.',
+    liveSite: 'Live site',
+    code: 'Source code on GitHub',
   },
   troubleshooting: {
     title: 'Troubleshooting',
