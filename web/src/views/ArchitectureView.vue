@@ -111,10 +111,8 @@ watch(flowId, () => {
 onBeforeUnmount(stop)
 
 /* Layer overview: dependencies point inward. */
-const layerChain = computed(() => {
-  const items = [lanes[0]!, lanes[1]!, lanes[2]!, lanes[3]!]
-  return rtl.value ? [...items].reverse() : items
-})
+// The flex row already mirrors in RTL, so the order stays Browser → API → Application → Domain in both languages.
+const layerChain = [lanes[0]!, lanes[1]!, lanes[2]!, lanes[3]!]
 </script>
 
 <template>
