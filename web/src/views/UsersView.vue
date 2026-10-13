@@ -14,6 +14,7 @@ import { useConfirm } from 'primevue/useconfirm'
 import { useToast } from 'primevue/usetoast'
 import type { MenuItem } from 'primevue/menuitem'
 import { computed, onMounted, reactive, ref, watch } from 'vue'
+import { useI18n } from 'vue-i18n'
 import { api } from '@/api'
 import type { Employee, PagedResult, UserAccount, UserQuery, UserRole } from '@/api/types'
 import { useAuthStore } from '@/stores/auth'
@@ -24,13 +25,10 @@ const auth = useAuthStore()
 const handleError = useApiError()
 const confirm = useConfirm()
 const toast = useToast()
+const { t } = useI18n()
 
-const roles: { label: string; value: UserRole }[] = [
-  { label: 'Admin', value: 'Admin' },
-  { label: 'HR', value: 'HR' },
-  { label: 'Employee', value: 'Employee' },
-]
-const statusOptions = [{ label: 'Active', value: true }, { label: 'Inactive', value: false }]
+const roles = computed(() => (['Admin', 'HR', 'Employee'] as UserRole[]).map((value) => ({ value, label: t(`roles.${value}`) })))
+const statusOptions = computed(() => [{ label: t('common.active'), value: true }, { label: t('common.inactive'), value: false }])
 
 const result = ref<PagedResult<UserAccount>>({ items: [], page: 1, pageSize: 10, totalCount: 0, totalPages: 0 })
 const loading = ref(false)
@@ -73,9 +71,9 @@ async function ensureEmployees() {
 }
 
 function statusOf(u: UserAccount): { label: string; severity: 'success' | 'warn' | 'secondary' } {
-  if (!u.isActive) return { label: 'Inactive', severity: 'secondary' }
-  if (u.isLockedOut) return { label: 'Locked', severity: 'warn' }
-  return { label: 'Active', severity: 'success' }
+  if (!u.isActive) return { label: t('common.inactive'), severity: 'secondary' }
+  if (u.isLockedOut) return { label: t('users.locked'), severity: 'warn' }
+  return { label: t('common.active'), severity: 'success' }
 }
 
 const isSelf = (u: UserAccount) => u.id === auth.user?.id
@@ -112,7 +110,7 @@ async function create() {
       employeeId: createForm.role === 'Employee' ? createForm.employeeId : null,
       displayName: createForm.role === 'Employee' ? null : createForm.displayName,
     })
-    toast.add({ severity: 'success', summary: 'Account created', detail: u.email, life: 3000 })
+    toast.add({ severity: 'success', summary: t('users.createdToast'), detail: u.email, life: 3000 })
     createOpen.value = false
     load()
   } catch (e) {
@@ -138,7 +136,7 @@ async function saveRole() {
   const target = roleTarget.value!
   await run(
     () => api().users.changeRole(target.id, roleForm.role, roleForm.role === 'Employee' ? roleForm.employeeId : null),
-    'Role updated',
+    t('users.roleUpdated'),
   )
   roleOpen.value = false
 }
@@ -160,7 +158,7 @@ async function saveReset() {
   resetErrors.value = {}
   try {
     await api().users.resetPassword(resetTarget.value!.id, resetPassword.value)
-    toast.add({ severity: 'success', summary: 'Password reset', detail: 'Share the new password with the user securely.', life: 4000 })
+    toast.add({ severity: 'success', summary: t('users.resetDone'), detail: t('users.resetDetail'), life: 4000 })
     resetOpen.value = false
     load()
   } catch (e) {
@@ -174,24 +172,24 @@ const menuItems = ref<MenuItem[]>([])
 
 function openMenu(event: Event, u: UserAccount) {
   menuItems.value = [
-    ...(u.isLockedOut ? [{ label: 'Unlock account', icon: 'pi pi-lock-open', command: () => run(() => api().users.unlock(u.id), 'Account unlocked') }] : []),
-    { label: 'Change role', icon: 'pi pi-id-card', disabled: isSelf(u), command: () => openRole(u) },
-    { label: 'Reset password', icon: 'pi pi-key', command: () => openReset(u) },
+    ...(u.isLockedOut ? [{ label: t('users.unlock'), icon: 'pi pi-lock-open', command: () => run(() => api().users.unlock(u.id), t('users.unlocked')) }] : []),
+    { label: t('users.changeRole'), icon: 'pi pi-id-card', disabled: isSelf(u), command: () => openRole(u) },
+    { label: t('users.resetPassword'), icon: 'pi pi-key', command: () => openReset(u) },
     u.isActive
-      ? { label: 'Deactivate', icon: 'pi pi-ban', disabled: isSelf(u), command: () => confirmDeactivate(u) }
-      : { label: 'Reactivate', icon: 'pi pi-check-circle', command: () => run(() => api().users.setActive(u.id, true), 'Account reactivated') },
+      ? { label: t('users.deactivate'), icon: 'pi pi-ban', disabled: isSelf(u), command: () => confirmDeactivate(u) }
+      : { label: t('users.reactivate'), icon: 'pi pi-check-circle', command: () => run(() => api().users.setActive(u.id, true), t('users.reactivated')) },
   ]
   menu.value?.toggle(event)
 }
 
 function confirmDeactivate(u: UserAccount) {
   confirm.require({
-    header: 'Deactivate account',
-    message: `Deactivate ${u.email}? They will no longer be able to sign in.`,
+    header: t('users.deactivateHeader'),
+    message: t('users.deactivateMessage', { email: u.email }),
     icon: 'pi pi-exclamation-triangle',
-    acceptProps: { label: 'Deactivate', severity: 'danger' },
-    rejectProps: { label: 'Cancel', text: true },
-    accept: () => run(() => api().users.setActive(u.id, false), 'Account deactivated'),
+    acceptProps: { label: t('users.deactivate'), severity: 'danger' },
+    rejectProps: { label: t('common.cancel'), text: true },
+    accept: () => run(() => api().users.setActive(u.id, false), t('users.deactivated')),
   })
 }
 
@@ -202,126 +200,126 @@ onMounted(load)
   <div>
     <div class="page-header">
       <div>
-        <h1>Users</h1>
-        <p>Sign-in accounts and roles. After 5 failed sign-ins an account locks for 15 minutes; unlock it here.</p>
+        <h1>{{ t('users.title') }}</h1>
+        <p>{{ t('users.subtitle') }}</p>
       </div>
-      <Button label="New account" icon="pi pi-user-plus" @click="openCreate" />
+      <Button :label="t('users.new')" icon="pi pi-user-plus" @click="openCreate" />
     </div>
 
     <section class="panel">
       <div class="toolbar">
         <IconField>
           <InputIcon class="pi pi-search" />
-          <InputText v-model="query.search" placeholder="Search email or name" aria-label="Search users" />
+          <InputText v-model="query.search" :placeholder="t('users.search')" :aria-label="t('users.search')" />
         </IconField>
-        <Select v-model="query.role" :options="roles" option-label="label" option-value="value" placeholder="All roles" show-clear aria-label="Role" />
-        <Select v-model="query.isActive" :options="statusOptions" option-label="label" option-value="value" placeholder="Any status" show-clear aria-label="Status" />
+        <Select v-model="query.role" :options="roles" option-label="label" option-value="value" :placeholder="t('users.allRoles')" show-clear :aria-label="t('users.role')" />
+        <Select v-model="query.isActive" :options="statusOptions" option-label="label" option-value="value" :placeholder="t('common.anyStatus')" show-clear :aria-label="t('common.status')" />
       </div>
 
       <DataTable :value="result.items" lazy paginator :rows="query.pageSize" :total-records="result.totalCount"
         :first="((query.page ?? 1) - 1) * (query.pageSize ?? 10)" :rows-per-page-options="[10, 20, 50]" :loading="loading"
         data-key="id" striped-rows scrollable @page="onPage">
-        <template #empty><div class="muted">No accounts match these filters.</div></template>
-        <Column header="Account">
+        <template #empty><div class="muted">{{ t('users.empty') }}</div></template>
+        <Column :header="t('users.account')">
           <template #body="{ data }">
             <div class="name">
-              <strong>{{ data.email }} <span v-if="isSelf(data)" class="muted">(you)</span></strong>
-              <span class="muted">{{ data.employeeName ?? data.displayName ?? 'Staff account' }}</span>
+              <strong>{{ data.email }} <span v-if="isSelf(data)" class="muted">{{ t('users.you') }}</span></strong>
+              <span class="muted">{{ data.employeeName ?? data.displayName ?? t('users.staffAccount') }}</span>
             </div>
           </template>
         </Column>
-        <Column header="Role">
-          <template #body="{ data }">{{ data.role }}</template>
+        <Column :header="t('users.role')">
+          <template #body="{ data }">{{ t(`roles.${data.role}`) }}</template>
         </Column>
-        <Column header="Status">
+        <Column :header="t('common.status')">
           <template #body="{ data }">
             <div class="status">
               <Tag :value="statusOf(data).label" :severity="statusOf(data).severity" />
-              <small v-if="data.isLockedOut && data.lockoutEndsAt" class="muted">until {{ formatTime(data.lockoutEndsAt) }}</small>
-              <small v-else-if="data.isActive && data.failedLoginCount > 0" class="muted">{{ data.failedLoginCount }} failed attempt(s)</small>
+              <small v-if="data.isLockedOut && data.lockoutEndsAt" class="muted">{{ t('users.until', { time: formatTime(data.lockoutEndsAt) }) }}</small>
+              <small v-else-if="data.isActive && data.failedLoginCount > 0" class="muted">{{ t('users.failedAttempts', { count: data.failedLoginCount }) }}</small>
             </div>
           </template>
         </Column>
-        <Column header="Created">
+        <Column :header="t('users.created')">
           <template #body="{ data }">{{ formatDate(data.createdAt) }}</template>
         </Column>
         <Column header="" :style="{ width: '4rem' }">
           <template #body="{ data }">
-            <Button icon="pi pi-ellipsis-v" text rounded aria-label="Account actions" aria-haspopup="true" @click="openMenu($event, data)" />
+            <Button icon="pi pi-ellipsis-v" text rounded :aria-label="t('users.actions')" aria-haspopup="true" @click="openMenu($event, data)" />
           </template>
         </Column>
       </DataTable>
       <Menu ref="menu" :model="menuItems" popup />
     </section>
 
-    <Dialog v-model:visible="createOpen" modal header="New account" :style="{ width: '30rem' }" :breakpoints="{ '640px': '95vw' }">
+    <Dialog v-model:visible="createOpen" modal :header="t('users.new')" :style="{ width: '30rem' }" :breakpoints="{ '640px': '95vw' }">
       <form id="create-user-form" class="form-grid" @submit.prevent="create">
         <div class="field full">
-          <label for="user-email">Email</label>
+          <label for="user-email">{{ t('common.email') }}</label>
           <InputText id="user-email" v-model="createForm.email" type="email" :invalid="!!createErrors.email" />
           <small v-if="createErrors.email" class="error">{{ createErrors.email }}</small>
         </div>
         <div class="field full">
-          <label for="user-password">Initial password</label>
+          <label for="user-password">{{ t('users.initialPassword') }}</label>
           <Password v-model="createForm.password" input-id="user-password" :feedback="false" toggle-mask
             autocomplete="new-password" :invalid="!!createErrors.password" fluid />
           <small v-if="createErrors.password" class="error">{{ createErrors.password }}</small>
-          <small v-else class="muted">At least 8 characters, with an uppercase letter, a lowercase letter and a digit.</small>
+          <small v-else class="muted">{{ t('common.passwordPolicy') }}</small>
         </div>
         <div class="field full">
-          <label for="user-role">Role</label>
+          <label for="user-role">{{ t('users.role') }}</label>
           <Select input-id="user-role" v-model="createForm.role" :options="roles" option-label="label" option-value="value" />
         </div>
         <div v-if="createForm.role !== 'Employee'" class="field full">
-          <label for="user-name">Full name</label>
+          <label for="user-name">{{ t('users.fullName') }}</label>
           <InputText id="user-name" v-model="createForm.displayName" :invalid="!!createErrors.displayName" />
           <small v-if="createErrors.displayName" class="error">{{ createErrors.displayName }}</small>
         </div>
         <div v-if="createForm.role === 'Employee'" class="field full">
-          <label for="user-employee">Employee</label>
+          <label for="user-employee">{{ t('common.employee') }}</label>
           <Select input-id="user-employee" v-model="createForm.employeeId" :options="employeeOptions" option-label="label"
-            option-value="id" filter placeholder="Choose an employee" :invalid="!!createErrors.employeeId" />
+            option-value="id" filter :placeholder="t('payroll.chooseEmployee')" :invalid="!!createErrors.employeeId" />
           <small v-if="createErrors.employeeId" class="error">{{ createErrors.employeeId }}</small>
         </div>
       </form>
       <template #footer>
-        <Button label="Cancel" text @click="createOpen = false" />
-        <Button type="submit" form="create-user-form" label="Create account" icon="pi pi-check" :loading="creating" />
+        <Button :label="t('common.cancel')" text @click="createOpen = false" />
+        <Button type="submit" form="create-user-form" :label="t('users.createButton')" icon="pi pi-check" :loading="creating" />
       </template>
     </Dialog>
 
-    <Dialog v-model:visible="roleOpen" modal header="Change role" :style="{ width: '28rem' }" :breakpoints="{ '640px': '95vw' }">
+    <Dialog v-model:visible="roleOpen" modal :header="t('users.changeRole')" :style="{ width: '28rem' }" :breakpoints="{ '640px': '95vw' }">
       <div class="form-grid">
         <p class="full muted intro">{{ roleTarget?.email }}</p>
         <div class="field full">
-          <label for="change-role">Role</label>
+          <label for="change-role">{{ t('users.role') }}</label>
           <Select input-id="change-role" v-model="roleForm.role" :options="roles" option-label="label" option-value="value" />
         </div>
         <div v-if="roleForm.role === 'Employee'" class="field full">
-          <label for="change-employee">Employee</label>
+          <label for="change-employee">{{ t('common.employee') }}</label>
           <Select input-id="change-employee" v-model="roleForm.employeeId" :options="employeeOptions" option-label="label"
-            option-value="id" filter placeholder="Choose an employee" />
+            option-value="id" filter :placeholder="t('payroll.chooseEmployee')" />
         </div>
       </div>
       <template #footer>
-        <Button label="Cancel" text @click="roleOpen = false" />
-        <Button label="Save" icon="pi pi-check" @click="saveRole" />
+        <Button :label="t('common.cancel')" text @click="roleOpen = false" />
+        <Button :label="t('common.save')" icon="pi pi-check" @click="saveRole" />
       </template>
     </Dialog>
 
-    <Dialog v-model:visible="resetOpen" modal header="Reset password" :style="{ width: '28rem' }" :breakpoints="{ '640px': '95vw' }">
+    <Dialog v-model:visible="resetOpen" modal :header="t('users.resetPassword')" :style="{ width: '28rem' }" :breakpoints="{ '640px': '95vw' }">
       <form id="reset-password-form" class="form-grid" @submit.prevent="saveReset">
-        <p class="full muted intro">Sets a new password for {{ resetTarget?.email }} and releases any lockout.</p>
+        <p class="full muted intro">{{ t('users.resetIntro', { email: resetTarget?.email }) }}</p>
         <div class="field full">
-          <label for="reset-password">New password</label>
+          <label for="reset-password">{{ t('users.newPassword') }}</label>
           <Password v-model="resetPassword" input-id="reset-password" :feedback="false" toggle-mask
             autocomplete="new-password" :invalid="!!resetErrors.newPassword" fluid />
           <small v-if="resetErrors.newPassword" class="error">{{ resetErrors.newPassword }}</small>
         </div>
       </form>
       <template #footer>
-        <Button label="Cancel" text @click="resetOpen = false" />
-        <Button type="submit" form="reset-password-form" label="Reset password" icon="pi pi-key" />
+        <Button :label="t('common.cancel')" text @click="resetOpen = false" />
+        <Button type="submit" form="reset-password-form" :label="t('users.resetPassword')" icon="pi pi-key" />
       </template>
     </Dialog>
   </div>

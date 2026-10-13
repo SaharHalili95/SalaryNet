@@ -16,6 +16,7 @@ It covers the core flows of a payroll product: employees and departments, monthl
 - **Rich domain model**: entities protect their own invariants (private setters, factory methods, guard clauses). `TotalHours` is derived at check-out and cannot be set from outside.
 - **Payroll engine**: a documented progressive tax and social-security calculator, unit-tested against hand-calculated values.
 - **Database-enforced rules**: a unique composite index on `(EmployeeId, Year, Month)` prevents duplicate payslips even under concurrent requests (covered by an integration test that fires 5 parallel requests). A filtered unique index allows only one open shift per employee.
+- **Bilingual UI**: English and Hebrew with full right-to-left layout and Israeli number and date formatting (vue-i18n), with a test that fails on any missing translation.
 - **Account security**: per-account lockout after repeated failed sign-ins, a password policy, admin unlock and reset, and deactivation without deleting history.
 - **Security**: JWT authentication, `Admin` / `HR` / `Employee` role policies, and resource-level authorization that blocks IDOR. An employee who asks for someone else's payslip gets `404`, and a spoofed `employeeId` filter is ignored.
 - **Consistent errors**: every failure is returned as RFC 7807 `ProblemDetails` with a `traceId`. Validation errors come back per field from FluentValidation.
@@ -187,7 +188,7 @@ The front end's tax calculator is tested against the same values as the C# calcu
 
 **Backend:** C# 12, .NET 8, ASP.NET Core Web API, EF Core 8, SQL Server 2022, FluentValidation, JWT Bearer, Swashbuckle
 
-**Frontend:** Vue 3 (Composition API), TypeScript, Vite, Pinia, Vue Router, PrimeVue, Chart.js
+**Frontend:** Vue 3 (Composition API), TypeScript, Vite, Pinia, Vue Router, vue-i18n, PrimeVue, Chart.js
 
 **Quality:** xUnit, Moq, FluentAssertions, Testcontainers, WebApplicationFactory, Vitest, .NET analyzers with warnings as errors, central package management
 

@@ -3,25 +3,28 @@ import Avatar from 'primevue/avatar'
 import Button from 'primevue/button'
 import Tag from 'primevue/tag'
 import { computed, ref, watch } from 'vue'
+import { useI18n } from 'vue-i18n'
 import { useRoute, useRouter } from 'vue-router'
 import { isDemoMode } from '@/api'
 import type { UserRole } from '@/api/types'
 import ChangePasswordDialog from '@/components/ChangePasswordDialog.vue'
+import { toggleLocale } from '@/i18n'
 import { useAuthStore } from '@/stores/auth'
 
 const auth = useAuthStore()
+const { t } = useI18n()
 const router = useRouter()
 const route = useRoute()
 const mobileOpen = ref(false)
 const passwordOpen = ref(false)
 
 const nav: { to: string; label: string; icon: string; roles?: UserRole[] }[] = [
-  { to: '/dashboard', label: 'Dashboard', icon: 'pi pi-chart-bar', roles: ['Admin', 'HR'] },
-  { to: '/employees', label: 'Employees', icon: 'pi pi-users', roles: ['Admin', 'HR'] },
-  { to: '/departments', label: 'Departments', icon: 'pi pi-sitemap', roles: ['Admin', 'HR'] },
-  { to: '/payroll', label: 'Payroll', icon: 'pi pi-wallet' },
-  { to: '/attendance', label: 'Attendance', icon: 'pi pi-clock' },
-  { to: '/users', label: 'Users', icon: 'pi pi-shield', roles: ['Admin'] },
+  { to: '/dashboard', label: 'nav.dashboard', icon: 'pi pi-chart-bar', roles: ['Admin', 'HR'] },
+  { to: '/employees', label: 'nav.employees', icon: 'pi pi-users', roles: ['Admin', 'HR'] },
+  { to: '/departments', label: 'nav.departments', icon: 'pi pi-sitemap', roles: ['Admin', 'HR'] },
+  { to: '/payroll', label: 'nav.payroll', icon: 'pi pi-wallet' },
+  { to: '/attendance', label: 'nav.attendance', icon: 'pi pi-clock' },
+  { to: '/users', label: 'nav.users', icon: 'pi pi-shield', roles: ['Admin'] },
 ]
 
 const visibleNav = computed(() => nav.filter((item) => !item.roles || auth.hasRole(item.roles)))
@@ -47,11 +50,11 @@ function logout() {
       <nav>
         <RouterLink v-for="item in visibleNav" :key="item.to" :to="item.to" class="nav-link">
           <i :class="item.icon" />
-          <span>{{ item.label }}</span>
+          <span>{{ t(item.label) }}</span>
         </RouterLink>
       </nav>
       <div class="sidebar-footer">
-        <span>.NET 8 · Vue 3 · SQL Server</span>
+        <span dir="ltr">{{ t('layout.footer') }}</span>
       </div>
     </aside>
     <div v-if="mobileOpen" class="backdrop" @click="mobileOpen = false" />
@@ -59,19 +62,20 @@ function logout() {
     <div class="main">
       <div v-if="isDemoMode" class="demo-banner">
         <i class="pi pi-info-circle" />
-        Demo mode: fictional data running in your browser. Changes reset when you reload.
+        {{ t('layout.demoBanner') }}
       </div>
       <header class="topbar">
-        <Button class="menu-toggle" icon="pi pi-bars" text rounded aria-label="Open menu" @click="mobileOpen = true" />
+        <Button class="menu-toggle" icon="pi pi-bars" text rounded :aria-label="t('nav.openMenu')" @click="mobileOpen = true" />
         <div class="spacer" />
         <div class="user">
           <Avatar :label="initials" shape="circle" />
           <div class="user-text">
             <strong>{{ auth.user?.displayName }}</strong>
-            <Tag :value="auth.user?.role" :severity="roleSeverity" />
+            <Tag :value="auth.user ? t(`roles.${auth.user.role}`) : ''" :severity="roleSeverity" />
           </div>
-          <Button icon="pi pi-key" text rounded aria-label="Change password" v-tooltip.bottom="'Change password'" @click="passwordOpen = true" />
-          <Button icon="pi pi-sign-out" text rounded aria-label="Sign out" v-tooltip.bottom="'Sign out'" @click="logout" />
+          <Button :label="t('nav.switchLanguage')" icon="pi pi-globe" text size="small" :aria-label="t('nav.switchLanguageLabel')" @click="toggleLocale" />
+          <Button icon="pi pi-key" text rounded :aria-label="t('nav.changePassword')" v-tooltip.bottom="t('nav.changePassword')" @click="passwordOpen = true" />
+          <Button icon="pi pi-sign-out" text rounded :aria-label="t('nav.signOut')" v-tooltip.bottom="t('nav.signOut')" @click="logout" />
         </div>
       </header>
       <main class="content">
@@ -97,6 +101,7 @@ nav { display: flex; flex-direction: column; gap: 0.25rem; }
 }
 .nav-link:hover { background: var(--app-sidebar-active); color: #fff; }
 .nav-link.router-link-active { background: var(--app-sidebar-active); color: #fff; box-shadow: inset 3px 0 0 var(--app-accent); }
+:global([dir='rtl']) .nav-link.router-link-active { box-shadow: inset -3px 0 0 var(--app-accent); }
 .sidebar-footer { margin-top: auto; padding: 0 0.5rem; font-size: 0.75rem; opacity: 0.6; }
 .main { flex: 1; min-width: 0; display: flex; flex-direction: column; }
 .demo-banner { background: #fff7e6; color: #8a5300; padding: 0.5rem 1.5rem; font-size: 0.8125rem; display: flex; gap: 0.5rem; align-items: center; }
@@ -108,7 +113,8 @@ nav { display: flex; flex-direction: column; gap: 0.25rem; }
 .menu-toggle, .backdrop { display: none; }
 
 @media (max-width: 900px) {
-  .sidebar { position: fixed; z-index: 30; left: 0; transform: translateX(-100%); transition: transform 0.2s; }
+  .sidebar { position: fixed; z-index: 30; inset-inline-start: 0; transform: translateX(-100%); transition: transform 0.2s; }
+  :global([dir='rtl']) .sidebar { transform: translateX(100%); }
   .sidebar.open { transform: none; }
   .backdrop { display: block; position: fixed; inset: 0; background: rgb(0 0 0 / 0.4); z-index: 20; }
   .menu-toggle { display: inline-flex; }

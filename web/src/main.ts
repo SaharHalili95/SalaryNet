@@ -8,6 +8,7 @@ import Tooltip from 'primevue/tooltip'
 import { createApp } from 'vue'
 import 'primeicons/primeicons.css'
 import App from './App.vue'
+import { i18n } from './i18n'
 import router from './router'
 import './styles/main.css'
 
@@ -22,6 +23,7 @@ const SalaryNetPreset = definePreset(Aura, {
 
 createApp(App)
   .use(createPinia())
+  .use(i18n)
   .use(router)
   .use(PrimeVue, { theme: { preset: SalaryNetPreset, options: { darkModeSelector: 'system' } } })
   .use(ToastService)

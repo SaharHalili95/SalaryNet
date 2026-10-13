@@ -6,6 +6,7 @@ import Textarea from 'primevue/textarea'
 import { useConfirm } from 'primevue/useconfirm'
 import { useToast } from 'primevue/usetoast'
 import { onMounted, reactive, ref } from 'vue'
+import { useI18n } from 'vue-i18n'
 import { api } from '@/api'
 import type { Department } from '@/api/types'
 import { useAuthStore } from '@/stores/auth'
@@ -15,6 +16,7 @@ const auth = useAuthStore()
 const handleError = useApiError()
 const confirm = useConfirm()
 const toast = useToast()
+const { t } = useI18n()
 
 const departments = ref<Department[]>([])
 const dialogOpen = ref(false)
@@ -45,7 +47,7 @@ async function save() {
     if (editing.value) await api().departments.update(editing.value.id, { ...form })
     else await api().departments.create({ ...form })
     dialogOpen.value = false
-    toast.add({ severity: 'success', summary: editing.value ? 'Department updated' : 'Department created', life: 3000 })
+    toast.add({ severity: 'success', summary: editing.value ? t('departments.updated') : t('departments.created'), life: 3000 })
     load()
   } catch (e) {
     errors.value = handleError(e)
@@ -56,15 +58,15 @@ async function save() {
 
 function remove(department: Department) {
   confirm.require({
-    header: 'Delete department',
-    message: `Delete "${department.name}"? Only empty departments can be deleted.`,
+    header: t('departments.deleteHeader'),
+    message: t('departments.deleteMessage', { name: department.name }),
     icon: 'pi pi-trash',
-    acceptProps: { label: 'Delete', severity: 'danger' },
-    rejectProps: { label: 'Cancel', text: true },
+    acceptProps: { label: t('common.delete'), severity: 'danger' },
+    rejectProps: { label: t('common.cancel'), text: true },
     accept: async () => {
       try {
         await api().departments.remove(department.id)
-        toast.add({ severity: 'success', summary: 'Department deleted', life: 3000 })
+        toast.add({ severity: 'success', summary: t('departments.deleted'), life: 3000 })
         load()
       } catch (e) {
         handleError(e)
@@ -80,11 +82,11 @@ onMounted(load)
   <div>
     <div class="page-header">
       <div>
-        <h1>Departments</h1>
-        <p v-if="auth.isAdmin">Only administrators can create, rename or delete departments.</p>
-        <p v-else>Read-only for HR. Ask an administrator to change the structure.</p>
+        <h1>{{ t('departments.title') }}</h1>
+        <p v-if="auth.isAdmin">{{ t('departments.adminNote') }}</p>
+        <p v-else>{{ t('departments.hrNote') }}</p>
       </div>
-      <Button v-if="auth.isAdmin" label="New department" icon="pi pi-plus" @click="open(null)" />
+      <Button v-if="auth.isAdmin" :label="t('departments.new')" icon="pi pi-plus" @click="open(null)" />
     </div>
 
     <div class="cards">
@@ -92,34 +94,34 @@ onMounted(load)
         <div class="card-head">
           <h2>{{ d.name }}</h2>
           <div v-if="auth.isAdmin" class="actions">
-            <Button icon="pi pi-pencil" text rounded size="small" aria-label="Edit" @click="open(d)" />
-            <Button icon="pi pi-trash" text rounded size="small" severity="danger" aria-label="Delete" @click="remove(d)" />
+            <Button icon="pi pi-pencil" text rounded size="small" :aria-label="t('common.edit')" @click="open(d)" />
+            <Button icon="pi pi-trash" text rounded size="small" severity="danger" :aria-label="t('common.delete')" @click="remove(d)" />
           </div>
         </div>
-        <p class="muted">{{ d.description || 'No description' }}</p>
+        <p class="muted">{{ d.description || t('departments.noDescription') }}</p>
         <div class="stats">
-          <div><strong>{{ d.activeEmployeeCount }}</strong><span class="muted">active</span></div>
-          <div><strong>{{ d.employeeCount }}</strong><span class="muted">total</span></div>
+          <div><strong>{{ d.activeEmployeeCount }}</strong><span class="muted">{{ t('departments.activeLabel') }}</span></div>
+          <div><strong>{{ d.employeeCount }}</strong><span class="muted">{{ t('departments.totalLabel') }}</span></div>
         </div>
       </article>
     </div>
 
-    <Dialog v-model:visible="dialogOpen" modal :header="editing ? 'Edit department' : 'New department'" :style="{ width: '30rem' }"
+    <Dialog v-model:visible="dialogOpen" modal :header="editing ? t('departments.dialogEdit') : t('departments.dialogNew')" :style="{ width: '30rem' }"
       :breakpoints="{ '640px': '95vw' }">
       <form id="department-form" class="form-grid" @submit.prevent="save">
         <div class="field full">
-          <label for="dept-name">Name</label>
+          <label for="dept-name">{{ t('departments.name') }}</label>
           <InputText id="dept-name" v-model="form.name" :invalid="!!errors.name" />
           <small v-if="errors.name" class="error">{{ errors.name }}</small>
         </div>
         <div class="field full">
-          <label for="dept-description">Description</label>
+          <label for="dept-description">{{ t('departments.description') }}</label>
           <Textarea id="dept-description" v-model="form.description" rows="3" auto-resize />
         </div>
       </form>
       <template #footer>
-        <Button label="Cancel" text @click="dialogOpen = false" />
-        <Button type="submit" form="department-form" label="Save" icon="pi pi-check" :loading="saving" />
+        <Button :label="t('common.cancel')" text @click="dialogOpen = false" />
+        <Button type="submit" form="department-form" :label="t('common.save')" icon="pi pi-check" :loading="saving" />
       </template>
     </Dialog>
   </div>

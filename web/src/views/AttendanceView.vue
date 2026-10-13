@@ -5,6 +5,7 @@ import DataTable, { type DataTablePageEvent } from 'primevue/datatable'
 import Tag from 'primevue/tag'
 import { useToast } from 'primevue/usetoast'
 import { computed, onBeforeUnmount, onMounted, reactive, ref } from 'vue'
+import { useI18n } from 'vue-i18n'
 import { api } from '@/api'
 import type { AttendanceLog, AttendanceQuery, PagedResult } from '@/api/types'
 import { useAuthStore } from '@/stores/auth'
@@ -14,6 +15,7 @@ import { useApiError } from '@/utils/useApiError'
 const auth = useAuthStore()
 const handleError = useApiError()
 const toast = useToast()
+const { t } = useI18n()
 
 const result = ref<PagedResult<AttendanceLog>>({ items: [], page: 1, pageSize: 10, totalCount: 0, totalPages: 0 })
 const query = reactive<AttendanceQuery>({ page: 1, pageSize: 10 })
@@ -50,10 +52,10 @@ async function toggleShift() {
   try {
     if (openShift.value) {
       const closed = await api().attendance.checkOut()
-      toast.add({ severity: 'success', summary: 'Checked out', detail: `Shift length ${formatHours(closed.totalHours)}`, life: 4000 })
+      toast.add({ severity: 'success', summary: t('attendance.checkedOutToast'), detail: t('attendance.shiftLength', { hours: formatHours(closed.totalHours) }), life: 4000 })
     } else {
       await api().attendance.checkIn()
-      toast.add({ severity: 'success', summary: 'Checked in', detail: 'Have a productive day!', life: 3000 })
+      toast.add({ severity: 'success', summary: t('attendance.checkedInToast'), detail: t('attendance.checkedInDetail'), life: 3000 })
     }
     tick.value = Date.now()
     query.page = 1
@@ -72,9 +74,8 @@ onMounted(load)
   <div>
     <div class="page-header">
       <div>
-        <h1>Attendance</h1>
-        <p v-if="auth.isStaff">Shift history for every employee. Hours are calculated by the server at check-out.</p>
-        <p v-else>Clock in and out. Your hours are calculated by the server when you check out.</p>
+        <h1>{{ t('attendance.title') }}</h1>
+        <p>{{ auth.isStaff ? t('attendance.subtitleStaff') : t('attendance.subtitleEmployee') }}</p>
       </div>
     </div>
 
@@ -82,13 +83,13 @@ onMounted(load)
       <div class="clock-state">
         <span class="dot" :class="{ on: openShift }" />
         <div>
-          <strong>{{ openShift ? 'You are checked in' : 'You are checked out' }}</strong>
+          <strong>{{ openShift ? t('attendance.checkedIn') : t('attendance.checkedOut') }}</strong>
           <div class="muted">
-            {{ openShift ? `Since ${formatTime(openShift.checkIn)} · ${elapsed} so far` : 'Start your shift when you begin work.' }}
+            {{ openShift ? t('attendance.since', { time: formatTime(openShift.checkIn), elapsed }) : t('attendance.startHint') }}
           </div>
         </div>
       </div>
-      <Button :label="openShift ? 'Check out' : 'Check in'" :icon="openShift ? 'pi pi-sign-out' : 'pi pi-sign-in'"
+      <Button :label="openShift ? t('attendance.checkOut') : t('attendance.checkIn')" :icon="openShift ? 'pi pi-sign-out' : 'pi pi-sign-in'"
         :severity="openShift ? 'danger' : 'success'" size="large" :loading="busy" @click="toggleShift" />
     </section>
 
@@ -96,21 +97,21 @@ onMounted(load)
       <DataTable :value="result.items" lazy paginator :rows="query.pageSize" :total-records="result.totalCount"
         :first="((query.page ?? 1) - 1) * (query.pageSize ?? 10)" :rows-per-page-options="[10, 20, 50]" :loading="loading"
         data-key="id" striped-rows scrollable @page="onPage">
-        <template #empty><div class="muted">No attendance records yet.</div></template>
-        <Column header="Date">
+        <template #empty><div class="muted">{{ t('attendance.empty') }}</div></template>
+        <Column :header="t('attendance.date')">
           <template #body="{ data }"><strong>{{ formatDate(data.checkIn) }}</strong></template>
         </Column>
-        <Column v-if="auth.isStaff" field="employeeName" header="Employee" />
-        <Column header="Check in">
+        <Column v-if="auth.isStaff" field="employeeName" :header="t('common.employee')" />
+        <Column :header="t('attendance.checkIn')">
           <template #body="{ data }">{{ formatTime(data.checkIn) }}</template>
         </Column>
-        <Column header="Check out">
+        <Column :header="t('attendance.checkOut')">
           <template #body="{ data }">
-            <Tag v-if="data.isOpen" value="On shift" severity="success" />
+            <Tag v-if="data.isOpen" :value="t('attendance.onShift')" severity="success" />
             <span v-else>{{ formatTime(data.checkOut) }}</span>
           </template>
         </Column>
-        <Column header="Hours">
+        <Column :header="t('attendance.hours')">
           <template #body="{ data }"><span class="money">{{ data.isOpen ? '-' : formatHours(data.totalHours) }}</span></template>
         </Column>
       </DataTable>

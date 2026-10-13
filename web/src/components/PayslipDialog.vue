@@ -1,14 +1,16 @@
 <script setup lang="ts">
 import Dialog from 'primevue/dialog'
+import { useI18n } from 'vue-i18n'
 import type { PayrollRecord } from '@/api/types'
 import { formatDate, formatMoney, formatPeriod } from '@/utils/format'
 
 defineProps<{ record: PayrollRecord | null }>()
 const visible = defineModel<boolean>('visible', { required: true })
+const { t } = useI18n()
 </script>
 
 <template>
-  <Dialog v-model:visible="visible" modal header="Payslip" :style="{ width: '30rem' }" :breakpoints="{ '640px': '95vw' }">
+  <Dialog v-model:visible="visible" modal :header="t('payslip.title')" :style="{ width: '30rem' }" :breakpoints="{ '640px': '95vw' }">
     <div v-if="record" class="slip">
       <div class="slip-head">
         <div>
@@ -17,31 +19,31 @@ const visible = defineModel<boolean>('visible', { required: true })
         </div>
         <div class="period">
           <strong>{{ formatPeriod(record.year, record.month) }}</strong>
-          <div class="muted">Issued {{ formatDate(record.generatedAt) }}</div>
+          <div class="muted">{{ t('payslip.issued', { date: formatDate(record.generatedAt) }) }}</div>
         </div>
       </div>
 
       <dl>
-        <div><dt>Base salary</dt><dd class="money">{{ formatMoney(record.baseSalary) }}</dd></div>
-        <div><dt>Bonus</dt><dd class="money">{{ formatMoney(record.bonus) }}</dd></div>
-        <div class="total"><dt>Gross salary</dt><dd class="money">{{ formatMoney(record.grossSalary) }}</dd></div>
-        <div><dt>Income tax <span class="muted">(tiered)</span></dt><dd class="money neg">-{{ formatMoney(record.incomeTax) }}</dd></div>
-        <div><dt>Social security</dt><dd class="money neg">-{{ formatMoney(record.socialSecurity) }}</dd></div>
-        <div class="total"><dt>Total deductions</dt><dd class="money neg">-{{ formatMoney(record.deductions) }}</dd></div>
+        <div><dt>{{ t('payslip.baseSalary') }}</dt><dd class="money">{{ formatMoney(record.baseSalary) }}</dd></div>
+        <div><dt>{{ t('payslip.bonus') }}</dt><dd class="money">{{ formatMoney(record.bonus) }}</dd></div>
+        <div class="total"><dt>{{ t('payslip.gross') }}</dt><dd class="money">{{ formatMoney(record.grossSalary) }}</dd></div>
+        <div><dt>{{ t('payslip.incomeTax') }} <span class="muted">{{ t('payslip.tiered') }}</span></dt><dd class="money neg">-{{ formatMoney(record.incomeTax) }}</dd></div>
+        <div><dt>{{ t('payslip.socialSecurity') }}</dt><dd class="money neg">-{{ formatMoney(record.socialSecurity) }}</dd></div>
+        <div class="total"><dt>{{ t('payslip.totalDeductions') }}</dt><dd class="money neg">-{{ formatMoney(record.deductions) }}</dd></div>
       </dl>
 
       <div class="net">
-        <span>Net pay</span>
+        <span>{{ t('payslip.net') }}</span>
         <strong class="money">{{ formatMoney(record.netSalary) }}</strong>
       </div>
-      <p class="muted note">Illustrative rates only, not official tax figures.</p>
+      <p class="muted note">{{ t('payslip.note') }}</p>
     </div>
   </Dialog>
 </template>
 
 <style scoped>
 .slip-head { display: flex; justify-content: space-between; gap: 1rem; padding-bottom: 1rem; border-bottom: 1px solid var(--app-border); }
-.period { text-align: right; }
+.period { text-align: end; }
 dl { margin: 0; }
 dl div { display: flex; justify-content: space-between; padding: 0.5rem 0; }
 dl .total { border-top: 1px dashed var(--app-border); font-weight: 600; }

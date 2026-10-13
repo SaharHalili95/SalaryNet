@@ -9,16 +9,18 @@ import Select from 'primevue/select'
 import Tag from 'primevue/tag'
 import { useConfirm } from 'primevue/useconfirm'
 import { useToast } from 'primevue/usetoast'
-import { onMounted, reactive, ref, watch } from 'vue'
+import { computed, onMounted, reactive, ref, watch } from 'vue'
+import { useI18n } from 'vue-i18n'
 import { api } from '@/api'
 import type { Department, Employee, EmployeeQuery, EmployeeSortField, EmploymentType, PagedResult } from '@/api/types'
 import EmployeeDialog from '@/components/EmployeeDialog.vue'
-import { employmentTypeLabel, formatDate, formatMoney } from '@/utils/format'
+import { formatDate, formatMoney } from '@/utils/format'
 import { useApiError } from '@/utils/useApiError'
 
 const handleError = useApiError()
 const confirm = useConfirm()
 const toast = useToast()
+const { t } = useI18n()
 
 const departments = ref<Department[]>([])
 const result = ref<PagedResult<Employee>>({ items: [], page: 1, pageSize: 10, totalCount: 0, totalPages: 0 })
@@ -27,8 +29,9 @@ const dialogOpen = ref(false)
 const editing = ref<Employee | null>(null)
 
 const query = reactive<EmployeeQuery>({ page: 1, pageSize: 10, search: '', sortBy: 'LastName', sortDirection: 'Asc', isActive: true })
-const typeOptions = (Object.keys(employmentTypeLabel) as EmploymentType[]).map((value) => ({ value, label: employmentTypeLabel[value] }))
-const statusOptions = [{ label: 'Active', value: true }, { label: 'Inactive', value: false }]
+const typeOptions = computed(() =>
+  (['FullTime', 'PartTime', 'Contractor'] as EmploymentType[]).map((value) => ({ value, label: t(`employmentType.${value}`) })))
+const statusOptions = computed(() => [{ label: t('common.active'), value: true }, { label: t('common.inactive'), value: false }])
 const sortFields: Record<string, EmployeeSortField> = { lastName: 'LastName', baseSalary: 'BaseSalary', createdAt: 'CreatedAt' }
 
 async function load() {
@@ -67,24 +70,22 @@ function openDialog(employee: Employee | null) {
 }
 
 function onSaved(employee: Employee) {
-  toast.add({ severity: 'success', summary: editing.value ? 'Employee updated' : 'Employee created', detail: `${employee.firstName} ${employee.lastName}`, life: 3000 })
+  toast.add({ severity: 'success', summary: editing.value ? t('employees.updated') : t('employees.created'), detail: `${employee.firstName} ${employee.lastName}`, life: 3000 })
   load()
 }
 
 function toggleActive(employee: Employee) {
   const activate = !employee.isActive
   confirm.require({
-    header: activate ? 'Reactivate employee' : 'Deactivate employee',
-    message: activate
-      ? `Reactivate ${employee.firstName} ${employee.lastName}?`
-      : `Deactivate ${employee.firstName} ${employee.lastName}? They will be excluded from future payroll runs.`,
+    header: activate ? t('employees.reactivateHeader') : t('employees.deactivateHeader'),
+    message: t(activate ? 'employees.reactivateMessage' : 'employees.deactivateMessage', { name: `${employee.firstName} ${employee.lastName}` }),
     icon: 'pi pi-exclamation-triangle',
-    acceptProps: { label: activate ? 'Reactivate' : 'Deactivate', severity: activate ? 'primary' : 'danger' },
-    rejectProps: { label: 'Cancel', text: true },
+    acceptProps: { label: activate ? t('employees.reactivate') : t('employees.deactivate'), severity: activate ? 'primary' : 'danger' },
+    rejectProps: { label: t('common.cancel'), text: true },
     accept: async () => {
       try {
         await api().employees.setActive(employee.id, activate)
-        toast.add({ severity: 'success', summary: activate ? 'Reactivated' : 'Deactivated', life: 3000 })
+        toast.add({ severity: 'success', summary: activate ? t('employees.reactivated') : t('employees.deactivated'), life: 3000 })
         load()
       } catch (e) {
         handleError(e)
@@ -107,31 +108,31 @@ onMounted(async () => {
   <div>
     <div class="page-header">
       <div>
-        <h1>Employees</h1>
-        <p>{{ result.totalCount }} matching employees. Search, filter and sort run on the server.</p>
+        <h1>{{ t('employees.title') }}</h1>
+        <p>{{ t('employees.subtitle', { count: result.totalCount }) }}</p>
       </div>
-      <Button label="New employee" icon="pi pi-plus" @click="openDialog(null)" />
+      <Button :label="t('employees.new')" icon="pi pi-plus" @click="openDialog(null)" />
     </div>
 
     <section class="panel">
       <div class="toolbar">
         <IconField>
           <InputIcon class="pi pi-search" />
-          <InputText v-model="query.search" placeholder="Search name or email" aria-label="Search employees" />
+          <InputText v-model="query.search" :placeholder="t('employees.search')" :aria-label="t('employees.search')" />
         </IconField>
         <Select v-model="query.departmentId" :options="departments" option-label="name" option-value="id"
-          placeholder="All departments" show-clear aria-label="Department" />
+          :placeholder="t('common.allDepartments')" show-clear :aria-label="t('common.department')" />
         <Select v-model="query.employmentType" :options="typeOptions" option-label="label" option-value="value"
-          placeholder="All contracts" show-clear aria-label="Employment type" />
+          :placeholder="t('employees.allContracts')" show-clear :aria-label="t('employees.employmentType')" />
         <Select v-model="query.isActive" :options="statusOptions" option-label="label" option-value="value"
-          placeholder="Any status" show-clear aria-label="Status" />
+          :placeholder="t('common.anyStatus')" show-clear :aria-label="t('common.status')" />
       </div>
 
       <DataTable :value="result.items" lazy paginator :rows="query.pageSize" :total-records="result.totalCount"
         :first="((query.page ?? 1) - 1) * (query.pageSize ?? 10)" :rows-per-page-options="[10, 20, 50]" :loading="loading"
         data-key="id" removable-sort striped-rows scrollable @page="onPage" @sort="onSort">
-        <template #empty><div class="muted">No employees match these filters.</div></template>
-        <Column field="lastName" header="Name" sortable>
+        <template #empty><div class="muted">{{ t('employees.empty') }}</div></template>
+        <Column field="lastName" :header="t('employees.name')" sortable>
           <template #body="{ data }">
             <div class="name">
               <strong>{{ data.firstName }} {{ data.lastName }}</strong>
@@ -139,28 +140,28 @@ onMounted(async () => {
             </div>
           </template>
         </Column>
-        <Column field="departmentName" header="Department" />
-        <Column field="employmentType" header="Contract">
-          <template #body="{ data }">{{ employmentTypeLabel[data.employmentType as EmploymentType] }}</template>
+        <Column field="departmentName" :header="t('common.department')" />
+        <Column field="employmentType" :header="t('employees.contract')">
+          <template #body="{ data }">{{ t(`employmentType.${data.employmentType}`) }}</template>
         </Column>
-        <Column field="baseSalary" header="Base salary" sortable>
+        <Column field="baseSalary" :header="t('employees.baseSalary')" sortable>
           <template #body="{ data }"><span class="money">{{ formatMoney(data.baseSalary) }}</span></template>
         </Column>
-        <Column field="createdAt" header="Joined" sortable>
+        <Column field="createdAt" :header="t('employees.joined')" sortable>
           <template #body="{ data }">{{ formatDate(data.createdAt) }}</template>
         </Column>
-        <Column header="Status">
+        <Column :header="t('common.status')">
           <template #body="{ data }">
-            <Tag :value="data.isActive ? 'Active' : 'Inactive'" :severity="data.isActive ? 'success' : 'secondary'" />
+            <Tag :value="data.isActive ? t('common.active') : t('common.inactive')" :severity="data.isActive ? 'success' : 'secondary'" />
           </template>
         </Column>
         <Column header="" :style="{ width: '6rem' }">
           <template #body="{ data }">
             <div class="actions">
-              <Button icon="pi pi-pencil" text rounded aria-label="Edit" v-tooltip.top="'Edit'" @click="openDialog(data)" />
+              <Button icon="pi pi-pencil" text rounded :aria-label="t('common.edit')" v-tooltip.top="t('common.edit')" @click="openDialog(data)" />
               <Button :icon="data.isActive ? 'pi pi-user-minus' : 'pi pi-user-plus'" text rounded
-                :severity="data.isActive ? 'danger' : 'success'" :aria-label="data.isActive ? 'Deactivate' : 'Reactivate'"
-                v-tooltip.top="data.isActive ? 'Deactivate' : 'Reactivate'" @click="toggleActive(data)" />
+                :severity="data.isActive ? 'danger' : 'success'" :aria-label="data.isActive ? t('employees.deactivate') : t('employees.reactivate')"
+                v-tooltip.top="data.isActive ? t('employees.deactivate') : t('employees.reactivate')" @click="toggleActive(data)" />
             </div>
           </template>
         </Column>

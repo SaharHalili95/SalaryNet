@@ -75,6 +75,9 @@ html, body {
 .field small.error { color: #dc2626; }
 
 .money { font-variant-numeric: tabular-nums; white-space: nowrap; }
+/* Codes, emails and passwords are always left-to-right, even inside Hebrew text. */
+code, input[type='email'], input[type='password'], .ltr { direction: ltr; unicode-bidi: isolate; }
+[dir='rtl'] input[type='email'], [dir='rtl'] input[type='password'] { text-align: right; }
 .muted { color: var(--app-text-muted); }
 
 @media (max-width: 640px) {
