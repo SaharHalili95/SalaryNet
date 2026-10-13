@@ -9,6 +9,7 @@ import { onMounted, reactive, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { api } from '@/api'
 import type { Department } from '@/api/types'
+import { useLocalizedData } from '@/i18n/useLocalizedData'
 import { useAuthStore } from '@/stores/auth'
 import { useApiError } from '@/utils/useApiError'
 
@@ -17,6 +18,7 @@ const handleError = useApiError()
 const confirm = useConfirm()
 const toast = useToast()
 const { t } = useI18n()
+const { term } = useLocalizedData()
 
 const departments = ref<Department[]>([])
 const dialogOpen = ref(false)
@@ -92,13 +94,13 @@ onMounted(load)
     <div class="cards">
       <article v-for="d in departments" :key="d.id" class="panel card">
         <div class="card-head">
-          <h2>{{ d.name }}</h2>
+          <h2>{{ term(d.name) }}</h2>
           <div v-if="auth.isAdmin" class="actions">
             <Button icon="pi pi-pencil" text rounded size="small" :aria-label="t('common.edit')" @click="open(d)" />
             <Button icon="pi pi-trash" text rounded size="small" severity="danger" :aria-label="t('common.delete')" @click="remove(d)" />
           </div>
         </div>
-        <p class="muted">{{ d.description || t('departments.noDescription') }}</p>
+        <p class="muted">{{ term(d.description) || t('departments.noDescription') }}</p>
         <div class="stats">
           <div><strong>{{ d.activeEmployeeCount }}</strong><span class="muted">{{ t('departments.activeLabel') }}</span></div>
           <div><strong>{{ d.employeeCount }}</strong><span class="muted">{{ t('departments.totalLabel') }}</span></div>

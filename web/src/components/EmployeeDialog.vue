@@ -8,6 +8,7 @@ import { computed, reactive, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { api } from '@/api'
 import type { Department, Employee, EmploymentType, SaveEmployeeRequest } from '@/api/types'
+import { useLocalizedData } from '@/i18n/useLocalizedData'
 import { useApiError } from '@/utils/useApiError'
 
 const props = defineProps<{ employee: Employee | null; departments: Department[] }>()
@@ -16,6 +17,8 @@ const emit = defineEmits<{ saved: [employee: Employee] }>()
 
 const handleError = useApiError()
 const { t } = useI18n()
+const { term } = useLocalizedData()
+const departmentOptions = computed(() => props.departments.map((d) => ({ id: d.id, name: term(d.name) })))
 const saving = ref(false)
 const errors = ref<Record<string, string>>({})
 const form = reactive<SaveEmployeeRequest>({ firstName: '', lastName: '', email: '', departmentId: '', baseSalary: 0, employmentType: 'FullTime' })
@@ -68,7 +71,7 @@ async function save() {
       </div>
       <div class="field">
         <label for="department">{{ t('common.department') }}</label>
-        <Select input-id="department" v-model="form.departmentId" :options="departments" option-label="name" option-value="id"
+        <Select input-id="department" v-model="form.departmentId" :options="departmentOptions" option-label="name" option-value="id"
           :invalid="!!errors.departmentId" />
         <small v-if="errors.departmentId" class="error">{{ errors.departmentId }}</small>
       </div>

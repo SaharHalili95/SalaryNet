@@ -2,11 +2,13 @@
 import Dialog from 'primevue/dialog'
 import { useI18n } from 'vue-i18n'
 import type { PayrollRecord } from '@/api/types'
+import { useLocalizedData } from '@/i18n/useLocalizedData'
 import { formatDate, formatMoney, formatPeriod } from '@/utils/format'
 
 defineProps<{ record: PayrollRecord | null }>()
 const visible = defineModel<boolean>('visible', { required: true })
 const { t } = useI18n()
+const { term, person } = useLocalizedData()
 </script>
 
 <template>
@@ -14,8 +16,8 @@ const { t } = useI18n()
     <div v-if="record" class="slip">
       <div class="slip-head">
         <div>
-          <strong>{{ record.employeeName }}</strong>
-          <div class="muted">{{ record.departmentName }}</div>
+          <strong>{{ person(record.employeeName) }}</strong>
+          <div class="muted">{{ term(record.departmentName) }}</div>
         </div>
         <div class="period">
           <strong>{{ formatPeriod(record.year, record.month) }}</strong>

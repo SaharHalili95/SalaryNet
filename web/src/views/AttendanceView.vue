@@ -9,6 +9,7 @@ import { useI18n } from 'vue-i18n'
 import { api } from '@/api'
 import type { AttendanceLog, AttendanceQuery, PagedResult } from '@/api/types'
 import { useAuthStore } from '@/stores/auth'
+import { useLocalizedData } from '@/i18n/useLocalizedData'
 import { formatDate, formatHours, formatTime } from '@/utils/format'
 import { useApiError } from '@/utils/useApiError'
 
@@ -16,6 +17,7 @@ const auth = useAuthStore()
 const handleError = useApiError()
 const toast = useToast()
 const { t } = useI18n()
+const { person } = useLocalizedData()
 
 const result = ref<PagedResult<AttendanceLog>>({ items: [], page: 1, pageSize: 10, totalCount: 0, totalPages: 0 })
 const query = reactive<AttendanceQuery>({ page: 1, pageSize: 10 })
@@ -101,7 +103,9 @@ onMounted(load)
         <Column :header="t('attendance.date')">
           <template #body="{ data }"><strong>{{ formatDate(data.checkIn) }}</strong></template>
         </Column>
-        <Column v-if="auth.isStaff" field="employeeName" :header="t('common.employee')" />
+        <Column v-if="auth.isStaff" :header="t('common.employee')">
+          <template #body="{ data }">{{ person(data.employeeName) }}</template>
+        </Column>
         <Column :header="t('attendance.checkIn')">
           <template #body="{ data }">{{ formatTime(data.checkIn) }}</template>
         </Column>

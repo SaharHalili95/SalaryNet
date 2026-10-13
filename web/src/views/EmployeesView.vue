@@ -14,6 +14,7 @@ import { useI18n } from 'vue-i18n'
 import { api } from '@/api'
 import type { Department, Employee, EmployeeQuery, EmployeeSortField, EmploymentType, PagedResult } from '@/api/types'
 import EmployeeDialog from '@/components/EmployeeDialog.vue'
+import { useLocalizedData } from '@/i18n/useLocalizedData'
 import { formatDate, formatMoney } from '@/utils/format'
 import { useApiError } from '@/utils/useApiError'
 
@@ -21,6 +22,7 @@ const handleError = useApiError()
 const confirm = useConfirm()
 const toast = useToast()
 const { t } = useI18n()
+const { term, person } = useLocalizedData()
 
 const departments = ref<Department[]>([])
 const result = ref<PagedResult<Employee>>({ items: [], page: 1, pageSize: 10, totalCount: 0, totalPages: 0 })
@@ -31,6 +33,7 @@ const editing = ref<Employee | null>(null)
 const query = reactive<EmployeeQuery>({ page: 1, pageSize: 10, search: '', sortBy: 'LastName', sortDirection: 'Asc', isActive: true })
 const typeOptions = computed(() =>
   (['FullTime', 'PartTime', 'Contractor'] as EmploymentType[]).map((value) => ({ value, label: t(`employmentType.${value}`) })))
+const departmentOptions = computed(() => departments.value.map((d) => ({ id: d.id, name: term(d.name) })))
 const statusOptions = computed(() => [{ label: t('common.active'), value: true }, { label: t('common.inactive'), value: false }])
 const sortFields: Record<string, EmployeeSortField> = { lastName: 'LastName', baseSalary: 'BaseSalary', createdAt: 'CreatedAt' }
 
@@ -120,7 +123,7 @@ onMounted(async () => {
           <InputIcon class="pi pi-search" />
           <InputText v-model="query.search" :placeholder="t('employees.search')" :aria-label="t('employees.search')" />
         </IconField>
-        <Select v-model="query.departmentId" :options="departments" option-label="name" option-value="id"
+        <Select v-model="query.departmentId" :options="departmentOptions" option-label="name" option-value="id"
           :placeholder="t('common.allDepartments')" show-clear :aria-label="t('common.department')" />
         <Select v-model="query.employmentType" :options="typeOptions" option-label="label" option-value="value"
           :placeholder="t('employees.allContracts')" show-clear :aria-label="t('employees.employmentType')" />
@@ -135,12 +138,14 @@ onMounted(async () => {
         <Column field="lastName" :header="t('employees.name')" sortable>
           <template #body="{ data }">
             <div class="name">
-              <strong>{{ data.firstName }} {{ data.lastName }}</strong>
+              <strong>{{ person(`${data.firstName} ${data.lastName}`) }}</strong>
               <span class="muted">{{ data.email }}</span>
             </div>
           </template>
         </Column>
-        <Column field="departmentName" :header="t('common.department')" />
+        <Column field="departmentName" :header="t('common.department')">
+          <template #body="{ data }">{{ term(data.departmentName) }}</template>
+        </Column>
         <Column field="employmentType" :header="t('employees.contract')">
           <template #body="{ data }">{{ t(`employmentType.${data.employmentType}`) }}</template>
         </Column>

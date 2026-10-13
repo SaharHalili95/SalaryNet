@@ -8,6 +8,7 @@ import { api } from '@/api'
 import type { DashboardSummary } from '@/api/types'
 import ChartCanvas, { type ChartTokens } from '@/components/ChartCanvas.vue'
 import StatTile from '@/components/StatTile.vue'
+import { useLocalizedData } from '@/i18n/useLocalizedData'
 import { formatMoney, formatMoneyCompact, formatMonthShort, formatPeriod } from '@/utils/format'
 import { useApiError } from '@/utils/useApiError'
 
@@ -17,6 +18,7 @@ const showDeptTable = ref(false)
 const handleError = useApiError()
 const { t, locale } = useI18n()
 const rtl = computed(() => locale.value === 'he')
+const { term } = useLocalizedData()
 
 onMounted(async () => {
   try {
@@ -84,7 +86,7 @@ const departmentChart = computed(() => {
   return (tk: ChartTokens): ChartConfiguration<'bar'> => ({
     type: 'bar',
     data: {
-      labels: rows.map((d) => d.departmentName),
+      labels: rows.map((d) => term(d.departmentName)),
       datasets: [{
         label: grossLabel, data: rows.map((d) => d.grossTotal), backgroundColor: tk.series1,
         borderRadius: 4, borderSkipped: 'start', barThickness: 18, borderColor: tk.surface, borderWidth: 0,
@@ -181,7 +183,7 @@ const typeTotal = computed(() => summary.value?.employmentTypes.reduce((s, t) =>
             <thead><tr><th>{{ t('common.department') }}</th><th>{{ t('dashboard.payslips') }}</th><th>{{ t('dashboard.gross') }}</th><th>{{ t('dashboard.net') }}</th></tr></thead>
             <tbody>
               <tr v-for="d in summary.payrollByDepartment" :key="d.departmentName">
-                <td>{{ d.departmentName }}</td>
+                <td>{{ term(d.departmentName) }}</td>
                 <td>{{ d.headcount }}</td>
                 <td class="money">{{ formatMoney(d.grossTotal) }}</td>
                 <td class="money">{{ formatMoney(d.netTotal) }}</td>

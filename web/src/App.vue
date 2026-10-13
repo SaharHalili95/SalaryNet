@@ -6,11 +6,13 @@ import { useToast } from 'primevue/usetoast'
 import { onBeforeUnmount, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { startDemoSimulation } from '@/api'
+import { useLocalizedData } from '@/i18n/useLocalizedData'
 import { useAuthStore } from '@/stores/auth'
 
 const toast = useToast()
 const { t, locale } = useI18n()
 const primevue = usePrimeVue()
+const { term, person } = useLocalizedData()
 
 // PrimeVue's own built-in texts (empty dropdowns, filters) follow the app language.
 watch(locale, (value) => {
@@ -30,7 +32,7 @@ const stop = startDemoSimulation((change) => {
   toast.add({
     severity: change.kind === 'hire' ? 'info' : 'secondary',
     summary: t(`simulation.${change.kind}`),
-    detail: t(`simulation.${change.kind}Detail`, { name: change.name, department: change.department }),
+    detail: t(`simulation.${change.kind}Detail`, { name: person(change.name), department: term(change.department) }),
     life: 6000,
   })
 })

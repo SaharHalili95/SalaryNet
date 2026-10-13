@@ -9,13 +9,14 @@ import { useI18n } from 'vue-i18n'
 import { useRoute, useRouter } from 'vue-router'
 import { DEMO_ACCOUNTS, DEMO_ADMIN_PASSWORD, DEMO_PASSWORD } from '@/api/demo/demoData'
 import { ApiError } from '@/api/errors'
-import { toggleLocale } from '@/i18n'
+import { toggleLocale, type Locale } from '@/i18n'
+import { translateServerMessage } from '@/i18n/serverMessages'
 import { useAuthStore } from '@/stores/auth'
 
 const auth = useAuthStore()
 const router = useRouter()
 const route = useRoute()
-const { t } = useI18n()
+const { t, locale } = useI18n()
 const toast = useToast()
 
 const email = ref('')
@@ -52,7 +53,7 @@ async function signIn(withEmail = email.value, withPassword = password.value) {
     const redirect = typeof route.query.redirect === 'string' ? route.query.redirect : '/'
     await router.replace(redirect)
   } catch (e) {
-    error.value = e instanceof ApiError ? (e.detail ?? e.title) : t('login.unreachable')
+    error.value = e instanceof ApiError ? (translateServerMessage(e.detail, locale.value as Locale) ?? e.title) : t('login.unreachable')
   } finally {
     loading.value = false
   }

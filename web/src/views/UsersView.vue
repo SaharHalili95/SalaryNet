@@ -17,6 +17,7 @@ import { computed, onMounted, reactive, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { api } from '@/api'
 import type { Employee, PagedResult, UserAccount, UserQuery, UserRole } from '@/api/types'
+import { useLocalizedData } from '@/i18n/useLocalizedData'
 import { useAuthStore } from '@/stores/auth'
 import { formatDate, formatTime } from '@/utils/format'
 import { useApiError } from '@/utils/useApiError'
@@ -26,6 +27,7 @@ const handleError = useApiError()
 const confirm = useConfirm()
 const toast = useToast()
 const { t } = useI18n()
+const { term, person } = useLocalizedData()
 
 const roles = computed(() => (['Admin', 'HR', 'Employee'] as UserRole[]).map((value) => ({ value, label: t(`roles.${value}`) })))
 const statusOptions = computed(() => [{ label: t('common.active'), value: true }, { label: t('common.inactive'), value: false }])
@@ -35,7 +37,7 @@ const loading = ref(false)
 const query = reactive<UserQuery>({ page: 1, pageSize: 10, search: '' })
 const employees = ref<Employee[]>([])
 const employeeOptions = computed(() =>
-  employees.value.map((e) => ({ id: e.id, label: `${e.firstName} ${e.lastName} · ${e.departmentName}` })))
+  employees.value.map((e) => ({ id: e.id, label: `${person(`${e.firstName} ${e.lastName}`)} · ${term(e.departmentName)}` })))
 
 async function load() {
   loading.value = true
@@ -224,7 +226,7 @@ onMounted(load)
           <template #body="{ data }">
             <div class="name">
               <strong>{{ data.email }} <span v-if="isSelf(data)" class="muted">{{ t('users.you') }}</span></strong>
-              <span class="muted">{{ data.employeeName ?? data.displayName ?? t('users.staffAccount') }}</span>
+              <span class="muted">{{ person(data.employeeName ?? data.displayName) || t('users.staffAccount') }}</span>
             </div>
           </template>
         </Column>

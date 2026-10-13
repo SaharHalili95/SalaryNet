@@ -9,10 +9,12 @@ import { isDemoMode } from '@/api'
 import type { UserRole } from '@/api/types'
 import ChangePasswordDialog from '@/components/ChangePasswordDialog.vue'
 import { toggleLocale } from '@/i18n'
+import { useLocalizedData } from '@/i18n/useLocalizedData'
 import { useAuthStore } from '@/stores/auth'
 
 const auth = useAuthStore()
 const { t } = useI18n()
+const { person } = useLocalizedData()
 const router = useRouter()
 const route = useRoute()
 const mobileOpen = ref(false)
@@ -84,7 +86,7 @@ function logout() {
         <div v-else class="user">
           <Avatar :label="initials" shape="circle" />
           <div class="user-text">
-            <strong>{{ auth.user?.displayName }}</strong>
+            <strong>{{ person(auth.user?.displayName) }}</strong>
             <Tag :value="auth.user ? t(`roles.${auth.user.role}`) : ''" :severity="roleSeverity" />
           </div>
           <Button :label="t('nav.switchLanguage')" icon="pi pi-globe" text size="small" :aria-label="t('nav.switchLanguageLabel')" @click="toggleLocale" />

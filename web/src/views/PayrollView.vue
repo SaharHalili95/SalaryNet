@@ -12,6 +12,7 @@ import { api } from '@/api'
 import type { Department, Employee, PagedResult, PayrollQuery, PayrollRecord } from '@/api/types'
 import PayslipDialog from '@/components/PayslipDialog.vue'
 import { useAuthStore } from '@/stores/auth'
+import { useLocalizedData } from '@/i18n/useLocalizedData'
 import { formatMoney, formatPeriod, monthOptions } from '@/utils/format'
 import { useApiError } from '@/utils/useApiError'
 
@@ -19,6 +20,7 @@ const auth = useAuthStore()
 const handleError = useApiError()
 const toast = useToast()
 const { t } = useI18n()
+const { term, person } = useLocalizedData()
 // monthOptions reads the active locale, so this recomputes when the language changes.
 const months = computed(() => monthOptions())
 
@@ -39,7 +41,9 @@ const busy = ref(false)
 const period = reactive({ year: now.getFullYear(), month: now.getMonth() + 1 })
 const single = reactive({ employeeId: '', bonus: 0 })
 const activeEmployees = ref<Employee[]>([])
-const employeeOptions = computed(() => activeEmployees.value.map((e) => ({ id: e.id, label: `${e.firstName} ${e.lastName} · ${e.departmentName}` })))
+const employeeOptions = computed(() =>
+  activeEmployees.value.map((e) => ({ id: e.id, label: `${person(`${e.firstName} ${e.lastName}`)} · ${term(e.departmentName)}` })))
+const departmentOptions = computed(() => departments.value.map((d) => ({ id: d.id, name: term(d.name) })))
 
 async function load() {
   loading.value = true
@@ -137,7 +141,7 @@ onMounted(async () => {
         <Select v-model="query.year" :options="yearOptions" :placeholder="t('payroll.anyYear')" show-clear :aria-label="t('common.year')" />
         <Select v-model="query.month" :options="months" option-label="label" option-value="value"
           :placeholder="t('payroll.anyMonth')" show-clear :aria-label="t('common.month')" />
-        <Select v-if="auth.isStaff" v-model="query.departmentId" :options="departments" option-label="name" option-value="id"
+        <Select v-if="auth.isStaff" v-model="query.departmentId" :options="departmentOptions" option-label="name" option-value="id"
           :placeholder="t('common.allDepartments')" show-clear :aria-label="t('common.department')" />
       </div>
 
@@ -148,8 +152,12 @@ onMounted(async () => {
         <Column :header="t('payroll.period')">
           <template #body="{ data }"><strong>{{ formatPeriod(data.year, data.month) }}</strong></template>
         </Column>
-        <Column v-if="auth.isStaff" field="employeeName" :header="t('common.employee')" />
-        <Column v-if="auth.isStaff" field="departmentName" :header="t('common.department')" />
+        <Column v-if="auth.isStaff" :header="t('common.employee')">
+          <template #body="{ data }">{{ person(data.employeeName) }}</template>
+        </Column>
+        <Column v-if="auth.isStaff" :header="t('common.department')">
+          <template #body="{ data }">{{ term(data.departmentName) }}</template>
+        </Column>
         <Column :header="t('payroll.gross')">
           <template #body="{ data }"><span class="money">{{ formatMoney(data.grossSalary) }}</span></template>
         </Column>
