@@ -26,8 +26,13 @@ const nav: { to: string; label: string; icon: string; roles?: UserRole[] }[] = [
   { to: '/attendance', label: 'nav.attendance', icon: 'pi pi-clock' },
   { to: '/users', label: 'nav.users', icon: 'pi pi-shield', roles: ['Admin'] },
 ]
+const guideNav = [
+  { to: '/architecture', label: 'nav.architecture', icon: 'pi pi-share-alt' },
+  { to: '/troubleshooting', label: 'nav.troubleshooting', icon: 'pi pi-wrench' },
+]
 
-const visibleNav = computed(() => nav.filter((item) => !item.roles || auth.hasRole(item.roles)))
+// Signed-out visitors (e.g. recruiters) can still read the architecture and troubleshooting guides.
+const visibleNav = computed(() => (auth.isAuthenticated ? nav.filter((item) => !item.roles || auth.hasRole(item.roles)) : []))
 const initials = computed(() =>
   (auth.user?.displayName ?? '?').split(/[\s@.]/).filter(Boolean).slice(0, 2).map((p) => p[0]!.toUpperCase()).join(''))
 const roleSeverity = computed(() => ({ Admin: 'danger', HR: 'info', Employee: 'success' } as const)[auth.user?.role ?? 'Employee'])
@@ -52,6 +57,11 @@ function logout() {
           <i :class="item.icon" />
           <span>{{ t(item.label) }}</span>
         </RouterLink>
+        <div v-if="visibleNav.length" class="nav-divider" />
+        <RouterLink v-for="item in guideNav" :key="item.to" :to="item.to" class="nav-link">
+          <i :class="item.icon" />
+          <span>{{ t(item.label) }}</span>
+        </RouterLink>
       </nav>
       <div class="sidebar-footer">
         <span dir="ltr">{{ t('layout.footer') }}</span>
@@ -67,7 +77,11 @@ function logout() {
       <header class="topbar">
         <Button class="menu-toggle" icon="pi pi-bars" text rounded :aria-label="t('nav.openMenu')" @click="mobileOpen = true" />
         <div class="spacer" />
-        <div class="user">
+        <div v-if="!auth.isAuthenticated" class="user">
+          <Button :label="t('nav.switchLanguage')" icon="pi pi-globe" text size="small" :aria-label="t('nav.switchLanguageLabel')" @click="toggleLocale" />
+          <Button :label="t('nav.signIn')" icon="pi pi-sign-in" size="small" @click="router.push({ name: 'login' })" />
+        </div>
+        <div v-else class="user">
           <Avatar :label="initials" shape="circle" />
           <div class="user-text">
             <strong>{{ auth.user?.displayName }}</strong>
@@ -102,6 +116,7 @@ nav { display: flex; flex-direction: column; gap: 0.25rem; }
 .nav-link:hover { background: var(--app-sidebar-active); color: #fff; }
 .nav-link.router-link-active { background: var(--app-sidebar-active); color: #fff; box-shadow: inset 3px 0 0 var(--app-accent); }
 :global([dir='rtl']) .nav-link.router-link-active { box-shadow: inset -3px 0 0 var(--app-accent); }
+.nav-divider { height: 1px; background: rgb(255 255 255 / 0.08); margin: 0.5rem 0.75rem; }
 .sidebar-footer { margin-top: auto; padding: 0 0.5rem; font-size: 0.75rem; opacity: 0.6; }
 .main { flex: 1; min-width: 0; display: flex; flex-direction: column; }
 .demo-banner { background: #fff7e6; color: #8a5300; padding: 0.5rem 1.5rem; font-size: 0.8125rem; display: flex; gap: 0.5rem; align-items: center; }
