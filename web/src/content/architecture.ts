@@ -11,6 +11,8 @@ export type NodeId =
 export interface Lane {
   id: string
   title: Localized
+  /** Restaurant analogy for readers without a software background. */
+  analogy: Localized
 }
 
 export interface DiagramNode {
@@ -18,6 +20,8 @@ export interface DiagramNode {
   lane: number
   row: number
   label: Localized
+  /** What this part is, in plain words. */
+  plain: Localized
   code: string
 }
 
@@ -35,30 +39,36 @@ export interface Flow {
 }
 
 export const lanes: Lane[] = [
-  { id: 'browser', title: { en: 'Browser · Vue 3', he: 'דפדפן · Vue 3' } },
-  { id: 'api', title: { en: 'API · ASP.NET Core', he: 'שרת · ASP.NET Core' } },
-  { id: 'application', title: { en: 'Application', he: 'שכבת האפליקציה' } },
-  { id: 'domain', title: { en: 'Domain', he: 'ליבה (Domain)' } },
-  { id: 'infrastructure', title: { en: 'Infrastructure', he: 'תשתית' } },
-  { id: 'database', title: { en: 'SQL Server', he: 'SQL Server' } },
+  { id: 'browser', title: { en: 'Browser · Vue 3', he: 'דפדפן · Vue 3' },
+    analogy: { en: 'The table and the menu: everything the guest sees and touches.', he: 'השולחן והתפריט: כל מה שהאורח רואה ונוגע בו.' } },
+  { id: 'api', title: { en: 'API · ASP.NET Core', he: 'שרת · ASP.NET Core' },
+    analogy: { en: 'The waiter at the door: checks who you are, whether you may order this, and that the order makes sense.', he: 'המלצר בכניסה: בודק מי אתה, אם מותר לך להזמין את זה, ושההזמנה הגיונית.' } },
+  { id: 'application', title: { en: 'Application', he: 'שכבת האפליקציה' },
+    analogy: { en: 'The shift manager: decides which steps fulfil the order and in what order.', he: 'מנהל המשמרת: מחליט אילו צעדים ממלאים את ההזמנה ובאיזה סדר.' } },
+  { id: 'domain', title: { en: 'Domain', he: 'ליבה (Domain)' },
+    analogy: { en: "The house rules and recipes: what is allowed, how pay and tax are calculated. They never change because of the kitchen's equipment.", he: 'כללי הבית והמתכונים: מה מותר, ואיך מחשבים שכר ומס. הם לא משתנים בגלל הציוד במטבח.' } },
+  { id: 'infrastructure', title: { en: 'Infrastructure', he: 'תשתית' },
+    analogy: { en: 'The kitchen equipment: the tools that talk to the storeroom, lock the safe and print the ID badges.', he: 'הציוד במטבח: הכלים שמדברים עם המחסן, נועלים את הכספת ומדפיסים תגי זיהוי.' } },
+  { id: 'database', title: { en: 'SQL Server', he: 'SQL Server' },
+    analogy: { en: 'The storeroom and the ledger: where everything is kept, with locks that stop mistakes such as paying someone twice.', he: 'המחסן ופנקס החשבונות: כאן הכול נשמר, עם מנעולים שמונעים טעויות כמו לשלם למישהו פעמיים.' } },
 ]
 
 export const nodes: DiagramNode[] = [
-  { id: 'view', lane: 0, row: 0, label: { en: 'Screen (view)', he: 'מסך (View)' }, code: 'web/src/views' },
-  { id: 'client', lane: 0, row: 1.2, label: { en: 'Store + API client', he: 'Store ולקוח API' }, code: 'web/src/api/httpApi.ts' },
-  { id: 'auth', lane: 1, row: 0, label: { en: 'JWT authentication', he: 'אימות JWT' }, code: 'src/SalaryNet.API/Program.cs' },
-  { id: 'policy', lane: 1, row: 1, label: { en: 'Role policy', he: 'מדיניות תפקידים' }, code: 'src/SalaryNet.API/Security/Policies.cs' },
-  { id: 'filter', lane: 1, row: 2, label: { en: 'Validation filter', he: 'מסנן ולידציה' }, code: 'src/SalaryNet.API/Filters/FluentValidationFilter.cs' },
-  { id: 'controller', lane: 1, row: 3, label: { en: 'Controller', he: 'Controller' }, code: 'src/SalaryNet.API/Controllers' },
-  { id: 'errors', lane: 1, row: 4, label: { en: 'Error handler', he: 'טיפול בשגיאות' }, code: 'src/SalaryNet.API/Errors/GlobalExceptionHandler.cs' },
-  { id: 'service', lane: 2, row: 1.5, label: { en: 'Service', he: 'שירות (Service)' }, code: 'src/SalaryNet.Application' },
-  { id: 'entity', lane: 3, row: 1, label: { en: 'Entity rules', he: 'כללי הישות' }, code: 'src/SalaryNet.Domain/Entities' },
-  { id: 'calculator', lane: 3, row: 2.4, label: { en: 'Payroll calculator', he: 'מחשבון שכר' }, code: 'src/SalaryNet.Domain/Services/PayrollCalculator.cs' },
-  { id: 'repository', lane: 4, row: 0, label: { en: 'Repository · EF Core', he: 'Repository · EF Core' }, code: 'src/SalaryNet.Infrastructure/Persistence/Repositories' },
-  { id: 'unitOfWork', lane: 4, row: 1, label: { en: 'Unit of work', he: 'Unit of Work' }, code: 'src/SalaryNet.Infrastructure/Persistence/UnitOfWork.cs' },
-  { id: 'jwt', lane: 4, row: 2, label: { en: 'JWT issuer', he: 'הנפקת JWT' }, code: 'src/SalaryNet.Infrastructure/Security/JwtAccessTokenGenerator.cs' },
-  { id: 'hasher', lane: 4, row: 3, label: { en: 'Password hasher', he: 'גיבוב סיסמאות' }, code: 'src/SalaryNet.Infrastructure/Security/IdentityPasswordHasher.cs' },
-  { id: 'database', lane: 5, row: 1.5, label: { en: 'Tables + indexes', he: 'טבלאות ואינדקסים' }, code: 'src/SalaryNet.Infrastructure/Persistence/Configurations' },
+  { id: 'view', lane: 0, row: 0, label: { en: 'Screen (view)', he: 'מסך (View)' }, plain: { en: 'The screen you click on.', he: 'המסך שעליו לוחצים.' }, code: 'web/src/views' },
+  { id: 'client', lane: 0, row: 1.2, label: { en: 'Store + API client', he: 'Store ולקוח API' }, plain: { en: 'Keeps who is signed in and sends requests to the server.', he: 'זוכר מי מחובר ושולח בקשות לשרת.' }, code: 'web/src/api/httpApi.ts' },
+  { id: 'auth', lane: 1, row: 0, label: { en: 'JWT authentication', he: 'אימות JWT' }, plain: { en: 'Checks the digital ID card (token) on every request.', he: 'בודק את תעודת הזהות הדיגיטלית (הטוקן) בכל בקשה.' }, code: 'src/SalaryNet.API/Program.cs' },
+  { id: 'policy', lane: 1, row: 1, label: { en: 'Role policy', he: 'מדיניות תפקידים' }, plain: { en: 'Decides whether your role may do this action.', he: 'מחליט אם התפקיד שלך רשאי לבצע את הפעולה.' }, code: 'src/SalaryNet.API/Security/Policies.cs' },
+  { id: 'filter', lane: 1, row: 2, label: { en: 'Validation filter', he: 'מסנן ולידציה' }, plain: { en: 'Checks the form is filled in correctly before anything else happens.', he: 'בודק שהטופס מולא נכון לפני שקורה משהו אחר.' }, code: 'src/SalaryNet.API/Filters/FluentValidationFilter.cs' },
+  { id: 'controller', lane: 1, row: 3, label: { en: 'Controller', he: 'Controller' }, plain: { en: 'The entry point for one kind of request; hands it to the right service.', he: 'נקודת הכניסה לסוג אחד של בקשה, שמעבירה אותה לשירות הנכון.' }, code: 'src/SalaryNet.API/Controllers' },
+  { id: 'errors', lane: 1, row: 4, label: { en: 'Error handler', he: 'טיפול בשגיאות' }, plain: { en: 'Turns any failure into a clear, consistent error message.', he: 'הופך כל תקלה להודעת שגיאה ברורה ואחידה.' }, code: 'src/SalaryNet.API/Errors/GlobalExceptionHandler.cs' },
+  { id: 'service', lane: 2, row: 1.5, label: { en: 'Service', he: 'שירות (Service)' }, plain: { en: 'Runs the steps of one task, like creating an employee.', he: 'מריץ את השלבים של משימה אחת, למשל יצירת עובד.' }, code: 'src/SalaryNet.Application' },
+  { id: 'entity', lane: 3, row: 1, label: { en: 'Entity rules', he: 'כללי הישות' }, plain: { en: 'The business rules every record must follow.', he: 'הכללים העסקיים שכל רשומה חייבת לעמוד בהם.' }, code: 'src/SalaryNet.Domain/Entities' },
+  { id: 'calculator', lane: 3, row: 2.4, label: { en: 'Payroll calculator', he: 'מחשבון שכר' }, plain: { en: 'Works out income tax, social security and net pay.', he: 'מחשב מס הכנסה, ביטוח לאומי ושכר נטו.' }, code: 'src/SalaryNet.Domain/Services/PayrollCalculator.cs' },
+  { id: 'repository', lane: 4, row: 0, label: { en: 'Repository · EF Core', he: 'Repository · EF Core' }, plain: { en: 'Reads and writes records in the database.', he: 'קורא וכותב רשומות במסד הנתונים.' }, code: 'src/SalaryNet.Infrastructure/Persistence/Repositories' },
+  { id: 'unitOfWork', lane: 4, row: 1, label: { en: 'Unit of work', he: 'Unit of Work' }, plain: { en: 'Saves all changes of a task together, or none of them.', he: 'שומר את כל השינויים של משימה ביחד, או אף אחד מהם.' }, code: 'src/SalaryNet.Infrastructure/Persistence/UnitOfWork.cs' },
+  { id: 'jwt', lane: 4, row: 2, label: { en: 'JWT issuer', he: 'הנפקת JWT' }, plain: { en: 'Prints the signed digital ID card after sign-in.', he: 'מדפיס את תעודת הזהות הדיגיטלית החתומה אחרי הכניסה.' }, code: 'src/SalaryNet.Infrastructure/Security/JwtAccessTokenGenerator.cs' },
+  { id: 'hasher', lane: 4, row: 3, label: { en: 'Password hasher', he: 'גיבוב סיסמאות' }, plain: { en: 'Stores passwords scrambled so even we cannot read them.', he: 'שומר סיסמאות מוצפנות בגיבוב, כך שגם אנחנו לא יכולים לקרוא אותן.' }, code: 'src/SalaryNet.Infrastructure/Security/IdentityPasswordHasher.cs' },
+  { id: 'database', lane: 5, row: 1.5, label: { en: 'Tables + indexes', he: 'טבלאות ואינדקסים' }, plain: { en: 'Where the data lives, with locks against duplicates.', he: 'המקום שבו הנתונים נשמרים, עם מנעולים נגד כפילויות.' }, code: 'src/SalaryNet.Infrastructure/Persistence/Configurations' },
 ]
 
 export const flows: Flow[] = [

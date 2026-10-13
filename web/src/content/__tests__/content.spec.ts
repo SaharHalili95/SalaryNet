@@ -3,7 +3,9 @@ import { resolve } from 'node:path'
 import { describe, expect, it } from 'vitest'
 import { flows, nodes } from '../architecture'
 import type { Localized } from '../localized'
+import { glossary } from '../glossary'
 import { issues } from '../troubleshooting'
+import { lanes } from '../architecture'
 
 const repoRoot = resolve(__dirname, '../../../..')
 const bothLanguages = (text: Localized) => text.en.trim().length > 0 && text.he.trim().length > 0
@@ -21,7 +23,9 @@ describe('architecture content', () => {
       expect(bothLanguages(flow.title) && bothLanguages(flow.summary), flow.id).toBe(true)
       for (const step of flow.steps) expect(bothLanguages(step.text), `${flow.id}: ${step.text.en}`).toBe(true)
     }
-    for (const node of nodes) expect(bothLanguages(node.label), node.id).toBe(true)
+    for (const node of nodes) expect(bothLanguages(node.label) && bothLanguages(node.plain), node.id).toBe(true)
+    for (const lane of lanes) expect(bothLanguages(lane.analogy), lane.id).toBe(true)
+    for (const g of glossary) expect(bothLanguages(g.meaning), g.term).toBe(true)
   })
 
   // The guides cite real files; this keeps them honest when code moves.

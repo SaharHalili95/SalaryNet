@@ -6,6 +6,7 @@ import { computed, onBeforeUnmount, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { isDemoMode } from '@/api'
 import { flows, lanes, nodes, type DiagramNode, type NodeId } from '@/content/architecture'
+import { glossary } from '@/content/glossary'
 import { pick } from '@/content/localized'
 import type { Locale } from '@/i18n'
 
@@ -112,6 +113,20 @@ const layerChain = computed(() => {
       </div>
     </div>
 
+    <section class="panel plain">
+      <h2>{{ t('architecture.plainTitle') }}</h2>
+      <p class="muted">{{ t('architecture.plainIntro') }}</p>
+      <ol class="analogy">
+        <li v-for="(lane, i) in lanes" :key="lane.id">
+          <span class="badge">{{ i + 1 }}</span>
+          <span>
+            <strong>{{ pick(lane.title, lang) }}</strong>
+            <span class="muted">{{ pick(lane.analogy, lang) }}</span>
+          </span>
+        </li>
+      </ol>
+    </section>
+
     <section class="panel layers">
       <h2>{{ t('architecture.layersTitle') }}</h2>
       <div class="chain">
@@ -180,6 +195,9 @@ const layerChain = computed(() => {
             <span class="step-text">
               <strong>{{ pick(byId.get(s.node)!.label, lang) }}</strong>
               <span>{{ pick(s.text, lang) }}</span>
+              <span v-if="i === stepIndex" class="plain-note">
+                <i class="pi pi-info-circle" /> {{ t('architecture.whatIsIt') }} {{ pick(byId.get(s.node)!.plain, lang) }}
+              </span>
               <code v-if="i === stepIndex" class="code-path">{{ t('architecture.code') }}: {{ byId.get(s.node)!.code }}</code>
             </span>
           </button>
@@ -188,11 +206,33 @@ const layerChain = computed(() => {
 
       <p v-if="isDemoMode" class="muted demo-note"><Tag severity="info" value="Demo" /> {{ t('architecture.demoNote') }}</p>
     </section>
+
+    <section class="panel glossary">
+      <h2>{{ t('architecture.glossaryTitle') }}</h2>
+      <p class="muted">{{ t('architecture.glossaryIntro') }}</p>
+      <dl>
+        <template v-for="g in glossary" :key="g.term">
+          <dt dir="ltr">{{ g.term }}</dt>
+          <dd>{{ pick(g.meaning, lang) }}</dd>
+        </template>
+      </dl>
+    </section>
   </div>
 </template>
 
 <style scoped>
-.layers { margin-bottom: 1rem; }
+.plain, .layers { margin-bottom: 1rem; }
+.plain > p { margin: 0 0 0.75rem; line-height: 1.6; }
+.analogy { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 0.75rem; }
+.analogy li { display: flex; gap: 0.75rem; align-items: flex-start; padding: 0.75rem; border: 1px solid var(--app-border); border-radius: 10px; background: var(--app-bg); }
+.analogy li > span:last-child { display: flex; flex-direction: column; gap: 0.25rem; line-height: 1.5; }
+.plain-note { display: block; margin-top: 0.375rem; padding: 0.5rem 0.625rem; border-radius: 8px; background: var(--app-bg); line-height: 1.5; }
+.glossary { margin-top: 1rem; }
+.glossary > p { margin: 0 0 0.75rem; }
+.glossary dl { margin: 0; display: grid; grid-template-columns: max-content 1fr; gap: 0.625rem 1.25rem; line-height: 1.6; }
+.glossary dt { font-weight: 650; text-align: start; }
+.glossary dd { margin: 0; }
+@media (max-width: 640px) { .glossary dl { grid-template-columns: 1fr; } .glossary dd { margin-bottom: 0.5rem; } }
 .chain { display: flex; align-items: center; gap: 0.625rem; flex-wrap: wrap; margin-bottom: 0.75rem; }
 .chain i { color: var(--app-text-muted); }
 .layer {

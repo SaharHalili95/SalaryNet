@@ -230,6 +230,11 @@ export default {
   architecture: {
     title: 'How it works',
     subtitle: 'Pick an action and follow the request through every layer of the system.',
+    plainTitle: 'In plain words: a restaurant',
+    plainIntro: 'Think of the system as a restaurant. Each layer has one job, like each person in a restaurant, and a request moves through them in order.',
+    whatIsIt: 'What is this?',
+    glossaryTitle: 'Glossary',
+    glossaryIntro: 'The technical words on this page, explained without jargon.',
     layersTitle: 'Clean Architecture layers',
     layersText: 'Dependencies point inward: the domain knows nothing about the database or the web, and infrastructure implements interfaces the application layer defines.',
     dependsOn: 'depends on',
