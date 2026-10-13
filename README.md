@@ -6,7 +6,13 @@ It covers the core flows of a payroll product: employees and departments, monthl
 
 > All data in this project is fictional demo data.
 
-**Live demo:** the front end runs on GitHub Pages in demo mode (the same business rules executed in the browser). Sign in with one click as Admin, HR or Employee.
+**Live demo:** https://saharhalili95.github.io/SalaryNet/ runs the front end on GitHub Pages in demo mode (the same business rules executed in the browser). Sign in with one click as Admin, HR or Employee, or open **How it works** to follow a request through every layer.
+
+| Sign in with test accounts | HR dashboard |
+| --- | --- |
+| ![Sign-in page with test accounts](docs/screenshots/1-sign-in.jpg) | ![HR dashboard](docs/screenshots/2-hr-dashboard.jpg) |
+| **Payslip with tax breakdown** | **Architecture walkthrough** |
+| ![Payslip](docs/screenshots/3-payslip.jpg) | ![How it works page](docs/screenshots/4-architecture.jpg) |
 
 ---
 
