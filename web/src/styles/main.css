@@ -80,6 +80,18 @@ code, input[type='email'], input[type='password'], .ltr { direction: ltr; unicod
 [dir='rtl'] input[type='email'], [dir='rtl'] input[type='password'] { text-align: right; }
 .muted { color: var(--app-text-muted); }
 
+body.menu-open { overflow: hidden; }
+
 @media (max-width: 640px) {
   .form-grid { grid-template-columns: 1fr; }
+}
+
+@media (max-width: 900px) {
+  /* iOS Safari zooms the page when it focuses a field smaller than 16px. */
+  /* :root raises specificity above PrimeVue's runtime-injected theme rules. */
+  :root input, :root select, :root textarea, :root .p-inputtext, :root .p-select-label { font-size: 16px; }
+  /* Icon-only buttons need a finger-sized hit area. */
+  :root .p-button.p-button-icon-only { min-width: 40px; min-height: 40px; }
+  .toolbar > * { flex: 1 1 100%; }
+  .toolbar .p-select, .toolbar .p-iconfield, .toolbar .p-iconfield .p-inputtext { width: 100%; }
 }
