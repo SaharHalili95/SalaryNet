@@ -181,9 +181,9 @@ onMounted(load)
 .panel-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem; }
 .panel-head h2 { margin: 0; }
 .recent-head { margin-top: 1.25rem; }
-.profile { margin: 0; display: grid; grid-template-columns: max-content 1fr; gap: 0.5rem 1rem; }
+.profile { margin: 0; display: grid; grid-template-columns: max-content minmax(0, 1fr); gap: 0.5rem 1rem; }
 .profile dt { color: var(--app-text-muted); }
-.profile dd { margin: 0; }
+.profile dd { margin: 0; overflow-wrap: anywhere; }
 .shifts { list-style: none; margin: 0; padding: 0; display: grid; gap: 0.375rem; }
 .shifts li { display: grid; grid-template-columns: 1fr auto auto; gap: 0.75rem; align-items: center; }
 @media (max-width: 1100px) { .tiles { grid-template-columns: repeat(2, minmax(0, 1fr)); } }

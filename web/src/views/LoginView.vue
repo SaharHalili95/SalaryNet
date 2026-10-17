@@ -196,8 +196,10 @@ async function signIn(withEmail = email.value, withPassword = password.value) {
 }
 @media (max-width: 520px) {
   .credentials thead { display: none; }
-  .credentials tbody tr { display: grid; grid-template-columns: auto 1fr; column-gap: 0.75rem; border-top: 1px solid var(--app-border); padding: 0.375rem 0; }
-  .credentials td { border-top: 0; padding: 0.125rem 0.375rem; }
+  .credentials tbody tr { display: grid; grid-template-columns: auto minmax(0, 1fr); column-gap: 0.75rem; border-top: 1px solid var(--app-border); padding: 0.375rem 0; }
+  .credentials td { border-top: 0; padding: 0.125rem 0.375rem; min-width: 0; }
+  .cred { display: flex; min-width: 0; }
+  .cred code { overflow-wrap: anywhere; }
   .credentials td:first-child { grid-row: span 2; align-self: center; }
   .copy { min-width: 36px; min-height: 36px; }
 }
