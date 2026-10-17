@@ -60,5 +60,5 @@ onMounted(async () => {
 .list { list-style: none; margin: 0; padding: 0; display: grid; gap: 0.5rem; }
 .list li { display: flex; justify-content: space-between; gap: 0.75rem; flex-wrap: wrap; padding-bottom: 0.5rem; border-bottom: 1px solid var(--app-border); }
 .list li:last-child { border-bottom: 0; padding-bottom: 0; }
-@media (max-width: 900px) { .focus { grid-template-columns: 1fr; } }
+@media (max-width: 900px) { .focus { grid-template-columns: minmax(0, 1fr); } }
 </style>

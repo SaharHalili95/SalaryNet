@@ -56,5 +56,5 @@ onMounted(async () => {
 .list { list-style: none; margin: 0.75rem 0 0; padding: 0; display: grid; gap: 0.5rem; }
 .list li { display: flex; justify-content: space-between; align-items: center; gap: 0.5rem; }
 p { margin: 0.75rem 0 0; }
-@media (max-width: 900px) { .focus { grid-template-columns: 1fr; } .counts { grid-template-columns: repeat(2, 1fr); } }
+@media (max-width: 900px) { .focus { grid-template-columns: minmax(0, 1fr); } .counts { grid-template-columns: repeat(2, 1fr); } }
 </style>

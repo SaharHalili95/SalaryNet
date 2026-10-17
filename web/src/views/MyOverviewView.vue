@@ -187,6 +187,6 @@ onMounted(load)
 .shifts { list-style: none; margin: 0; padding: 0; display: grid; gap: 0.375rem; }
 .shifts li { display: grid; grid-template-columns: 1fr auto auto; gap: 0.75rem; align-items: center; }
 @media (max-width: 1100px) { .tiles { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
-@media (max-width: 900px) { .grid { grid-template-columns: 1fr; } }
+@media (max-width: 900px) { .grid { grid-template-columns: minmax(0, 1fr); } }
 @media (max-width: 560px) { .tiles { grid-template-columns: 1fr; } }
 </style>

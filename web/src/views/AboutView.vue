@@ -37,7 +37,7 @@ const lang = computed(() => locale.value as Locale)
 <style scoped>
 .links { display: flex; gap: 1.25rem; flex-wrap: wrap; margin-bottom: 1rem; }
 .links a { display: inline-flex; align-items: center; gap: 0.5rem; color: var(--app-accent); text-decoration: none; font-weight: 600; }
-.sections { display: grid; grid-template-columns: repeat(auto-fit, minmax(340px, 1fr)); gap: 1rem; }
+.sections { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(340px, 100%), 1fr)); gap: 1rem; }
 .sections h2 { display: flex; align-items: center; gap: 0.5rem; }
 .sections h2 i { color: var(--app-accent); }
 .tech { font-size: 0.75rem; font-weight: 500; color: var(--app-text-muted); padding: 0.125rem 0.5rem; border: 1px solid var(--app-border); border-radius: 6px; }

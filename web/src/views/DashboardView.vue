@@ -153,7 +153,7 @@ const typeTotal = computed(() => summary.value?.employmentTypes.reduce((s, t) =>
               text size="small" @click="showTrendTable = !showTrendTable" />
           </div>
           <ChartCanvas v-if="!showTrendTable" :build="trendChart" :label="t('dashboard.trendLabel')" />
-          <table v-else class="data-table">
+          <div v-else class="table-scroll"><table class="data-table">
             <thead><tr><th>{{ t('dashboard.period') }}</th><th>{{ t('dashboard.gross') }}</th><th>{{ t('dashboard.deductions') }}</th><th>{{ t('dashboard.net') }}</th><th>{{ t('dashboard.payslips') }}</th></tr></thead>
             <tbody>
               <tr v-for="p in summary.monthlyTrend" :key="`${p.year}-${p.month}`">
@@ -164,7 +164,7 @@ const typeTotal = computed(() => summary.value?.employmentTypes.reduce((s, t) =>
                 <td>{{ p.payslips }}</td>
               </tr>
             </tbody>
-          </table>
+          </table></div>
         </section>
 
         <section class="panel">
@@ -185,7 +185,7 @@ const typeTotal = computed(() => summary.value?.employmentTypes.reduce((s, t) =>
           </div>
           <ChartCanvas v-if="!showDeptTable" :build="departmentChart" :label="t('dashboard.byDepartmentLabel')"
             :height="Math.max(200, summary.payrollByDepartment.length * 44)" />
-          <table v-else class="data-table">
+          <div v-else class="table-scroll"><table class="data-table">
             <thead><tr><th>{{ t('common.department') }}</th><th>{{ t('dashboard.payslips') }}</th><th>{{ t('dashboard.gross') }}</th><th>{{ t('dashboard.net') }}</th></tr></thead>
             <tbody>
               <tr v-for="d in summary.payrollByDepartment" :key="d.departmentName">
@@ -195,7 +195,7 @@ const typeTotal = computed(() => summary.value?.employmentTypes.reduce((s, t) =>
                 <td class="money">{{ formatMoney(d.netTotal) }}</td>
               </tr>
             </tbody>
-          </table>
+          </table></div>
         </section>
       </div>
     </template>
@@ -215,8 +215,9 @@ const typeTotal = computed(() => summary.value?.employmentTypes.reduce((s, t) =>
 .meter-label { display: flex; justify-content: space-between; margin-bottom: 0.375rem; }
 .meter { height: 8px; border-radius: 4px; background: var(--chart-grid); overflow: hidden; }
 .meter div { height: 100%; background: var(--chart-series-1); border-radius: 4px; }
+.table-scroll { overflow-x: auto; }
 .data-table { width: 100%; border-collapse: collapse; }
 .data-table th, .data-table td { text-align: start; padding: 0.5rem 0.625rem; border-bottom: 1px solid var(--app-border); }
 .data-table th { color: var(--app-text-muted); font-weight: 550; font-size: 0.8125rem; }
-@media (max-width: 900px) { .grid { grid-template-columns: 1fr; } }
+@media (max-width: 900px) { .grid { grid-template-columns: minmax(0, 1fr); } }
 </style>

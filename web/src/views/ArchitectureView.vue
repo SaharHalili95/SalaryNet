@@ -310,7 +310,7 @@ const layerChain = [lanes[0]!, lanes[1]!, lanes[2]!, lanes[3]!]
 <style scoped>
 .plain, .layers { margin-bottom: 1rem; }
 .plain > p { margin: 0 0 0.75rem; line-height: 1.6; }
-.analogy { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 0.75rem; }
+.analogy { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fit, minmax(min(240px, 100%), 1fr)); gap: 0.75rem; }
 .analogy li { display: flex; gap: 0.75rem; align-items: flex-start; padding: 0.75rem; border: 1px solid var(--app-border); border-radius: 10px; background: var(--app-bg); }
 .analogy li > span:last-child { display: flex; flex-direction: column; gap: 0.25rem; line-height: 1.5; }
 .plain-note { display: block; margin-top: 0.375rem; padding: 0.5rem 0.625rem; border-radius: 8px; background: var(--app-bg); line-height: 1.5; }
@@ -379,7 +379,7 @@ const layerChain = [lanes[0]!, lanes[1]!, lanes[2]!, lanes[3]!]
 @media (max-width: 640px) { .impl-pair { grid-template-columns: 1fr; } }
 .catalog { margin-top: 1rem; }
 .catalog > p { margin: 0 0 0.75rem; }
-.cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 0.75rem; }
+.cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(320px, 100%), 1fr)); gap: 0.75rem; }
 .card { border: 1px solid var(--app-border); border-radius: 10px; padding: 0.875rem 1rem; background: var(--app-bg); }
 .card dl { grid-template-columns: 1fr; gap: 0.125rem; }
 .card dd { margin-bottom: 0.375rem; }

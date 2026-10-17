@@ -130,7 +130,7 @@ onMounted(load)
 </template>
 
 <style scoped>
-.cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 1rem; }
+.cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(260px, 100%), 1fr)); gap: 1rem; }
 .card { display: flex; flex-direction: column; gap: 0.5rem; }
 .card-head { display: flex; justify-content: space-between; align-items: center; }
 .card-head h2 { margin: 0; }

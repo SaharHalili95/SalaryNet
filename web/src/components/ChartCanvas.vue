@@ -55,5 +55,6 @@ watch(() => props.build, render)
 </template>
 
 <style scoped>
-.chart { position: relative; width: 100%; }
+.chart { position: relative; width: 100%; min-width: 0; }
+.chart canvas { max-width: 100%; }
 </style>
