@@ -10,7 +10,8 @@
     "build:demo": "vue-tsc --noEmit && vite build --mode demo",
     "preview": "vite preview",
     "typecheck": "vue-tsc --noEmit",
-    "test": "vitest run"
+    "test": "vitest run",
+    "test:e2e": "playwright test"
   },
   "dependencies": {
     "@primeuix/themes": "2.0.3",
@@ -23,6 +24,7 @@
     "vue-router": "4.5.1"
   },
   "devDependencies": {
+    "@playwright/test": "1.63.0",
     "@types/node": "22.15.21",
     "@vitejs/plugin-vue": "5.2.4",
     "@vue/test-utils": "2.4.6",
