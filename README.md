@@ -26,7 +26,7 @@ It covers the core flows of a payroll product: employees and departments, monthl
 - **Account security**: per-account lockout after repeated failed sign-ins, a password policy, admin unlock and reset, and deactivation without deleting history.
 - **Security**: JWT authentication, `Admin` / `HR` / `Employee` role policies, and resource-level authorization that blocks IDOR. An employee who asks for someone else's payslip gets `404`, and a spoofed `employeeId` filter is ignored.
 - **Consistent errors**: every failure is returned as RFC 7807 `ProblemDetails` with a `traceId`. Validation errors come back per field from FluentValidation.
-- **Tests**: 132 xUnit test methods (162 test cases) (unit tests with Moq and FluentAssertions, plus integration tests with `WebApplicationFactory` against a real SQL Server in Testcontainers) and Vitest tests on the front end.
+- **Tests**: 132 xUnit test methods (162 test cases) (unit tests with Moq and FluentAssertions, plus integration tests with `WebApplicationFactory` against a real SQL Server in Testcontainers) Vitest tests on the front end, and 101 Playwright mobile tests that run on iPhone (WebKit), a 320px iPhone SE and Android in English and Hebrew.
 
 ## Architecture
 
@@ -206,6 +206,12 @@ Integration tests need Docker running: Testcontainers starts a SQL Server contai
 cd web && npm test
 ```
 
+Mobile end-to-end tests run the demo build on emulated phones (iPhone 14 and iPhone SE on WebKit, Pixel 7 on Chromium). They check that no page scrolls sideways, that fields are big enough to stop iOS from zooming, that tap targets are finger-sized, and that the main flows work by touch in both languages.
+
+```bash
+cd web && npx playwright install chromium webkit && npm run test:e2e
+```
+
 The front end's tax calculator is tested against the same values as the C# calculator, so the demo mode cannot drift from the backend.
 
 ## Tech stack
@@ -214,6 +220,6 @@ The front end's tax calculator is tested against the same values as the C# calcu
 
 **Frontend:** Vue 3 (Composition API), TypeScript, Vite, Pinia, Vue Router, vue-i18n, PrimeVue, Chart.js
 
-**Quality:** xUnit, Moq, FluentAssertions, Testcontainers, WebApplicationFactory, Vitest, .NET analyzers with warnings as errors, central package management
+**Quality:** xUnit, Moq, FluentAssertions, Testcontainers, WebApplicationFactory, Vitest, Playwright, .NET analyzers with warnings as errors, central package management
 
 **Delivery:** Docker, Docker Compose, nginx, GitHub Actions (CI and GitHub Pages)

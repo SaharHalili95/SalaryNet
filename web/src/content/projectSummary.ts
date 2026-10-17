@@ -44,6 +44,7 @@ export const summarySections: SummarySection[] = [
     items: [
       { en: '164 back-end tests, including integration tests against a real SQL Server in Testcontainers.', he: '164 בדיקות בשרת, כולל בדיקות אינטגרציה מול SQL Server אמיתי ב-Testcontainers.' },
       { en: '54 front-end tests, including checks that no translation is missing and every cited code path exists.', he: '54 בדיקות בממשק, כולל בדיקה שאין תרגום חסר ושכל נתיב קוד שמוזכר קיים.' },
+      { en: '101 mobile tests in Playwright, run on iPhone (Safari engine), a small iPhone and Android, in English and Hebrew.', he: '101 בדיקות מובייל ב-Playwright, שרצות על אייפון (מנוע Safari), אייפון קטן ואנדרואיד, באנגלית ובעברית.' },
       { en: 'An end-to-end script that runs 67 actions across every role against a running server.', he: 'סקריפט מקצה לקצה שמריץ 67 פעולות בכל התפקידים מול שרת פעיל.' },
     ],
   },
