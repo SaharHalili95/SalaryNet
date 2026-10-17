@@ -159,7 +159,7 @@ async function signIn(withEmail = email.value, withPassword = password.value) {
   border: 1px solid rgb(255 255 255 / 0.25); color: #fff; text-decoration: none; font-weight: 550;
 }
 .guide-link:hover { background: rgb(255 255 255 / 0.08); }
-.form-side { display: grid; place-items: center; padding: 2rem 1rem; }
+.form-side { display: grid; grid-template-columns: minmax(0, 420px); justify-content: center; align-items: center; padding: 2rem 1rem; }
 .card { width: 100%; max-width: 420px; display: flex; flex-direction: column; gap: 1rem; }
 .card h2 { margin: 0; font-size: 1.5rem; }
 .card-head { display: flex; justify-content: space-between; align-items: center; }
@@ -189,9 +189,16 @@ async function signIn(withEmail = email.value, withPassword = password.value) {
 }
 .copy:hover { color: var(--app-accent); }
 @media (max-width: 900px) {
-  .login { grid-template-columns: 1fr; }
+  .login { grid-template-columns: minmax(0, 1fr); }
   .hero { padding: 2rem 1.25rem; }
   .hero h1 { font-size: 1.75rem; }
   .demo-grid { grid-template-columns: 1fr; }
+}
+@media (max-width: 520px) {
+  .credentials thead { display: none; }
+  .credentials tbody tr { display: grid; grid-template-columns: auto 1fr; column-gap: 0.75rem; border-top: 1px solid var(--app-border); padding: 0.375rem 0; }
+  .credentials td { border-top: 0; padding: 0.125rem 0.375rem; }
+  .credentials td:first-child { grid-row: span 2; align-self: center; }
+  .copy { min-width: 36px; min-height: 36px; }
 }
 </style>
