@@ -2,7 +2,7 @@
 import Avatar from 'primevue/avatar'
 import Button from 'primevue/button'
 import Tag from 'primevue/tag'
-import { computed, ref, watch } from 'vue'
+import { computed, onUnmounted, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRoute, useRouter } from 'vue-router'
 import { isDemoMode } from '@/api'
@@ -42,6 +42,9 @@ const initials = computed(() =>
 const roleSeverity = computed(() => ({ Admin: 'danger', HR: 'info', Employee: 'success' } as const)[auth.user?.role ?? 'Employee'])
 
 watch(() => route.fullPath, () => (mobileOpen.value = false))
+// Keep the page behind the open mobile menu from scrolling.
+watch(mobileOpen, (open) => document.body.classList.toggle('menu-open', open))
+onUnmounted(() => document.body.classList.remove('menu-open'))
 
 function logout() {
   auth.logout()
@@ -119,7 +122,7 @@ nav { display: flex; flex-direction: column; gap: 0.25rem; }
 }
 .nav-link:hover { background: var(--app-sidebar-active); color: #fff; }
 .nav-link.router-link-active { background: var(--app-sidebar-active); color: #fff; box-shadow: inset 3px 0 0 var(--app-accent); }
-:global([dir='rtl']) .nav-link.router-link-active { box-shadow: inset -3px 0 0 var(--app-accent); }
+[dir='rtl'] .nav-link.router-link-active { box-shadow: inset -3px 0 0 var(--app-accent); }
 .nav-divider { height: 1px; background: rgb(255 255 255 / 0.08); margin: 0.5rem 0.75rem; }
 .sidebar-footer { margin-top: auto; padding: 0 0.5rem; font-size: 0.75rem; opacity: 0.6; }
 .main { flex: 1; min-width: 0; display: flex; flex-direction: column; }
@@ -132,13 +135,23 @@ nav { display: flex; flex-direction: column; gap: 0.25rem; }
 .menu-toggle, .backdrop { display: none; }
 
 @media (max-width: 900px) {
-  .sidebar { position: fixed; z-index: 30; inset-inline-start: 0; transform: translateX(-100%); transition: transform 0.2s; }
-  :global([dir='rtl']) .sidebar { transform: translateX(100%); }
-  .sidebar.open { transform: none; }
-  .backdrop { display: block; position: fixed; inset: 0; background: rgb(0 0 0 / 0.4); z-index: 20; }
+  /* Not :global(): in scoped CSS it would compile to a bare [dir='rtl'] and move the whole page. */
+  .sidebar {
+    position: fixed; z-index: 30; inset-inline-start: 0; height: 100dvh; overflow-y: auto; overscroll-behavior: contain;
+    transform: translateX(-100%); transition: transform 0.2s, visibility 0.2s; visibility: hidden;
+  }
+  [dir='rtl'] .sidebar { transform: translateX(100%); }
+  .sidebar.open { transform: none; visibility: visible; }
+  /* iOS Safari only turns a tap into a click on elements that look clickable. */
+  .backdrop { display: block; position: fixed; inset: 0; background: rgb(0 0 0 / 0.4); z-index: 20; cursor: pointer; }
   .menu-toggle { display: inline-flex; }
+  .topbar :deep(.p-button) { min-width: 44px; min-height: 44px; }
+  .user { gap: 0.25rem; }
   .content { padding: 1.25rem 1rem 2rem; }
   .topbar { padding: 0.5rem 1rem; }
   .user-text strong { display: none; }
+}
+@media (max-width: 420px) {
+  .user-text { display: none; }
 }
 </style>
