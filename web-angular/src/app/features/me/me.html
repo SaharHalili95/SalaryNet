@@ -1,0 +1,78 @@
+<div class="page-header">
+  <div>
+    <h1>{{ 'me.greeting' | t: { name: (me()?.firstName | person) } }}</h1>
+    <p>{{ 'me.subtitle' | t }}</p>
+  </div>
+</div>
+
+@if (me(); as employee) {
+  <section class="panel shift">
+    <div class="shift-state">
+      <span class="dot" [class.on]="openShift()"></span>
+      <div>
+        <strong>{{ (openShift() ? 'attendance.checkedIn' : 'attendance.checkedOut') | t }}</strong>
+        <div class="muted">
+          @if (openShift(); as s) { {{ s.checkIn | clock }} } @else { {{ 'attendance.startHint' | t }} }
+        </div>
+      </div>
+    </div>
+    <button mat-flat-button type="button" [class.danger]="openShift()" [disabled]="busy()" (click)="toggleShift()">
+      <mat-icon>{{ openShift() ? 'logout' : 'login' }}</mat-icon>
+      {{ (openShift() ? 'attendance.checkOut' : 'attendance.checkIn') | t }}
+    </button>
+  </section>
+
+  <div class="tiles">
+    <app-stat-tile icon="payments" [label]="'me.lastNet' | t" [value]="latest() ? money(latest()!.netSalary) : '-'"
+      [caption]="latest() ? period(latest()!) : ('me.noPayslips' | t)" />
+    <app-stat-tile icon="show_chart" [label]="'me.ytdGross' | t" [value]="money(ytdGross(), true)"
+      [caption]="'me.payslipsCount' | t: { count: thisYearSlips().length }" />
+    <app-stat-tile icon="check_circle" [label]="'me.ytdNet' | t" [value]="money(ytdNet(), true)" />
+    <app-stat-tile icon="schedule" [label]="'me.hoursThisMonth' | t" [value]="hours(monthHours())"
+      [caption]="'me.shifts' | t: { count: monthShifts().length }" />
+  </div>
+
+  <div class="grid">
+    <section class="panel">
+      <div class="panel-head">
+        <h2>{{ 'me.netHistory' | t }}</h2>
+        <button mat-button type="button" class="all-payslips" (click)="openPage('/payroll')">{{ 'me.allPayslips' | t }}</button>
+      </div>
+      @if (payslips().length) {
+        <app-chart-canvas [build]="netChart()" [label]="'me.netHistoryLabel' | t" [height]="240" />
+      } @else {
+        <p class="muted">{{ 'me.noPayslips' | t }}</p>
+      }
+    </section>
+
+    <section class="panel">
+      <h2>{{ 'me.profile' | t }}</h2>
+      <dl class="profile">
+        <dt>{{ 'common.department' | t }}</dt><dd>{{ employee.departmentName | term }}</dd>
+        <dt>{{ 'employees.contract' | t }}</dt><dd>{{ 'employmentType.' + employee.employmentType | t }}</dd>
+        <dt>{{ 'me.joined' | t }}</dt><dd>{{ employee.createdAt | shortDate }}</dd>
+        <dt>{{ 'employees.baseSalary' | t }}</dt><dd class="money">{{ employee.baseSalary | money }}</dd>
+        <dt>{{ 'common.email' | t }}</dt><dd class="ltr">{{ employee.email }}</dd>
+      </dl>
+      <div class="panel-head recent-head">
+        <h2>{{ 'me.recentShifts' | t }}</h2>
+        <button mat-button type="button" (click)="openPage('/attendance')">{{ 'me.allShifts' | t }}</button>
+      </div>
+      <ul class="shifts">
+        @for (s of recentShifts(); track s.id) {
+          <li>
+            <span>{{ s.checkIn | shortDate }}</span>
+            <span class="muted">{{ s.checkIn | clock }}@if (s.checkOut) { - {{ s.checkOut | clock }}}</span>
+            <strong class="money">{{ s.isOpen ? ('attendance.onShift' | t) : (s.totalHours | hours) }}</strong>
+          </li>
+        }
+      </ul>
+    </section>
+  </div>
+} @else {
+  <div class="tiles" aria-busy="true">
+    @for (i of [1, 2, 3, 4]; track i) {
+      <div class="skeleton"></div>
+    }
+  </div>
+}
