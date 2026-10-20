@@ -1,0 +1,62 @@
+<div class="shell">
+  <aside class="sidebar" [class.open]="menuOpen()">
+    <div class="brand">
+      <span class="logo">S</span>
+      <span>SalaryNet</span>
+      <span class="flavor">Angular</span>
+    </div>
+    <nav>
+      @for (item of nav(); track item.path) {
+        <a class="nav-link" [routerLink]="item.path" routerLinkActive="router-link-active">
+          <mat-icon aria-hidden="true">{{ item.icon }}</mat-icon>
+          <span>{{ item.label | t }}</span>
+        </a>
+      }
+    </nav>
+    @if (vueUrl) {
+      <div class="nav-divider"></div>
+      <a class="nav-link version-link" [href]="vueUrl">
+        <mat-icon aria-hidden="true">swap_horiz</mat-icon>
+        <span>{{ 'layout.vueVersion' | t }}</span>
+      </a>
+    }
+    <div class="sidebar-footer">
+      <span dir="ltr">{{ 'layout.footerAngular' | t }}</span>
+    </div>
+  </aside>
+  @if (menuOpen()) {
+    <button type="button" class="backdrop" [attr.aria-label]="'nav.closeMenu' | t" (click)="toggleMenu(false)"></button>
+  }
+
+  <div class="main">
+    @if (demoMode) {
+      <div class="demo-banner">
+        <mat-icon aria-hidden="true">info</mat-icon>
+        <span>{{ 'layout.demoBanner' | t }} {{ 'layout.angularScope' | t }}</span>
+      </div>
+    }
+    <header class="topbar">
+      <button mat-icon-button class="menu-toggle" type="button" [attr.aria-label]="'nav.openMenu' | t" (click)="toggleMenu(true)">
+        <mat-icon>menu</mat-icon>
+      </button>
+      <div class="spacer"></div>
+      <div class="user">
+        <span class="avatar" aria-hidden="true">{{ initials() }}</span>
+        <div class="user-text">
+          <strong>{{ auth.user()?.displayName | person }}</strong>
+          <span class="role" [attr.data-role]="auth.user()?.role">{{ 'roles.' + auth.user()?.role | t }}</span>
+        </div>
+        <button mat-button type="button" class="language" [attr.aria-label]="'nav.switchLanguageLabel' | t" (click)="i18n.toggle()">
+          <mat-icon>language</mat-icon>
+          {{ 'nav.switchLanguage' | t }}
+        </button>
+        <button mat-icon-button type="button" [attr.aria-label]="'nav.signOut' | t" [matTooltip]="'nav.signOut' | t" (click)="logout()">
+          <mat-icon>logout</mat-icon>
+        </button>
+      </div>
+    </header>
+    <main class="content">
+      <router-outlet />
+    </main>
+  </div>
+</div>

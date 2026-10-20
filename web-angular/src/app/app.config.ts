@@ -1,10 +1,11 @@
 import { provideHttpClient, withInterceptors } from '@angular/common/http';
 import { ApplicationConfig, provideBrowserGlobalErrorListeners } from '@angular/core';
-import { provideRouter, withHashLocation } from '@angular/router';
+import { provideRouter, TitleStrategy, withHashLocation } from '@angular/router';
 import { environment } from '../environments/environment';
 import { routes } from './app.routes';
 import { authInterceptor, problemDetailsInterceptor } from './core/interceptors';
 import { provideLocalization } from './core/locale.service';
+import { TranslatedTitleStrategy } from './core/title.strategy';
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -13,5 +14,6 @@ export const appConfig: ApplicationConfig = {
     provideRouter(routes, ...(environment.demoMode ? [withHashLocation()] : [])),
     provideHttpClient(withInterceptors([authInterceptor, problemDetailsInterceptor])),
     provideLocalization(),
+    { provide: TitleStrategy, useClass: TranslatedTitleStrategy },
   ],
 };
