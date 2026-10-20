@@ -4,15 +4,17 @@ The manual `Deploy browser demo to AWS` workflow publishes the Vue and Angular s
 
 ## Cost and account requirements
 
-Use a CloudFront **Free flat-rate plan** for the distribution. AWS currently lists that plan at $0/month with no overage charges, with a baseline allowance of 1 million requests and 100 GB of data transfer per month. The plan includes 5 GB of S3 storage credits. Above the allowance, AWS says performance can be reduced; the plan does not add overage fees. A CloudFront Free plan cannot be attached to an AWS account that is currently on the AWS Free Tier account plan. Check the account plan before provisioning. [CloudFront flat-rate plans](https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/flat-rate-pricing-plan.html)
+Use only an AWS account whose plan reports `FREE` and `ACTIVE`. The workflow checks this through the AWS Free Tier API and stops before uploading anything when the check fails. AWS says free-plan accounts do not see charges when they exceed free usage, though the service can restrict use. This account plan is available only to eligible new AWS customers, so an existing paid account will not pass the check. [AWS Free Tier FAQ](https://docs.aws.amazon.com/awsaccountbilling/latest/aboutv2/free-tier-FAQ.html)
 
-This is a browser-only demo. The real .NET API still needs a persistent SQL Server database; this repository does not provision one because a managed SQL database cannot be promised at $0 for every AWS account. AWS Lambda has an Always Free monthly allowance, but requests beyond the allowance can be billed on a paid account. [AWS Free Tier account plans](https://docs.aws.amazon.com/awsaccountbilling/latest/aboutv2/free-tier.html), [Lambda pricing](https://aws.amazon.com/lambda/pricing/)
+This deployment uses only S3 and CloudFront's AWS Free Tier offers. It does not use the CloudFront flat-rate plan, paid DNS, custom paid logging, Lambda, API Gateway, or a database. New AWS customers receive 5 GB S3 storage, 20,000 GET requests, and 2,000 PUT requests per month for one year. CloudFront has an Always Free allowance of 1 TB data transfer and 10 million requests per month. The workflow is manual and uses one S3 sync and one invalidation per run. [S3 Free Tier](https://aws.amazon.com/s3/faqs/), [CloudFront Free Tier](https://aws.amazon.com/free/networking/)
+
+The real .NET API still needs a persistent SQL Server database. This repository does not deploy either one, since AWS compute and a managed database cannot be guaranteed free for every account. The live demo continues to use the browser-only demo engine on GitHub Pages.
 
 ## One-time setup
 
-Create an S3 bucket with public access blocked, a CloudFront distribution using Origin Access Control, and a CloudFront Free flat-rate subscription associated with the distribution and its WAF web ACL. CloudFront pricing-plan subscriptions require a global-scope WAF web ACL in `us-east-1`. Enable the Free plan before using the site. Do not select a paid plan.
+Create a private S3 bucket and a CloudFront distribution using Origin Access Control. Keep it on the normal Free Tier allowances. Do not attach a CloudFront flat-rate plan, paid WAF features, a custom domain, or paid logging.
 
-Create a GitHub Actions IAM role trusted through GitHub OIDC. Limit its trust policy to this repository and the `main` branch. Grant only `s3:ListBucket`, `s3:PutObject`, `s3:DeleteObject`, and `cloudfront:CreateInvalidation` on the demo bucket and distribution.
+Create a GitHub Actions IAM role trusted through GitHub OIDC. Limit its trust policy to this repository and the `main` branch. Grant only `freetier:GetAccountPlanState`, `s3:ListBucket`, `s3:PutObject`, `s3:DeleteObject`, and `cloudfront:CreateInvalidation` on the demo bucket and distribution.
 
 Set the repository secret `AWS_ROLE_TO_ASSUME` to that role ARN and the repository variables `AWS_DEMO_BUCKET` and `AWS_DEMO_DISTRIBUTION_ID` to the bucket name and distribution ID. Then run the workflow manually from the Actions tab.
 

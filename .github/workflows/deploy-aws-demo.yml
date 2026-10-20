@@ -34,5 +34,14 @@ jobs:
         with:
           role-to-assume: ${{ secrets.AWS_ROLE_TO_ASSUME }}
           aws-region: us-east-1
+      - name: Require an active AWS Free account plan
+        shell: bash
+        run: |
+          plan_type="$(aws freetier get-account-plan-state --query accountPlanType --output text)"
+          plan_status="$(aws freetier get-account-plan-state --query accountPlanStatus --output text)"
+          if [[ "$plan_type" != "FREE" || "$plan_status" != "ACTIVE" ]]; then
+            echo "Refusing deployment: AWS account plan must be FREE and ACTIVE." >&2
+            exit 1
+          fi
       - run: aws s3 sync web/dist "s3://${{ vars.AWS_DEMO_BUCKET }}" --delete
       - run: aws cloudfront create-invalidation --distribution-id "${{ vars.AWS_DEMO_DISTRIBUTION_ID }}" --paths '/*'
