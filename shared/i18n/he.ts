@@ -357,6 +357,15 @@ const he: typeof en = {
     hireDetail: '{name} הצטרף/ה למחלקת {department}.',
     leaveDetail: '{name} עזב/ה את מחלקת {department}.',
   },
+  paginator: {
+    itemsPerPage: 'שורות בעמוד',
+    firstPage: 'עמוד ראשון',
+    previousPage: 'עמוד קודם',
+    nextPage: 'עמוד הבא',
+    lastPage: 'עמוד אחרון',
+    range: '{start} – {end} מתוך {total}',
+    empty: '0 מתוך {total}',
+  },
   errors: {
     unexpected: 'שגיאה לא צפויה',
     400: 'יש לבדוק את הטופס',

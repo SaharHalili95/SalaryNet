@@ -355,6 +355,15 @@ export default {
     hireDetail: '{name} joined {department}.',
     leaveDetail: '{name} left {department}.',
   },
+  paginator: {
+    itemsPerPage: 'Rows per page',
+    firstPage: 'First page',
+    previousPage: 'Previous page',
+    nextPage: 'Next page',
+    lastPage: 'Last page',
+    range: '{start} – {end} of {total}',
+    empty: '0 of {total}',
+  },
   errors: {
     unexpected: 'Unexpected error',
     400: 'Please check the form',
