@@ -46,7 +46,7 @@ Sahar's condition: it must stay professional and make sense to a recruiter. Noth
 
 - Angular is an addition alongside Vue, not a replacement.
 - Build Phase 1 now (the core pages). Decide on Phases 2 and 3 after seeing it.
-- Sahar gets a Hebrew explainer after each part so he can defend the code in interviews.
+- Sahar gets a Hebrew explainer after each part so they can defend the code in interviews.
 - Shared, framework-free code (rules, demo data, translations) is written once and used by both apps.
 
 ### My calls (Sahar can override)
