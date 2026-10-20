@@ -16,12 +16,18 @@ export default defineConfig({
     { name: 'iphone-14', use: { ...devices['iPhone 14'] } },
     { name: 'iphone-se', use: { ...devices['iPhone SE'] } },
     { name: 'pixel-7', use: { ...devices['Pixel 7'] } },
+    { name: 'angular-iphone-14', use: { ...devices['iPhone 14'], baseURL: 'http://localhost:4174' }, metadata: { app: 'angular' }, grepInvert: /@full-app/ },
+    { name: 'angular-iphone-se', use: { ...devices['iPhone SE'], baseURL: 'http://localhost:4174' }, metadata: { app: 'angular' }, grepInvert: /@full-app/ },
+    { name: 'angular-pixel-7', use: { ...devices['Pixel 7'], baseURL: 'http://localhost:4174' }, metadata: { app: 'angular' }, grepInvert: /@full-app/ },
   ],
-  webServer: {
-    command: 'npx vite build --mode demo --outDir dist-e2e && npx vite preview --mode demo --outDir dist-e2e --port 4173 --strictPort',
-    env: { VITE_BASE: '/' },
-    url: 'http://localhost:4173',
-    reuseExistingServer: !process.env.CI,
-    timeout: 180_000,
-  },
+  webServer: [
+    {
+      command: 'npx vite build --mode demo --outDir dist-e2e && npx vite preview --mode demo --outDir dist-e2e --port 4173 --strictPort',
+      env: { VITE_BASE: '/' }, url: 'http://localhost:4173', reuseExistingServer: !process.env.CI, timeout: 180_000,
+    },
+    {
+      command: 'cd ../web-angular && npx ng build --configuration e2e && cd ../web && npx vite preview --outDir ../web-angular/dist/salarynet/browser --port 4174 --strictPort',
+      url: 'http://localhost:4174', reuseExistingServer: !process.env.CI, timeout: 180_000,
+    },
+  ],
 })

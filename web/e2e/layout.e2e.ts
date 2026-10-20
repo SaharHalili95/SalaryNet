@@ -1,13 +1,7 @@
 import { expect, test } from '@playwright/test'
-import { expectNoHorizontalScroll, goTo, open, signIn, type Locale, type Role } from './helpers'
+import { appFor, expectNoHorizontalScroll, goTo, open, pagesFor, signIn, type Locale, type Role } from './helpers'
 
 const guides = ['/architecture', '/troubleshooting', '/about']
-const pagesByRole: Record<Role, string[]> = {
-  Admin: ['/dashboard', '/employees', '/departments', '/payroll', '/attendance', '/users'],
-  HR: ['/dashboard', '/employees', '/departments', '/payroll', '/attendance'],
-  Employee: ['/me', '/payroll', '/attendance'],
-}
-
 for (const locale of ['en', 'he'] as Locale[]) {
   test.describe(`fits the screen (${locale})`, () => {
     test(`signed out: login`, async ({ page }) => {
@@ -17,17 +11,18 @@ for (const locale of ['en', 'he'] as Locale[]) {
     })
 
     for (const path of guides) {
-      test(`signed out: ${path}`, async ({ page }) => {
+      test(`@full-app signed out: ${path}`, async ({ page }) => {
         await open(page, path, locale)
         await expect(page.locator('main.content h1').first()).toBeVisible()
         await expectNoHorizontalScroll(page)
       })
     }
 
-    for (const [role, paths] of Object.entries(pagesByRole) as [Role, string[]][]) {
+    for (const role of ['Admin', 'HR', 'Employee'] as Role[]) {
       test(`${role}: every page`, async ({ page }) => {
         await signIn(page, role, locale)
-        for (const path of [...paths, ...guides]) {
+        const paths = [...pagesFor(appFor(page), role), ...(appFor(page) === 'vue' ? guides : [])]
+        for (const path of paths) {
           await test.step(path, async () => {
             await goTo(page, path)
             await expect(page.locator('main.content h1').first()).toBeVisible()
@@ -56,7 +51,7 @@ test('text inputs are at least 16px so iOS Safari does not zoom in on focus', as
 
 test('search fields on list pages are at least 16px', async ({ page }) => {
   await signIn(page, 'Admin')
-  for (const path of ['/employees', '/users']) {
+  for (const path of ['/employees', ...(appFor(page) === 'vue' ? ['/users'] : [])]) {
     await goTo(page, path)
     const size = await page.locator('.toolbar input').first().evaluate((el) => parseFloat(getComputedStyle(el).fontSize))
     expect(size, path).toBeGreaterThanOrEqual(16)

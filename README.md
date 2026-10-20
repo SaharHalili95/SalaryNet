@@ -1,6 +1,6 @@
 # SalaryNet
 
-A full-stack payroll and HR management system built with **ASP.NET Core 8 Web API**, **Clean Architecture**, **EF Core on SQL Server** and a **Vue 3 + TypeScript** front end.
+A full-stack payroll and HR management system built with **ASP.NET Core 8 Web API**, **Clean Architecture**, **EF Core on SQL Server**, and **Vue 3 and Angular** front ends.
 
 It covers the core flows of a payroll product: employees and departments, monthly payroll with a tiered tax calculation, attendance tracking, and role-based access where employees can only ever see their own records.
 
@@ -34,6 +34,7 @@ It covers the core flows of a payroll product: employees and departments, monthl
 flowchart LR
     subgraph Client
         Vue["Vue 3 + TypeScript<br/>PrimeVue, Pinia, Vue Router"]
+        Angular["Angular + TypeScript<br/>Signals, Angular Material"]
     end
     subgraph API["SalaryNet.API"]
         Ctrl["Controllers<br/>JWT + role policies"]
@@ -56,6 +57,7 @@ flowchart LR
     DB[("SQL Server")]
 
     Vue -->|HTTP + Bearer token| Ctrl
+    Angular -->|HTTP + Bearer token| Ctrl
     Ctrl --> Services
     Services --> Ports
     Services --> Entities
@@ -73,6 +75,7 @@ flowchart LR
 | `SalaryNet.API` | Controllers, authorization policies, global exception handler, validation action filter, Swagger, DI composition root. |
 | `SalaryNet.Tests` | xUnit unit tests and integration tests. |
 | `web/` | Vue 3 front end with an HTTP client for the real API and an in-browser demo implementation. |
+| `web-angular/` | Angular front end for the core flows, sharing the API contract, demo engine, payroll rules and translations. |
 
 ## Business rules
 
@@ -134,11 +137,13 @@ Full interactive documentation is available in Swagger at `/swagger`.
 
 ## Live demo vs. the full stack
 
-The public site has no server behind it. GitHub Pages only serves static files; the Vue app then runs in the visitor's browser in demo mode.
+The public site has no server behind it. GitHub Pages only serves static files; both Vue and Angular run in the visitor's browser in demo mode.
 
 - The UI talks to one interface, `SalaryNetApi`, with two implementations: `httpApi.ts` calls the real ASP.NET Core API and SQL Server, and `demoApi.ts` runs an in-browser copy of the same rules (roles, lockout, duplicate checks, tax calculation).
 - Each visitor gets a private fictional company in memory, so visitors never affect each other and a reload starts fresh.
 - On the live site the C# code itself does not run. The .NET server is proven by this repository, its test suite, and CI that runs the tests against a real SQL Server on every push. A front-end test pins the demo tax calculation to the C# results.
+
+The optional [AWS static demo deployment](docs/aws-demo-hosting.md) publishes both front ends to S3 and CloudFront through GitHub OIDC. It does not host the API or database.
 
 | What | Needs Docker |
 | --- | --- |
@@ -151,6 +156,17 @@ The public site has no server behind it. GitHub Pages only serves static files; 
 Stopping Docker loses nothing: local data lives in a Docker volume and returns on the next `docker compose --profile full up`.
 
 ## Running locally
+
+### Angular front end
+
+```bash
+cd web-angular
+npm ci
+npm start          # http://localhost:4200, proxies /api to the API on port 5080
+npm run start:demo # in-browser demo, no API or database required
+npm test
+npm run lint
+```
 
 ### Everything in Docker
 
@@ -218,7 +234,9 @@ The front end's tax calculator is tested against the same values as the C# calcu
 
 **Backend:** C# 12, .NET 8, ASP.NET Core Web API, EF Core 8, SQL Server 2022, FluentValidation, JWT Bearer, Swashbuckle
 
-**Frontend:** Vue 3 (Composition API), TypeScript, Vite, Pinia, Vue Router, vue-i18n, PrimeVue, Chart.js
+**Frontend:** Vue 3 (Composition API), Angular, TypeScript, Vite, Pinia, Vue Router, vue-i18n, PrimeVue, Angular Material, Chart.js
+
+**Demo hosting:** GitHub Pages; optional AWS S3 + CloudFront deployment
 
 **Quality:** xUnit, Moq, FluentAssertions, Testcontainers, WebApplicationFactory, Vitest, Playwright, .NET analyzers with warnings as errors, central package management
 

@@ -29,6 +29,22 @@ export const routes: Routes = [
         canActivate: [staff],
         loadComponent: () => import('./features/dashboard/dashboard').then((m) => m.Dashboard),
       },
+      {
+        path: 'employees',
+        title: 'nav.employees',
+        canActivate: [staff],
+        loadComponent: () => import('./features/employees/employees').then((m) => m.Employees),
+      },
+      {
+        path: 'payroll',
+        title: 'nav.payroll',
+        loadComponent: () => import('./features/payroll/payroll').then((m) => m.Payroll),
+      },
+      {
+        path: 'attendance',
+        title: 'nav.attendance',
+        loadComponent: () => import('./features/attendance/attendance').then((m) => m.Attendance),
+      },
     ],
   },
   { path: '**', redirectTo: '' },

@@ -1,0 +1,57 @@
+<div class="page-header">
+  <div>
+    <h1>{{ (auth.isStaff() ? 'payroll.titleStaff' : 'payroll.titleEmployee') | t }}</h1>
+    <p>{{ (auth.isStaff() ? 'payroll.subtitleStaff' : 'payroll.subtitleEmployee') | t }}</p>
+  </div>
+  @if (auth.isStaff()) {
+    <div class="header-actions">
+      <button mat-stroked-button type="button" (click)="generate()"><mat-icon>receipt_long</mat-icon>{{ 'payroll.single' | t }}</button>
+      <button mat-flat-button type="button" (click)="runMonth()"><mat-icon>play_arrow</mat-icon>{{ 'payroll.runMonthly' | t }}</button>
+    </div>
+  }
+</div>
+<section class="panel">
+  <div class="toolbar">
+    <mat-form-field appearance="outline"><mat-label>{{ 'common.year' | t }}</mat-label>
+      <mat-select [value]="query().year ?? null" (selectionChange)="filter('year', $event.value)">
+        <mat-option [value]="null">{{ 'payroll.anyYear' | t }}</mat-option>
+        @for (year of years; track year) { <mat-option [value]="year">{{ year }}</mat-option> }
+      </mat-select>
+    </mat-form-field>
+    <mat-form-field appearance="outline"><mat-label>{{ 'common.month' | t }}</mat-label>
+      <mat-select [value]="query().month ?? null" (selectionChange)="filter('month', $event.value)">
+        <mat-option [value]="null">{{ 'payroll.anyMonth' | t }}</mat-option>
+        @for (month of months; track month.value) { <mat-option [value]="month.value">{{ month.label }}</mat-option> }
+      </mat-select>
+    </mat-form-field>
+    @if (auth.isStaff()) {
+      <mat-form-field appearance="outline" data-filter="department"><mat-label>{{ 'common.department' | t }}</mat-label>
+        <mat-select [value]="query().departmentId ?? null" (selectionChange)="filter('departmentId', $event.value)">
+          <mat-option [value]="null">{{ 'common.allDepartments' | t }}</mat-option>
+          @for (department of departments(); track department.id) { <mat-option [value]="department.id">{{ department.name | term }}</mat-option> }
+        </mat-select>
+      </mat-form-field>
+    }
+  </div>
+  <div class="table-scroll">
+    <table mat-table [dataSource]="records()" [class.loading]="loading()">
+      <ng-container matColumnDef="period"><th mat-header-cell *matHeaderCellDef>{{ 'payroll.period' | t }}</th>
+        <td mat-cell *matCellDef="let row"><strong>{{ row.year | period: row.month }}</strong></td></ng-container>
+      <ng-container matColumnDef="employee"><th mat-header-cell *matHeaderCellDef>{{ 'common.employee' | t }}</th>
+        <td mat-cell *matCellDef="let row">{{ row.employeeName | person }}</td></ng-container>
+      <ng-container matColumnDef="department"><th mat-header-cell *matHeaderCellDef>{{ 'common.department' | t }}</th>
+        <td mat-cell *matCellDef="let row">{{ row.departmentName | term }}</td></ng-container>
+      <ng-container matColumnDef="gross"><th mat-header-cell *matHeaderCellDef>{{ 'payroll.gross' | t }}</th>
+        <td mat-cell *matCellDef="let row">{{ row.grossSalary | money }}</td></ng-container>
+      <ng-container matColumnDef="deductions"><th mat-header-cell *matHeaderCellDef>{{ 'payroll.deductions' | t }}</th>
+        <td mat-cell *matCellDef="let row" class="muted">{{ row.deductions | money }}</td></ng-container>
+      <ng-container matColumnDef="net"><th mat-header-cell *matHeaderCellDef>{{ 'payroll.netPay' | t }}</th>
+        <td mat-cell *matCellDef="let row"><strong>{{ row.netSalary | money }}</strong></td></ng-container>
+      <tr mat-header-row *matHeaderRowDef="auth.isStaff() ? columns : ['period', 'gross', 'deductions', 'net']"></tr>
+      <tr mat-row *matRowDef="let row; columns: auth.isStaff() ? columns : ['period', 'gross', 'deductions', 'net']" (click)="view(row)"></tr>
+      <tr *matNoDataRow><td class="empty" [attr.colspan]="auth.isStaff() ? 6 : 4">{{ 'payroll.empty' | t }}</td></tr>
+    </table>
+  </div>
+  <mat-paginator [length]="total()" [pageIndex]="(query().page ?? 1) - 1" [pageSize]="query().pageSize ?? 10"
+    [pageSizeOptions]="[10, 20, 50]" (page)="page($event)" />
+</section>

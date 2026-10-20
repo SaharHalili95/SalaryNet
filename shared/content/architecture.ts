@@ -211,7 +211,7 @@ export const flows: Flow[] = [
       { node: 'service', text: { en: 'Services throw NotFound (404), Conflict (409), Forbidden (403) or Unauthorized (401).', he: 'השירותים זורקים NotFound (404), Conflict (409), Forbidden (403) או Unauthorized (401).' } },
       { node: 'errors', text: { en: 'GlobalExceptionHandler maps each type to a status and writes ProblemDetails with a traceId. Unknown errors become 500 without internal details.', he: 'GlobalExceptionHandler ממפה כל סוג לסטטוס וכותב ProblemDetails עם traceId. שגיאה לא מוכרת הופכת ל-500 בלי לחשוף פרטים פנימיים.' } },
       { node: 'client', text: { en: 'The API client turns the body into an ApiError.', he: 'לקוח ה-API הופך את גוף התשובה ל-ApiError.' } },
-      { node: 'view', text: { en: 'Field errors appear under the matching inputs; anything else is shown as a toast.', he: 'שגיאות שדה מוצגות מתחת לשדות המתאימים, וכל השאר כהודעה קופצת.' } },
+      { node: 'view', text: { en: 'Vue and Angular show field errors under the matching inputs; anything else is shown as a toast.', he: 'ב-Vue וב-Angular שגיאות שדה מוצגות מתחת לשדות המתאימים, וכל השאר כהודעה קופצת.' } },
     ],
   },
 ]

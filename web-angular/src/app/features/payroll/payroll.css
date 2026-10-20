@@ -1,0 +1,13 @@
+.header-actions { display: flex; gap: .5rem; flex-wrap: wrap; }
+.header-actions mat-icon { margin-inline-end: .25rem; }
+.toolbar { display: flex; flex-wrap: wrap; gap: .75rem; padding: 1rem 1rem 0; }
+.toolbar mat-form-field { min-width: 10rem; }
+.table-scroll { overflow-x: auto; }
+table { width: 100%; min-width: 34rem; }
+tr.mat-mdc-row { cursor: pointer; }
+tr.mat-mdc-row:hover { background: var(--surface-raised); }
+td, th { white-space: nowrap; }
+.muted { color: var(--text-muted); }
+.empty { padding: 2rem; text-align: center; color: var(--text-muted); }
+.loading { opacity: .65; }
+@media (max-width: 640px) { .toolbar mat-form-field { flex: 1 1 9rem; min-width: 0; } }

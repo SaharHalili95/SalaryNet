@@ -1,5 +1,5 @@
 import { expect, test, type Locator, type Page } from '@playwright/test'
-import { goTo, signIn } from './helpers'
+import { dialog, goTo, signIn } from './helpers'
 
 async function expectInsideScreen(page: Page, locator: Locator) {
   const box = (await locator.boundingBox())!
@@ -10,22 +10,22 @@ async function expectInsideScreen(page: Page, locator: Locator) {
 }
 
 async function expectDialogUsable(page: Page) {
-  const dialog = page.locator('.p-dialog')
-  await expect(dialog).toBeVisible()
-  await expectInsideScreen(page, dialog)
-  const footer = dialog.locator('.p-dialog-footer button').last()
+  const modal = dialog(page)
+  await expect(modal).toBeVisible()
+  await expectInsideScreen(page, modal)
+  const footer = modal.locator('.p-dialog-footer button, mat-dialog-actions button').last()
   if (await footer.count()) {
     await footer.scrollIntoViewIfNeeded()
     await expect(footer).toBeInViewport({ ratio: 0.99 })
   }
-  return dialog
+  return modal
 }
 
 test.describe('payroll', () => {
   test('employee opens a payslip and it fits the screen', async ({ page }) => {
     await signIn(page, 'Employee')
     await goTo(page, '/payroll')
-    await page.locator('.p-datatable-tbody tr').first().tap()
+    await page.locator('.p-datatable-tbody tr, tr.mat-mdc-row').first().tap()
     const dialog = await expectDialogUsable(page)
     await expect(dialog).toContainText('Net')
   })
@@ -33,7 +33,7 @@ test.describe('payroll', () => {
   test('payslip amounts are not cut off', async ({ page }) => {
     await signIn(page, 'HR')
     await goTo(page, '/payroll')
-    await page.locator('.p-datatable-tbody tr').first().tap()
+    await page.locator('.p-datatable-tbody tr, tr.mat-mdc-row').first().tap()
     const dialog = await expectDialogUsable(page)
     for (const amount of await dialog.locator('.money').all()) {
       await expect(amount).toBeInViewport({ ratio: 0.99 })
@@ -43,10 +43,10 @@ test.describe('payroll', () => {
   test('payslip closes with its close button', async ({ page }) => {
     await signIn(page, 'Employee')
     await goTo(page, '/payroll')
-    await page.locator('.p-datatable-tbody tr').first().tap()
+    await page.locator('.p-datatable-tbody tr, tr.mat-mdc-row').first().tap()
     await expectDialogUsable(page)
-    await page.locator('.p-dialog-header button').last().tap()
-    await expect(page.locator('.p-dialog')).toBeHidden()
+    await dialog(page).getByRole('button', { name: /Close|Cancel/ }).last().tap()
+    await expect(dialog(page)).toBeHidden()
   })
 
   test('staff can open the single payslip dialog', async ({ page }) => {
@@ -66,7 +66,7 @@ test.describe('payroll', () => {
   test('payroll table scrolls inside its panel, not the page', async ({ page }) => {
     await signIn(page, 'HR')
     await goTo(page, '/payroll')
-    const table = page.locator('.p-datatable-table-container').first()
+    const table = page.locator('.p-datatable-table-container, .table-scroll').first()
     const box = (await table.boundingBox())!
     expect(box.x + box.width).toBeLessThanOrEqual(page.viewportSize()!.width + 1)
   })
@@ -74,7 +74,7 @@ test.describe('payroll', () => {
   test('paginator fits the screen', async ({ page }) => {
     await signIn(page, 'HR')
     await goTo(page, '/payroll')
-    const paginator = page.locator('.p-paginator').first()
+    const paginator = page.locator('.p-paginator, mat-paginator').first()
     await paginator.scrollIntoViewIfNeeded()
     await expectInsideScreen(page, paginator)
   })
@@ -82,16 +82,16 @@ test.describe('payroll', () => {
   test('next page button works', async ({ page }) => {
     await signIn(page, 'HR')
     await goTo(page, '/payroll')
-    const first = await page.locator('.p-datatable-tbody tr').first().innerText()
-    await page.locator('.p-paginator-next').tap()
-    await expect(page.locator('.p-datatable-tbody tr').first()).not.toHaveText(first)
+    const first = await page.locator('.p-datatable-tbody tr, tr.mat-mdc-row').first().innerText()
+    await page.locator('.p-paginator-next, button[aria-label="Next page"]').tap()
+    await expect(page.locator('.p-datatable-tbody tr, tr.mat-mdc-row').first()).not.toHaveText(first)
   })
 
   test('year filter dropdown opens inside the screen', async ({ page }) => {
     await signIn(page, 'HR')
     await goTo(page, '/payroll')
-    await page.locator('.toolbar .p-select').first().tap()
-    const overlay = page.locator('.p-select-overlay')
+    await page.locator('.toolbar .p-select, .toolbar mat-select').first().tap()
+    const overlay = page.locator('.p-select-overlay, .cdk-overlay-pane').last()
     await expect(overlay).toBeVisible()
     await expectInsideScreen(page, overlay)
   })
@@ -113,23 +113,23 @@ test.describe('employees', () => {
     await signIn(page, 'HR')
     await goTo(page, '/employees')
     await page.getByRole('button', { name: 'New employee' }).tap()
-    const dialog = page.locator('.p-dialog')
+    const dialog = page.locator('.p-dialog, .mat-mdc-dialog-container').last()
     await dialog.locator('#firstName').fill('Mobile')
     await dialog.locator('#lastName').fill('Tester')
     await dialog.locator('#email').fill('mobile.tester@salarynet.demo')
     await dialog.locator('#department').tap()
-    await page.locator('.p-select-overlay .p-select-option').first().tap()
+    await page.locator('.p-select-overlay .p-select-option, .cdk-overlay-pane mat-option').first().tap()
     await dialog.locator('#salary').fill('12000')
     await dialog.getByRole('button', { name: 'Create employee' }).tap()
     await expect(dialog).toBeHidden()
     await page.locator('.toolbar input').first().fill('Mobile')
-    await expect(page.locator('.p-datatable-tbody')).toContainText('Tester')
+    await expect(page.locator('.p-datatable-tbody, table[mat-table]')).toContainText('Tester')
   })
 
   test('search filters the list', async ({ page }) => {
     await signIn(page, 'HR')
     await goTo(page, '/employees')
-    const rows = page.locator('.p-datatable-tbody tr')
+    const rows = page.locator('.p-datatable-tbody tr, tr.mat-mdc-row')
     const before = await rows.count()
     await page.locator('.toolbar input').first().fill('Noa')
     await expect.poll(() => rows.count()).toBeLessThan(before)
@@ -148,14 +148,14 @@ test.describe('employees', () => {
     await signIn(page, 'HR')
     await goTo(page, '/employees')
     await page.getByRole('button', { name: 'New employee' }).tap()
-    await page.locator('.p-dialog').getByRole('button', { name: 'Create employee' }).tap()
-    const error = page.locator('.p-dialog small.error').first()
+    await page.locator('.p-dialog, .mat-mdc-dialog-container').getByRole('button', { name: /Create employee|Create/ }).tap()
+    const error = page.locator('.p-dialog small.error, .mat-mdc-dialog-container small.error').first()
     await expect(error).toBeVisible()
     await expectInsideScreen(page, error)
   })
 })
 
-test.describe('departments', () => {
+test.describe('@full-app departments', () => {
   test('department cards stack in one column', async ({ page }) => {
     await signIn(page, 'Admin')
     await goTo(page, '/departments')
@@ -205,7 +205,7 @@ test.describe('attendance', () => {
   })
 })
 
-test.describe('users', () => {
+test.describe('@full-app users', () => {
   test('row action menu opens inside the screen', async ({ page }) => {
     await signIn(page, 'Admin')
     await goTo(page, '/users')
@@ -233,7 +233,7 @@ test.describe('users', () => {
   })
 })
 
-test.describe('account', () => {
+test.describe('@full-app account', () => {
   test('change password dialog fits the screen', async ({ page }) => {
     await signIn(page, 'Employee')
     await page.locator('.topbar').getByRole('button', { name: 'Change password' }).tap()
@@ -247,7 +247,7 @@ test.describe('account', () => {
   })
 })
 
-test.describe('guides', () => {
+test.describe('@full-app guides', () => {
   test('architecture diagram fits or scrolls inside its own box', async ({ page }) => {
     await signIn(page, 'HR')
     await goTo(page, '/architecture')

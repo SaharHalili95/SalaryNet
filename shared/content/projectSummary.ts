@@ -28,8 +28,9 @@ export const summarySections: SummarySection[] = [
     id: 'frontend',
     icon: 'pi pi-desktop',
     title: { en: 'Front end', he: 'צד הממשק' },
-    tech: 'Vue 3 · TypeScript',
+    tech: 'Vue 3 · Angular · TypeScript',
     items: [
+      { en: 'Two front ends share the same API contract and business rules: Vue is the full app, Angular covers the core flows.', he: 'שני ממשקים חולקים את אותו חוזה API וכללי עסק: Vue היא האפליקציה המלאה, ו-Angular מכסה את התהליכים המרכזיים.' },
       { en: 'Dashboard, employees, departments, payroll and payslips, attendance and users.', he: 'לוח בקרה, עובדים, מחלקות, שכר ותלושים, נוכחות ומשתמשים.' },
       { en: 'A different home screen per role: My overview for employees, payroll status for HR, account health for the admin.', he: 'מסך בית שונה לכל תפקיד: "הסקירה שלי" לעובד, סטטוס השכר למשאבי אנוש, ומצב החשבונות למנהל.' },
       { en: 'English and Hebrew with full right-to-left layout, including demo data and server messages.', he: 'עברית ואנגלית עם תמיכה מלאה מימין לשמאל, כולל נתוני הדמו והודעות השרת.' },
@@ -76,7 +77,7 @@ export const summarySections: SummarySection[] = [
     title: { en: 'What is next', he: 'מה הלאה' },
     items: [
       { en: 'A practice track: realistic bugs planted on separate branches to find and fix.', he: 'מסלול תרגול: באגים אמיתיים שנשתלים בענפים נפרדים, כדי למצוא ולתקן אותם.' },
-      { en: 'Optionally, hosting the real .NET API and database on Azure.', he: 'אופציונלי: אירוח שרת ה-‎.NET ומסד הנתונים האמיתיים ב-Azure.' },
+      { en: 'An optional AWS deployment path for the browser demo using S3 and CloudFront, without a paid database or API host.', he: 'אפשרות לפריסת דמו הדפדפן ב-AWS באמצעות S3 ו-CloudFront, בלי מסד נתונים או אירוח API בתשלום.' },
     ],
   },
 ]

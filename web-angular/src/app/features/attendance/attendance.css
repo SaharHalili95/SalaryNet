@@ -1,0 +1,9 @@
+.clock { display: grid; justify-items: center; gap: .75rem; margin-bottom: 1rem; padding: 1.5rem; text-align: center; }
+.clock-heading { display: flex; align-items: center; gap: .6rem; font-size: 1.1rem; }
+.clock p { margin: 0; color: var(--text-muted); }
+.clock button { min-height: 48px; min-width: 9rem; }
+.dot { width: .65rem; height: .65rem; border-radius: 50%; background: var(--text-muted); }
+.dot.on { background: var(--success); box-shadow: 0 0 0 4px color-mix(in srgb, var(--success) 18%, transparent); }
+.table-scroll { overflow-x: auto; }
+table { width: 100%; min-width: 29rem; }
+.empty { padding: 2rem; text-align: center; color: var(--text-muted); }

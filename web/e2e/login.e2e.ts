@@ -34,7 +34,7 @@ test('wrong password shows an error that fits the screen', async ({ page }) => {
   await page.locator('#email').fill('hr@salarynet.demo')
   await page.locator('#password').fill('wrong-password')
   await page.getByRole('button', { name: 'Sign in', exact: true }).tap()
-  const error = page.locator('.p-message-error')
+  const error = page.locator('.p-message-error, .form-error')
   await expect(error).toBeVisible()
   const box = (await error.boundingBox())!
   expect(box.x + box.width).toBeLessThanOrEqual(page.viewportSize()!.width)
@@ -77,7 +77,7 @@ test('password show/hide toggle works', async ({ page }) => {
   await open(page, '/login')
   await page.locator('#password').fill('Demo123!')
   await expect(page.locator('#password')).toHaveAttribute('type', 'password')
-  await page.locator('.p-password-toggle-mask-icon, .p-password [data-pc-section="maskicon"], .p-password [data-pc-section="unmaskicon"]').first().tap()
+  await page.locator('.p-password-toggle-mask-icon, .p-password [data-pc-section="maskicon"], .p-password [data-pc-section="unmaskicon"], .password-toggle').first().tap()
   await expect(page.locator('#password')).toHaveAttribute('type', 'text')
 })
 
