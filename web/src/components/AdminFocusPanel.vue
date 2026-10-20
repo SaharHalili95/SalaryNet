@@ -5,7 +5,7 @@ import { computed, onMounted, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRouter } from 'vue-router'
 import { api } from '@/api'
-import type { UserAccount, UserRole } from '@/api/types'
+import type { UserAccount, UserRole } from '@shared/api/types'
 import { formatTime } from '@/utils/format'
 
 const { t } = useI18n()

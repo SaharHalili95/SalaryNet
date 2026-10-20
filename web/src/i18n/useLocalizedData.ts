@@ -1,6 +1,6 @@
 import { useI18n } from 'vue-i18n'
 import type { Locale } from '.'
-import { localizeName, localizeTerm } from './dataGlossary'
+import { localizeName, localizeTerm } from '@shared/i18n/dataGlossary'
 
 /** Display helpers for demo data in the active language: `term` for departments, `person` for names. */
 export function useLocalizedData() {

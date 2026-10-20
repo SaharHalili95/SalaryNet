@@ -1,4 +1,4 @@
-import type { Locale } from '.'
+import type { Locale } from './locale'
 import { localizeName } from './dataGlossary'
 
 type Rule = [pattern: RegExp, hebrew: string | ((...groups: string[]) => string)]

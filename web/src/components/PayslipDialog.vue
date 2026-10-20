@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import Dialog from 'primevue/dialog'
 import { useI18n } from 'vue-i18n'
-import type { PayrollRecord } from '@/api/types'
+import type { PayrollRecord } from '@shared/api/types'
 import { useLocalizedData } from '@/i18n/useLocalizedData'
 import { formatDate, formatMoney, formatPeriod } from '@/utils/format'
 

@@ -1,7 +1,7 @@
 import { defineStore } from 'pinia'
 import { computed, ref } from 'vue'
 import { api } from '@/api'
-import type { User, UserRole } from '@/api/types'
+import type { User, UserRole } from '@shared/api/types'
 
 const STORAGE_KEY = 'salarynet.session'
 

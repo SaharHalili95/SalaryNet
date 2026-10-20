@@ -1,8 +1,8 @@
 import { useAuthStore } from '@/stores/auth'
-import type { SalaryNetApi } from './client'
-import { createDemoApi } from './demo/demoApi'
-import { createDemoDatabase, randomChange, type DemoChange } from './demo/demoData'
-import { createHttpApi } from './httpApi'
+import type { SalaryNetApi } from '@shared/api/client'
+import { createDemoApi } from '@shared/api/demo/demoApi'
+import { createDemoDatabase, randomChange, type DemoChange } from '@shared/api/demo/demoData'
+import { createHttpApi } from '@shared/api/httpApi'
 
 export const isDemoMode = import.meta.env.VITE_DEMO_MODE === 'true'
 

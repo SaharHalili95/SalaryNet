@@ -7,10 +7,10 @@ import { useToast } from 'primevue/usetoast'
 import { ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRoute, useRouter } from 'vue-router'
-import { DEMO_ACCOUNTS, DEMO_ADMIN_PASSWORD, DEMO_PASSWORD } from '@/api/demo/demoData'
-import { ApiError } from '@/api/errors'
+import { DEMO_ACCOUNTS, DEMO_ADMIN_PASSWORD, DEMO_PASSWORD } from '@shared/api/demo/demoData'
+import { ApiError } from '@shared/api/errors'
 import { toggleLocale, type Locale } from '@/i18n'
-import { translateServerMessage } from '@/i18n/serverMessages'
+import { translateServerMessage } from '@shared/i18n/serverMessages'
 import { useAuthStore } from '@/stores/auth'
 
 const auth = useAuthStore()

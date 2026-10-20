@@ -10,8 +10,8 @@ import Select from 'primevue/select'
 import Tag from 'primevue/tag'
 import { computed, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { pick } from '@/content/localized'
-import { issues, type IssueCategory } from '@/content/troubleshooting'
+import { pick } from '@shared/content/localized'
+import { issues, type IssueCategory } from '@shared/content/troubleshooting'
 import type { Locale } from '@/i18n'
 
 const { t, locale } = useI18n()

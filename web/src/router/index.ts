@@ -1,6 +1,6 @@
 import { createRouter, createWebHashHistory, createWebHistory, type RouteRecordRaw } from 'vue-router'
 import { isDemoMode } from '@/api'
-import type { UserRole } from '@/api/types'
+import type { UserRole } from '@shared/api/types'
 import { i18n } from '@/i18n'
 import { useAuthStore } from '@/stores/auth'
 

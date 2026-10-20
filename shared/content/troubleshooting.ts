@@ -129,7 +129,7 @@ export const issues: Issue[] = [
       { en: 'This is by design, so visitors can never affect each other.', he: 'זה מכוון, כדי שמבקרים לעולם לא ישפיעו זה על זה.' },
       { en: 'To keep data, run the full system locally with Docker: docker compose --profile full up', he: 'כדי לשמור נתונים, להריץ את המערכת המלאה מקומית עם Docker: docker compose --profile full up' },
     ],
-    code: 'web/src/api/demo/demoApi.ts',
+    code: 'shared/api/demo/demoApi.ts',
   },
   {
     id: 'api-down',

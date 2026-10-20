@@ -55,7 +55,7 @@ export const lanes: Lane[] = [
 
 export const nodes: DiagramNode[] = [
   { id: 'view', lane: 0, row: 0, label: { en: 'Screen (view)', he: 'מסך (View)' }, plain: { en: 'The screen you click on.', he: 'המסך שעליו לוחצים.' }, code: 'web/src/views' },
-  { id: 'client', lane: 0, row: 1.2, label: { en: 'Store + API client', he: 'Store ולקוח API' }, plain: { en: 'Keeps who is signed in and sends requests to the server.', he: 'זוכר מי מחובר ושולח בקשות לשרת.' }, code: 'web/src/api/httpApi.ts' },
+  { id: 'client', lane: 0, row: 1.2, label: { en: 'Store + API client', he: 'Store ולקוח API' }, plain: { en: 'Keeps who is signed in and sends requests to the server.', he: 'זוכר מי מחובר ושולח בקשות לשרת.' }, code: 'shared/api/httpApi.ts' },
   { id: 'auth', lane: 1, row: 0, label: { en: 'JWT authentication', he: 'אימות JWT' }, plain: { en: 'Checks the digital ID card (token) on every request.', he: 'בודק את תעודת הזהות הדיגיטלית (הטוקן) בכל בקשה.' }, code: 'src/SalaryNet.API/Program.cs' },
   { id: 'policy', lane: 1, row: 1, label: { en: 'Role policy', he: 'מדיניות תפקידים' }, plain: { en: 'Decides whether your role may do this action.', he: 'מחליט אם התפקיד שלך רשאי לבצע את הפעולה.' }, code: 'src/SalaryNet.API/Security/Policies.cs' },
   { id: 'filter', lane: 1, row: 2, label: { en: 'Validation filter', he: 'מסנן ולידציה' }, plain: { en: 'Checks the form is filled in correctly before anything else happens.', he: 'בודק שהטופס מולא נכון לפני שקורה משהו אחר.' }, code: 'src/SalaryNet.API/Filters/FluentValidationFilter.cs' },

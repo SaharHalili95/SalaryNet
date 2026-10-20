@@ -1,4 +1,4 @@
-import type { Locale } from '.'
+import type { Locale } from './locale'
 
 /**
  * Hebrew display names for the fictional demo company. The data itself is stored once (in English, as the

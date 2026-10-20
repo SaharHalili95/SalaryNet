@@ -9,7 +9,7 @@ import { summarySections } from '../projectSummary'
 import { issues } from '../troubleshooting'
 import { lanes } from '../architecture'
 
-const repoRoot = resolve(__dirname, '../../../..')
+const repoRoot = resolve(__dirname, '../../..')
 const bothLanguages = (text: Localized) => text.en.trim().length > 0 && text.he.trim().length > 0
 
 describe('architecture content', () => {

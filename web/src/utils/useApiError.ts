@@ -1,8 +1,8 @@
 import { useToast } from 'primevue/usetoast'
 import { useI18n } from 'vue-i18n'
-import { ApiError } from '@/api/errors'
+import { ApiError } from '@shared/api/errors'
 import type { Locale } from '@/i18n'
-import { translateServerMessage } from '@/i18n/serverMessages'
+import { translateServerMessage } from '@shared/i18n/serverMessages'
 
 /** Shows any error as a toast; returns field errors so forms can highlight inputs. */
 export function useApiError() {
