@@ -42,6 +42,24 @@ jobs:
       - run: npm test
       - run: npm run build
 
+  angular:
+    name: Angular lint, unit tests and build
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: web-angular
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: web-angular/package-lock.json
+      - run: npm ci
+      - run: npm run lint
+      - run: npm test
+      - run: npm run build:demo
+
   mobile-e2e:
     name: Mobile end-to-end tests
     runs-on: ubuntu-latest
