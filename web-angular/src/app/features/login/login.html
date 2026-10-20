@@ -1,0 +1,90 @@
+<div class="login">
+  <section class="hero">
+    <div class="brand"><span class="logo">S</span> SalaryNet <span class="flavor">Angular</span></div>
+    <h1>{{ 'login.heroTitle' | t }}</h1>
+    <p>{{ 'login.heroTextAngular' | t }}</p>
+    <ul>
+      <li><mat-icon aria-hidden="true">check_circle</mat-icon> {{ 'login.bullet1' | t }}</li>
+      <li><mat-icon aria-hidden="true">check_circle</mat-icon> {{ 'login.bullet2' | t }}</li>
+      <li><mat-icon aria-hidden="true">check_circle</mat-icon> {{ 'login.bullet3' | t }}</li>
+    </ul>
+    @if (vueUrl) {
+      <div class="guides">
+        <a class="guide-link" [href]="vueUrl + '#/architecture'"><mat-icon aria-hidden="true">share</mat-icon> {{ 'nav.architecture' | t }} · Vue</a>
+        <a class="guide-link" [href]="vueUrl + '#/about'"><mat-icon aria-hidden="true">menu_book</mat-icon> {{ 'nav.about' | t }} · Vue</a>
+        <a class="guide-link version-link" [href]="vueUrl"><mat-icon aria-hidden="true">swap_horiz</mat-icon> {{ 'layout.vueVersion' | t }}</a>
+      </div>
+    }
+  </section>
+
+  <section class="form-side">
+    <form class="card" [formGroup]="form" (ngSubmit)="submit()" novalidate>
+      <div class="card-head">
+        <h2>{{ 'login.title' | t }}</h2>
+        <button mat-button type="button" [attr.aria-label]="'nav.switchLanguageLabel' | t" (click)="i18n.toggle()">
+          <mat-icon>language</mat-icon> {{ 'nav.switchLanguage' | t }}
+        </button>
+      </div>
+      <p class="muted">{{ 'login.intro' | t }}</p>
+
+      <div class="demo-grid">
+        @for (account of accounts; track account.role) {
+          <button type="button" class="demo-account" [disabled]="loading()" (click)="signIn(account.email, account.password)">
+            <mat-icon aria-hidden="true">{{ account.icon }}</mat-icon>
+            <strong>{{ 'roles.' + account.role | t }}</strong>
+            <span>{{ account.hint | t }}</span>
+          </button>
+        }
+      </div>
+
+      <div class="divider"><span>{{ 'login.or' | t }}</span></div>
+
+      <mat-form-field appearance="outline" class="full">
+        <mat-label>{{ 'common.email' | t }}</mat-label>
+        <input matInput id="email" type="email" formControlName="email" autocomplete="username" placeholder="hr@salarynet.demo" />
+      </mat-form-field>
+      <mat-form-field appearance="outline" class="full">
+        <mat-label>{{ 'login.password' | t }}</mat-label>
+        <input matInput id="password" [type]="showPassword() ? 'text' : 'password'" formControlName="password" autocomplete="current-password" />
+        <button mat-icon-button matSuffix type="button" class="password-toggle" [attr.aria-label]="'login.password' | t"
+          [attr.aria-pressed]="showPassword()" (click)="showPassword.set(!showPassword())">
+          <mat-icon>{{ showPassword() ? 'visibility_off' : 'visibility' }}</mat-icon>
+        </button>
+      </mat-form-field>
+
+      @if (error()) {
+        <div class="form-error" role="alert">{{ error() }} {{ 'login.lockoutHint' | t }}</div>
+      }
+      <button mat-flat-button type="submit" class="submit" [disabled]="loading()">
+        <mat-icon>login</mat-icon> {{ 'login.submit' | t }}
+      </button>
+
+      <section class="credentials" [attr.aria-label]="'login.credentialsTitle' | t">
+        <h3>{{ 'login.credentialsTitle' | t }}</h3>
+        <p class="muted">{{ 'login.credentialsHint' | t }}</p>
+        <table>
+          <thead>
+            <tr><th>{{ 'users.role' | t }}</th><th>{{ 'common.email' | t }}</th><th>{{ 'login.password' | t }}</th></tr>
+          </thead>
+          <tbody>
+            @for (account of accounts; track account.role) {
+              <tr [class.selected]="form.controls.email.value === account.email" (click)="fill(account)">
+                <td><strong>{{ 'roles.' + account.role | t }}</strong></td>
+                <td>
+                  <span class="cred"><code>{{ account.email }}</code>
+                    <button type="button" class="copy" [attr.aria-label]="'login.copy' | t" (click)="copy(account.email, $event)"><mat-icon>content_copy</mat-icon></button>
+                  </span>
+                </td>
+                <td>
+                  <span class="cred"><code>{{ account.password }}</code>
+                    <button type="button" class="copy" [attr.aria-label]="'login.copy' | t" (click)="copy(account.password, $event)"><mat-icon>content_copy</mat-icon></button>
+                  </span>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </section>
+    </form>
+  </section>
+</div>

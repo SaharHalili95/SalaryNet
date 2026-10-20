@@ -54,6 +54,7 @@ const he: typeof en = {
     title: 'כניסה',
     heroTitle: 'ניהול שכר ומשאבי אנוש, מקצה לקצה.',
     heroText: 'פרויקט תיק עבודות: Web API ב-ASP.NET Core 8 בארכיטקטורה נקייה, EF Core על SQL Server, אבטחה מבוססת תפקידים עם JWT, וממשק Vue 3 + TypeScript.',
+    heroTextAngular: 'פרויקט תיק עבודות: Web API ב-ASP.NET Core 8 בארכיטקטורה נקייה, EF Core על SQL Server, אבטחה מבוססת תפקידים עם JWT, וממשק Angular, אחד משני ממשקים על אותו API.',
     bullet1: 'חישוב מס מדורג עם פירוט מלא בתלוש',
     bullet2: 'תפקידי מנהל, משאבי אנוש ועובד עם הרשאות ברמת הרשומה',
     bullet3: 'מעקב נוכחות עם שעות שמחושבות בשרת',

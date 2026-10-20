@@ -52,6 +52,7 @@ export default {
     title: 'Sign in',
     heroTitle: 'Payroll and HR management, end to end.',
     heroText: 'A portfolio project: ASP.NET Core 8 Web API with Clean Architecture, EF Core on SQL Server, JWT role-based security, and this Vue 3 + TypeScript front end.',
+    heroTextAngular: 'A portfolio project: ASP.NET Core 8 Web API with Clean Architecture, EF Core on SQL Server, JWT role-based security, and this Angular front end, one of two UIs on the same API.',
     bullet1: 'Tiered tax calculation with a full payslip breakdown',
     bullet2: 'Admin, HR and Employee roles with resource-level authorization',
     bullet3: 'Attendance tracking with server-calculated hours',
