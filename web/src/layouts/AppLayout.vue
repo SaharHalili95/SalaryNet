@@ -5,7 +5,7 @@ import Tag from 'primevue/tag'
 import { computed, onUnmounted, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRoute, useRouter } from 'vue-router'
-import { isDemoMode } from '@/api'
+import { angularUrl, isDemoMode } from '@/api'
 import type { UserRole } from '@shared/api/types'
 import ChangePasswordDialog from '@/components/ChangePasswordDialog.vue'
 import { toggleLocale } from '@/i18n'
@@ -70,6 +70,13 @@ function logout() {
           <span>{{ t(item.label) }}</span>
         </RouterLink>
       </nav>
+      <template v-if="angularUrl">
+        <div class="nav-divider" />
+        <a :href="angularUrl" class="nav-link version-link">
+          <i class="pi pi-arrow-right-arrow-left" />
+          <span>{{ t('layout.angularVersion') }}</span>
+        </a>
+      </template>
       <div class="sidebar-footer">
         <span dir="ltr">{{ t('layout.footer') }}</span>
       </div>

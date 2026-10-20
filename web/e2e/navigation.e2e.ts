@@ -117,3 +117,16 @@ test('sign out from the topbar returns to login', async ({ page }) => {
   await page.locator('.topbar').getByRole('button', { name: 'Sign out' }).tap()
   await expect(page).toHaveURL(/#\/login/)
 })
+
+test('@full-app the menu links to the Angular version', async ({ page }) => {
+  await signIn(page, 'HR')
+  await openMenu(page)
+  const link = page.locator('.sidebar .version-link')
+  await expect(link).toHaveAttribute('href', '/angular/')
+  await expect(link).toBeInViewport()
+})
+
+test('@full-app the sign-in page links to the Angular version', async ({ page }) => {
+  await open(page, '/login')
+  await expect(page.locator('.guide-link.version-link')).toHaveAttribute('href', '/angular/')
+})

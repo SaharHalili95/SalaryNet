@@ -34,6 +34,7 @@ export default {
     about: 'About this project',
     signIn: 'Sign in',
     openMenu: 'Open menu',
+    closeMenu: 'Close menu',
     changePassword: 'Change password',
     signOut: 'Sign out',
     switchLanguage: 'עברית',
@@ -42,6 +43,10 @@ export default {
   layout: {
     demoBanner: 'Demo mode: fictional data running in your browser. Changes reset when you reload.',
     footer: '.NET 8 · Vue 3 · SQL Server',
+    footerAngular: '.NET 8 · Angular · SQL Server',
+    vueVersion: 'Vue version',
+    angularVersion: 'Angular version',
+    angularScope: 'The Angular version covers sign-in, dashboards, employees, payroll and attendance. The full app is in the Vue version.',
   },
   login: {
     title: 'Sign in',

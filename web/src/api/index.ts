@@ -6,6 +6,9 @@ import { createHttpApi } from '@shared/api/httpApi'
 
 export const isDemoMode = import.meta.env.VITE_DEMO_MODE === 'true'
 
+/** The Angular front end: deployed next to this app on GitHub Pages, or configured for local runs. */
+export const angularUrl = isDemoMode ? `${import.meta.env.BASE_URL}angular/` : (import.meta.env.VITE_ANGULAR_URL ?? null)
+
 let instance: SalaryNetApi | undefined
 
 /** Lazily created so the Pinia store exists before the API asks it for the token. */

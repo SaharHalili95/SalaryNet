@@ -36,6 +36,7 @@ const he: typeof en = {
     about: 'סיכום הפרויקט',
     signIn: 'כניסה',
     openMenu: 'פתיחת תפריט',
+    closeMenu: 'סגירת תפריט',
     changePassword: 'החלפת סיסמה',
     signOut: 'יציאה',
     switchLanguage: 'English',
@@ -44,6 +45,10 @@ const he: typeof en = {
   layout: {
     demoBanner: 'מצב דמו: נתונים בדויים שרצים בדפדפן שלך. שינויים מתאפסים בטעינה מחדש.',
     footer: '.NET 8 · Vue 3 · SQL Server',
+    footerAngular: '.NET 8 · Angular · SQL Server',
+    vueVersion: 'גרסת Vue',
+    angularVersion: 'גרסת Angular',
+    angularScope: 'גרסת ה-Angular כוללת כניסה, לוחות בקרה, עובדים, שכר ונוכחות. המערכת המלאה נמצאת בגרסת ה-Vue.',
   },
   login: {
     title: 'כניסה',
