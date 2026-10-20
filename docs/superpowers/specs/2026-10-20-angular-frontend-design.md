@@ -10,11 +10,12 @@ Sahar's condition: it must stay professional and make sense to a recruiter. Noth
 
 ## Goals
 
-- A complete Angular app with feature parity with the Vue app, built and released in three phases (below). Each phase is shippable and deployed.
+- **Committed scope is Phase 1 only** (see Phases): the core of the product in Angular, shipped, deployed and tested. Phases 2 and 3 are a later, separate decision Sahar makes after seeing Phase 1. Nothing in Phase 1 may depend on them happening.
 - Idiomatic, current Angular that an Angular interviewer recognizes as good practice: standalone components, Signals, functional route guards, `HttpClient` with interceptors, Reactive Forms, RxJS where it is natural (debounced search), lazy-loaded routes.
 - Same business behavior as Vue: roles (Admin/HR/Employee), IDOR scoping, lockout and admin unlock, payroll calculation, attendance, English and Hebrew with RTL.
 - Runs on the live demo site with no server (demo mode), like Vue, and against the real API locally and in Docker.
-- Tested and in CI with the same standard as Vue: unit tests for services and components, and the Playwright mobile suite on iPhone, iPhone SE and Pixel.
+- Tested and in CI with the same standard as Vue: unit tests for services and components, and the Playwright mobile suite on iPhone, iPhone SE and Pixel (in Phase 1, the tests that cover Phase 1 pages).
+- Sahar can explain every part in an interview. After each part of the work, a short Hebrew explainer for Sahar: what was built, which Angular concept it shows (signal, interceptor, guard, Reactive Forms, RxJS), why it was done that way, and three or four likely interview questions with answers. These notes are personal study material and live outside the repository (for example on the Desktop), not in the public repo.
 - Recruiter-facing clarity: the live site, README, About page, CV and portfolio explain the two front ends and let a visitor switch between them.
 
 ## Non-goals
@@ -44,7 +45,8 @@ Sahar's condition: it must stay professional and make sense to a recruiter. Noth
 ### Decided with Sahar
 
 - Angular is an addition alongside Vue, not a replacement.
-- Full parity, delivered in phases, rather than one deep slice.
+- Build Phase 1 now (the core pages). Decide on Phases 2 and 3 after seeing it.
+- Sahar gets a Hebrew explainer after each part so he can defend the code in interviews.
 - Shared, framework-free code (rules, demo data, translations) is written once and used by both apps.
 
 ### My calls (Sahar can override)
@@ -109,15 +111,17 @@ Feature-based layout under `web-angular/src/app/`: `core/` (auth, API provider, 
 
 ## Phases
 
-Each phase ends deployed, with CI green and the README describing exactly what exists.
+Each phase ends deployed, with CI green and the README describing exactly what exists. **Only Phase 1 is approved for building now.**
 
-1. **Shared core and Angular core.**
+While only Phase 1 exists, the Angular app must look finished rather than missing pages: its navigation lists only the pages it has, the README and About page say plainly that the Angular version covers the core flows (sign-in, dashboards, employees, payroll, attendance) while the Vue version is the complete app, and links to Vue for the rest. No dead links, no "coming soon" placeholders.
+
+1. **Shared core and Angular core (approved).**
    - Move the shared code into `shared/` and keep Vue green.
    - Scaffold the Angular app.
    - Build login, shell and navigation, the dashboard, employees, payroll with the payslip, attendance and my overview.
-   - Ship English and Hebrew, both demo and HTTP modes, unit tests, the Pages deploy to `/angular/` and the version switch.
-2. **The rest of the app.** Departments, users and unlock, change password, admin and HR focus panels, and the Playwright suite passing on Angular.
-3. **Guides.** Architecture, troubleshooting and about pages, Docker service, final README, CV, portfolio and profile updates.
+   - Ship English and Hebrew, both demo and HTTP modes, unit tests, the Playwright tests for these pages on Angular, the CI job, the Pages deploy to `/angular/`, the version switch, and README, About and CV wording for what exists.
+2. **The rest of the app (later decision).** Departments, users and unlock, change password, admin and HR focus panels, and the Playwright suite passing on Angular.
+3. **Guides (later decision).** Architecture, troubleshooting and about pages, Docker service, final README, CV, portfolio and profile updates.
 
 ## Left to the builder
 
