@@ -1,0 +1,12 @@
+.table-scroll { overflow-x: auto; }
+.table-scroll.loading { opacity: 0.6; }
+table { width: 100%; min-width: 720px; }
+.name { display: flex; flex-direction: column; gap: 0.125rem; }
+.name span { font-size: 0.8125rem; }
+.actions { display: flex; gap: 0.125rem; justify-content: flex-end; }
+.danger { color: #dc2626; }
+.tag { font-size: 0.75rem; font-weight: 600; padding: 0.125rem 0.5rem; border-radius: 6px; background: var(--app-border); color: var(--app-text-muted); }
+.tag.active { background: #dcfce7; color: #166534; }
+.empty { padding: 1rem; }
+.toolbar mat-form-field { min-width: 12rem; }
+@media (max-width: 900px) { .toolbar mat-form-field { min-width: 0; } }

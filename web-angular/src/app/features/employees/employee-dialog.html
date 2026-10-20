@@ -1,0 +1,63 @@
+<h2 mat-dialog-title>{{ (data.employee ? 'employees.dialogEdit' : 'employees.dialogNew') | t }}</h2>
+<form id="employee-form" [formGroup]="form" (ngSubmit)="save()" novalidate>
+  <mat-dialog-content>
+    <div class="form-grid">
+      <div class="field">
+        <mat-form-field appearance="outline">
+          <mat-label>{{ 'employees.firstName' | t }}</mat-label>
+          <input matInput id="firstName" formControlName="firstName" />
+        </mat-form-field>
+        @if (error('firstName'); as message) { <small class="error">{{ message }}</small> }
+      </div>
+      <div class="field">
+        <mat-form-field appearance="outline">
+          <mat-label>{{ 'employees.lastName' | t }}</mat-label>
+          <input matInput id="lastName" formControlName="lastName" />
+        </mat-form-field>
+        @if (error('lastName'); as message) { <small class="error">{{ message }}</small> }
+      </div>
+      <div class="field full">
+        <mat-form-field appearance="outline">
+          <mat-label>{{ 'employees.workEmail' | t }}</mat-label>
+          <input matInput id="email" type="email" formControlName="email" />
+        </mat-form-field>
+        @if (error('email'); as message) { <small class="error">{{ message }}</small> }
+      </div>
+      <div class="field">
+        <mat-form-field appearance="outline">
+          <mat-label>{{ 'common.department' | t }}</mat-label>
+          <mat-select id="department" formControlName="departmentId">
+            @for (d of data.departments; track d.id) {
+              <mat-option [value]="d.id">{{ d.name | term }}</mat-option>
+            }
+          </mat-select>
+        </mat-form-field>
+        @if (error('departmentId'); as message) { <small class="error">{{ message }}</small> }
+      </div>
+      <div class="field">
+        <mat-form-field appearance="outline">
+          <mat-label>{{ 'employees.employmentType' | t }}</mat-label>
+          <mat-select id="type" formControlName="employmentType">
+            @for (type of types; track type) {
+              <mat-option [value]="type">{{ 'employmentType.' + type | t }}</mat-option>
+            }
+          </mat-select>
+        </mat-form-field>
+      </div>
+      <div class="field full">
+        <mat-form-field appearance="outline">
+          <mat-label>{{ 'employees.monthlySalary' | t }}</mat-label>
+          <span matTextPrefix>₪&nbsp;</span>
+          <input matInput id="salary" type="number" inputmode="decimal" min="0" step="100" formControlName="baseSalary" />
+        </mat-form-field>
+        @if (error('baseSalary'); as message) { <small class="error">{{ message }}</small> }
+      </div>
+    </div>
+  </mat-dialog-content>
+  <mat-dialog-actions align="end">
+    <button mat-button type="button" mat-dialog-close>{{ 'common.cancel' | t }}</button>
+    <button mat-flat-button type="submit" [disabled]="saving()">
+      {{ (data.employee ? 'common.saveChanges' : 'employees.createButton') | t }}
+    </button>
+  </mat-dialog-actions>
+</form>
