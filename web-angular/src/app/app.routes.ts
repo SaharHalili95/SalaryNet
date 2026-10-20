@@ -1,5 +1,7 @@
 import type { Routes } from '@angular/router';
-import { authGuard, homeRedirect, loginGuard } from './core/guards';
+import { authGuard, homeRedirect, loginGuard, roleGuard } from './core/guards';
+
+const staff = roleGuard(['Admin', 'HR']);
 
 // Feature routes are added to the shell's children as each page is built; each one is lazy-loaded.
 export const routes: Routes = [
@@ -14,7 +16,20 @@ export const routes: Routes = [
     path: '',
     loadComponent: () => import('./layout/shell').then((m) => m.Shell),
     canActivate: [authGuard],
-    children: [],
+    children: [
+      {
+        path: 'me',
+        title: 'nav.myOverview',
+        canActivate: [roleGuard(['Employee'])],
+        loadComponent: () => import('./features/me/me').then((m) => m.Me),
+      },
+      {
+        path: 'dashboard',
+        title: 'nav.dashboard',
+        canActivate: [staff],
+        loadComponent: () => import('./features/dashboard/dashboard').then((m) => m.Dashboard),
+      },
+    ],
   },
   { path: '**', redirectTo: '' },
 ];
