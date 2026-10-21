@@ -1,11 +1,5 @@
 import { expect, test } from '@playwright/test'
-import { goTo, open, openMenu, signIn, type Role } from './helpers'
-
-const expectedLinks: Record<Role, string[]> = {
-  Admin: ['/dashboard', '/employees', '/departments', '/payroll', '/attendance', '/users'],
-  HR: ['/dashboard', '/employees', '/departments', '/payroll', '/attendance'],
-  Employee: ['/me', '/payroll', '/attendance'],
-}
+import { appFor, goTo, open, openMenu, pagesFor, signIn, type Role } from './helpers'
 
 test('menu is hidden off-screen until opened', async ({ page }) => {
   await signIn(page, 'HR')
@@ -54,6 +48,7 @@ test('choosing a page closes the menu and navigates', async ({ page }) => {
 
 test('the page behind the open menu does not scroll', async ({ page }) => {
   await signIn(page, 'Admin')
+  test.skip(appFor(page) === 'angular', 'Angular Phase 1 has no guide pages')
   await goTo(page, '/architecture')
   await openMenu(page)
   const overflow = await page.evaluate(() => getComputedStyle(document.body).overflow)
@@ -69,12 +64,13 @@ test('every link in the menu is reachable on a short screen', async ({ page }) =
   await expect(last).toBeInViewport()
 })
 
-for (const [role, links] of Object.entries(expectedLinks) as [Role, string[]][]) {
+for (const role of ['Admin', 'HR', 'Employee'] as Role[]) {
   test(`${role} sees only their own pages in the menu`, async ({ page }) => {
     await signIn(page, role)
     await openMenu(page)
     const hrefs = await page.locator('.sidebar nav a').evaluateAll((as) => as.map((a) => a.getAttribute('href')))
-    expect(hrefs).toEqual([...links, '/architecture', '/troubleshooting', '/about'].map((l) => `#${l}`))
+    const links = [...pagesFor(appFor(page), role), ...(appFor(page) === 'vue' ? ['/architecture', '/troubleshooting', '/about'] : [])]
+    expect(hrefs).toEqual(links.map((l) => `#${l}`))
   })
 }
 
@@ -84,21 +80,21 @@ test('employee cannot open staff pages by URL', async ({ page }) => {
   await expect(page).toHaveURL(/#\/me/)
 })
 
-test('signed-out visitor can open the guides from the menu', async ({ page }) => {
+test('@full-app signed-out visitor can open the guides from the menu', async ({ page }) => {
   await open(page, '/architecture')
   await openMenu(page)
   await page.locator('.sidebar a[href="#/troubleshooting"]').tap()
   await expect(page).toHaveURL(/#\/troubleshooting/)
 })
 
-test('guide links on the login page work', async ({ page }) => {
+test('@full-app guide links on the login page work', async ({ page }) => {
   await open(page, '/login')
   await page.locator('.guide-link').first().tap()
   await expect(page).toHaveURL(/#\/architecture/)
   await expect(page.locator('main h1').first()).toBeVisible()
 })
 
-test('signed-out topbar shows a sign-in button that works', async ({ page }) => {
+test('@full-app signed-out topbar shows a sign-in button that works', async ({ page }) => {
   await open(page, '/about')
   await page.locator('.topbar').getByRole('button', { name: 'Sign in' }).tap()
   await expect(page).toHaveURL(/#\/login/)
@@ -116,4 +112,17 @@ test('sign out from the topbar returns to login', async ({ page }) => {
   await signIn(page, 'HR')
   await page.locator('.topbar').getByRole('button', { name: 'Sign out' }).tap()
   await expect(page).toHaveURL(/#\/login/)
+})
+
+test('@full-app the menu links to the Angular version', async ({ page }) => {
+  await signIn(page, 'HR')
+  await openMenu(page)
+  const link = page.locator('.sidebar .version-link')
+  await expect(link).toHaveAttribute('href', '/angular/')
+  await expect(link).toBeInViewport()
+})
+
+test('@full-app the sign-in page links to the Angular version', async ({ page }) => {
+  await open(page, '/login')
+  await expect(page.locator('.guide-link.version-link')).toHaveAttribute('href', '/angular/')
 })

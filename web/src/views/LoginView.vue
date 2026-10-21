@@ -7,10 +7,11 @@ import { useToast } from 'primevue/usetoast'
 import { ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRoute, useRouter } from 'vue-router'
-import { DEMO_ACCOUNTS, DEMO_ADMIN_PASSWORD, DEMO_PASSWORD } from '@/api/demo/demoData'
-import { ApiError } from '@/api/errors'
+import { DEMO_ACCOUNTS, DEMO_ADMIN_PASSWORD, DEMO_PASSWORD } from '@shared/api/demo/demoData'
+import { angularUrl } from '@/api'
+import { ApiError } from '@shared/api/errors'
 import { toggleLocale, type Locale } from '@/i18n'
-import { translateServerMessage } from '@/i18n/serverMessages'
+import { translateServerMessage } from '@shared/i18n/serverMessages'
 import { useAuthStore } from '@/stores/auth'
 
 const auth = useAuthStore()
@@ -75,6 +76,7 @@ async function signIn(withEmail = email.value, withPassword = password.value) {
         <RouterLink :to="{ name: 'architecture' }" class="guide-link"><i class="pi pi-share-alt" /> {{ t('nav.architecture') }}</RouterLink>
         <RouterLink :to="{ name: 'troubleshooting' }" class="guide-link"><i class="pi pi-wrench" /> {{ t('nav.troubleshooting') }}</RouterLink>
         <RouterLink :to="{ name: 'about' }" class="guide-link"><i class="pi pi-book" /> {{ t('nav.about') }}</RouterLink>
+        <a v-if="angularUrl" :href="angularUrl" class="guide-link version-link"><i class="pi pi-arrow-right-arrow-left" /> {{ t('layout.angularVersion') }}</a>
       </div>
     </section>
 

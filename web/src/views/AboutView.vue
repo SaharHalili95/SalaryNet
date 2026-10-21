@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { pick } from '@/content/localized'
-import { summarySections } from '@/content/projectSummary'
+import { pick } from '@shared/content/localized'
+import { summarySections } from '@shared/content/projectSummary'
 import type { Locale } from '@/i18n'
 
 const { t, locale } = useI18n()

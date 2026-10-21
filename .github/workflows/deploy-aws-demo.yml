@@ -1,0 +1,47 @@
+name: Deploy browser demo to AWS
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: |
+            web/package-lock.json
+            web-angular/package-lock.json
+      - run: npm ci
+        working-directory: web
+      - run: npm run build:demo
+        working-directory: web
+      - run: npm ci
+        working-directory: web-angular
+      - run: npm run build:demo -- --base-href /angular/
+        working-directory: web-angular
+      - run: mkdir -p web/dist/angular && cp -r web-angular/dist/salarynet/browser/. web/dist/angular/
+      - uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_ROLE_TO_ASSUME }}
+          aws-region: us-east-1
+      - name: Require an active AWS Free account plan
+        shell: bash
+        run: |
+          plan_type="$(aws freetier get-account-plan-state --query accountPlanType --output text)"
+          plan_status="$(aws freetier get-account-plan-state --query accountPlanStatus --output text)"
+          if [[ "$plan_type" != "FREE" || "$plan_status" != "ACTIVE" ]]; then
+            echo "Refusing deployment: AWS account plan must be FREE and ACTIVE." >&2
+            exit 1
+          fi
+      - run: aws s3 sync web/dist "s3://${{ vars.AWS_DEMO_BUCKET }}" --delete
+      - run: aws cloudfront create-invalidation --distribution-id "${{ vars.AWS_DEMO_DISTRIBUTION_ID }}" --paths '/*'

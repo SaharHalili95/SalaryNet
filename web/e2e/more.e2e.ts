@@ -1,18 +1,13 @@
 import { expect, test } from '@playwright/test'
-import { expectNoHorizontalScroll, goTo, open, openMenu, signIn, type Role } from './helpers'
-
-const landscapePages: Record<Role, string[]> = {
-  Admin: ['/dashboard', '/employees', '/users', '/architecture'],
-  HR: ['/dashboard', '/payroll', '/attendance'],
-  Employee: ['/me', '/payroll', '/attendance'],
-}
+import { appFor, expectNoHorizontalScroll, goTo, open, openMenu, pagesFor, signIn, type Role } from './helpers'
 
 test.describe('landscape', () => {
-  for (const [role, paths] of Object.entries(landscapePages) as [Role, string[]][]) {
+  for (const role of ['Admin', 'HR', 'Employee'] as Role[]) {
     test(`${role} pages fit when the phone is turned sideways`, async ({ page }) => {
       const { width, height } = page.viewportSize()!
       await page.setViewportSize({ width: height, height: width })
       await signIn(page, role)
+      const paths = [...pagesFor(appFor(page), role), ...(appFor(page) === 'vue' && role === 'Admin' ? ['/architecture'] : [])]
       for (const path of paths) {
         await goTo(page, path)
         await expect(page.locator('main.content h1').first()).toBeVisible()
@@ -65,8 +60,8 @@ test.describe('Hebrew flows', () => {
   test('payslip dialog fits the screen', async ({ page }) => {
     await signIn(page, 'Employee', 'he')
     await goTo(page, '/payroll')
-    await page.locator('.p-datatable-tbody tr').first().tap()
-    const box = (await page.locator('.p-dialog').boundingBox())!
+    await page.locator('.p-datatable-tbody tr, tr.mat-mdc-row').first().tap()
+    const box = (await page.locator('.p-dialog, .mat-mdc-dialog-container').boundingBox())!
     expect(box.x).toBeGreaterThanOrEqual(0)
     expect(box.x + box.width).toBeLessThanOrEqual(page.viewportSize()!.width + 1)
   })
@@ -82,7 +77,7 @@ test.describe('Hebrew flows', () => {
     await signIn(page, 'HR', 'he')
     await goTo(page, '/employees')
     await page.locator('.page-header button').tap()
-    const box = (await page.locator('.p-dialog').boundingBox())!
+    const box = (await page.locator('.p-dialog, .mat-mdc-dialog-container').boundingBox())!
     expect(box.x).toBeGreaterThanOrEqual(0)
     expect(box.x + box.width).toBeLessThanOrEqual(page.viewportSize()!.width + 1)
   })
@@ -96,36 +91,35 @@ test.describe('more interactions', () => {
     await expectNoHorizontalScroll(page)
   })
 
-  test('admin opens the edit dialog for a department', async ({ page }) => {
+  test('@full-app admin opens the edit dialog for a department', async ({ page }) => {
     await signIn(page, 'Admin')
     await goTo(page, '/departments')
     await page.locator('.cards .card').first().getByRole('button', { name: 'Edit' }).tap()
     await expect(page.locator('.p-dialog #dept-name')).not.toHaveValue('')
   })
 
-  test('users search filters the list', async ({ page }) => {
+  test('@full-app users search filters the list', async ({ page }) => {
     await signIn(page, 'Admin')
     await goTo(page, '/users')
     await page.locator('.toolbar input').first().fill('hr@')
-    await expect(page.locator('.p-datatable-tbody tr')).toHaveCount(1)
+    await expect(page.locator('.p-datatable-tbody tr, tr.mat-mdc-row')).toHaveCount(1)
   })
 
   test('employee filters payslips by year', async ({ page }) => {
     await signIn(page, 'Employee')
     await goTo(page, '/payroll')
-    await page.locator('.toolbar .p-select').first().tap()
-    const year = page.locator('.p-select-overlay .p-select-option').first()
-    const label = (await year.innerText()).trim()
-    await year.tap()
-    for (const row of await page.locator('.p-datatable-tbody tr').all()) await expect(row).toContainText(label)
+    await page.locator('.toolbar .p-select, .toolbar mat-select').first().tap()
+    const year = String(new Date().getFullYear())
+    await page.getByRole('option', { name: year, exact: true }).tap()
+    for (const row of await page.locator('.p-datatable-tbody tr, tr.mat-mdc-row').all()) await expect(row).toContainText(year)
   })
 
   test('payslip shows the tax breakdown', async ({ page }) => {
     await signIn(page, 'Employee')
     await goTo(page, '/payroll')
-    await page.locator('.p-datatable-tbody tr').first().tap()
-    await expect(page.locator('.p-dialog')).toContainText('Income tax')
-    await expect(page.locator('.p-dialog')).toContainText('Social security')
+    await page.locator('.p-datatable-tbody tr, tr.mat-mdc-row').first().tap()
+    await expect(page.locator('.p-dialog, .mat-mdc-dialog-container')).toContainText('Income tax')
+    await expect(page.locator('.p-dialog, .mat-mdc-dialog-container')).toContainText('Social security')
   })
 
   test('"All payslips" on the overview opens the payroll page', async ({ page }) => {
@@ -136,13 +130,13 @@ test.describe('more interactions', () => {
 })
 
 test.describe('account security on a phone', () => {
-  test('five wrong passwords lock the account, and an admin unlocks it', async ({ page }) => {
+  test('@full-app five wrong passwords lock the account, and an admin unlocks it', async ({ page }) => {
     await open(page, '/login')
     for (let i = 0; i < 5; i++) {
       await page.locator('#email').fill('hr@salarynet.demo')
       await page.locator('#password').fill(`wrong-${i}`)
       await page.getByRole('button', { name: 'Sign in', exact: true }).tap()
-      await expect(page.locator('.p-message-error')).toBeVisible()
+      await expect(page.locator('.p-message-error, .form-error')).toBeVisible()
     }
     await page.locator('.demo-account').filter({ has: page.getByText('Admin', { exact: true }) }).tap()
     await goTo(page, '/users')
@@ -166,7 +160,7 @@ test.describe('account security on a phone', () => {
   test('session survives a reload', async ({ page }) => {
     await signIn(page, 'Employee')
     await page.reload()
-    await expect(page.locator('.topbar .p-avatar')).toBeVisible()
+    await expect(page.locator('.topbar .user')).toBeVisible()
   })
 })
 

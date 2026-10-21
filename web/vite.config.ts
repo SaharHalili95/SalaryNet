@@ -7,13 +7,19 @@ export default defineConfig(({ mode }) => ({
   base: mode === 'demo' ? (process.env.VITE_BASE ?? '/SalaryNet/') : '/',
   plugins: [vue()],
   resolve: {
-    alias: { '@': fileURLToPath(new URL('./src', import.meta.url)) },
+    alias: {
+      '@': fileURLToPath(new URL('./src', import.meta.url)),
+      '@shared': fileURLToPath(new URL('../shared', import.meta.url)),
+    },
   },
   server: {
     port: 5173,
+    // Code shared with the Angular app lives one level up.
+    fs: { allow: ['..'] },
     proxy: { '/api': 'http://localhost:5080' },
   },
   test: {
     environment: 'jsdom',
+    include: ['src/**/*.spec.ts', '../shared/**/*.spec.ts'],
   },
 }))

@@ -1,6 +1,6 @@
 # SalaryNet
 
-A full-stack payroll and HR management system built with **ASP.NET Core 8 Web API**, **Clean Architecture**, **EF Core on SQL Server** and a **Vue 3 + TypeScript** front end.
+A full-stack payroll and HR management system built with **ASP.NET Core 8 Web API**, **Clean Architecture**, **EF Core on SQL Server**, and **Vue 3 and Angular** front ends.
 
 It covers the core flows of a payroll product: employees and departments, monthly payroll with a tiered tax calculation, attendance tracking, and role-based access where employees can only ever see their own records.
 
@@ -26,7 +26,7 @@ It covers the core flows of a payroll product: employees and departments, monthl
 - **Account security**: per-account lockout after repeated failed sign-ins, a password policy, admin unlock and reset, and deactivation without deleting history.
 - **Security**: JWT authentication, `Admin` / `HR` / `Employee` role policies, and resource-level authorization that blocks IDOR. An employee who asks for someone else's payslip gets `404`, and a spoofed `employeeId` filter is ignored.
 - **Consistent errors**: every failure is returned as RFC 7807 `ProblemDetails` with a `traceId`. Validation errors come back per field from FluentValidation.
-- **Tests**: 132 xUnit test methods (162 test cases) (unit tests with Moq and FluentAssertions, plus integration tests with `WebApplicationFactory` against a real SQL Server in Testcontainers) Vitest tests on the front end, and 101 Playwright mobile tests that run on iPhone (WebKit), a 320px iPhone SE and Android in English and Hebrew.
+- **Tests**: 132 xUnit test methods (162 test cases) (unit tests with Moq and FluentAssertions, plus integration tests with `WebApplicationFactory` against a real SQL Server in Testcontainers) Vitest tests on both front ends (59 for Vue, 75 for Angular), and Playwright mobile tests (103 for Vue, 79 for Angular) that run on iPhone (WebKit), a 320px iPhone SE and Android in English and Hebrew.
 
 ## Architecture
 
@@ -34,6 +34,7 @@ It covers the core flows of a payroll product: employees and departments, monthl
 flowchart LR
     subgraph Client
         Vue["Vue 3 + TypeScript<br/>PrimeVue, Pinia, Vue Router"]
+        Angular["Angular + TypeScript<br/>Signals, Angular Material"]
     end
     subgraph API["SalaryNet.API"]
         Ctrl["Controllers<br/>JWT + role policies"]
@@ -56,6 +57,7 @@ flowchart LR
     DB[("SQL Server")]
 
     Vue -->|HTTP + Bearer token| Ctrl
+    Angular -->|HTTP + Bearer token| Ctrl
     Ctrl --> Services
     Services --> Ports
     Services --> Entities
@@ -73,6 +75,13 @@ flowchart LR
 | `SalaryNet.API` | Controllers, authorization policies, global exception handler, validation action filter, Swagger, DI composition root. |
 | `SalaryNet.Tests` | xUnit unit tests and integration tests. |
 | `web/` | Vue 3 front end with an HTTP client for the real API and an in-browser demo implementation. |
+| `web-angular/` | Angular front end for the core flows, sharing the API contract, demo engine, payroll rules and translations. |
+
+## Why two front ends
+
+The same API serves a Vue 3 app and an Angular app. Vue is the full product; Angular covers the core flows: sign-in, the dashboards, employees, payroll and payslips, and attendance. Each side bar links to the other version, and the chosen language carries over.
+
+Nothing that holds business logic is written twice. The API contract, the in-browser demo engine, the payroll calculator and the English and Hebrew translations live once in `shared/`, and both apps import them. Each app only adds its own framework layer: Pinia, Vue Router and PrimeVue on one side; Signals, `HttpClient` interceptors, functional guards, Reactive Forms and Angular Material on the other. The same Playwright suite runs against both builds, so the two apps cannot quietly behave differently.
 
 ## Business rules
 
@@ -134,11 +143,13 @@ Full interactive documentation is available in Swagger at `/swagger`.
 
 ## Live demo vs. the full stack
 
-The public site has no server behind it. GitHub Pages only serves static files; the Vue app then runs in the visitor's browser in demo mode.
+The public site has no server behind it. GitHub Pages only serves static files; both Vue and Angular run in the visitor's browser in demo mode.
 
 - The UI talks to one interface, `SalaryNetApi`, with two implementations: `httpApi.ts` calls the real ASP.NET Core API and SQL Server, and `demoApi.ts` runs an in-browser copy of the same rules (roles, lockout, duplicate checks, tax calculation).
 - Each visitor gets a private fictional company in memory, so visitors never affect each other and a reload starts fresh.
 - On the live site the C# code itself does not run. The .NET server is proven by this repository, its test suite, and CI that runs the tests against a real SQL Server on every push. A front-end test pins the demo tax calculation to the C# results.
+
+The optional [AWS static demo deployment](docs/aws-demo-hosting.md) publishes both front ends to S3 and CloudFront through GitHub OIDC. It does not host the API or database.
 
 | What | Needs Docker |
 | --- | --- |
@@ -151,6 +162,17 @@ The public site has no server behind it. GitHub Pages only serves static files; 
 Stopping Docker loses nothing: local data lives in a Docker volume and returns on the next `docker compose --profile full up`.
 
 ## Running locally
+
+### Angular front end
+
+```bash
+cd web-angular
+npm ci
+npm start          # http://localhost:4200, proxies /api to the API on port 5080
+npm run start:demo # in-browser demo, no API or database required
+npm test
+npm run lint
+```
 
 ### Everything in Docker
 
@@ -204,9 +226,10 @@ Integration tests need Docker running: Testcontainers starts a SQL Server contai
 
 ```bash
 cd web && npm test
+cd web-angular && npm test
 ```
 
-Mobile end-to-end tests run the demo build on emulated phones (iPhone 14 and iPhone SE on WebKit, Pixel 7 on Chromium). They check that no page scrolls sideways, that fields are big enough to stop iOS from zooming, that tap targets are finger-sized, and that the main flows work by touch in both languages.
+Mobile end-to-end tests run the demo builds of both front ends on emulated phones (iPhone 14 and iPhone SE on WebKit, Pixel 7 on Chromium). They check that no page scrolls sideways, that fields are big enough to stop iOS from zooming, that tap targets are finger-sized, and that the main flows work by touch in both languages.
 
 ```bash
 cd web && npx playwright install chromium webkit && npm run test:e2e
@@ -218,7 +241,9 @@ The front end's tax calculator is tested against the same values as the C# calcu
 
 **Backend:** C# 12, .NET 8, ASP.NET Core Web API, EF Core 8, SQL Server 2022, FluentValidation, JWT Bearer, Swashbuckle
 
-**Frontend:** Vue 3 (Composition API), TypeScript, Vite, Pinia, Vue Router, vue-i18n, PrimeVue, Chart.js
+**Frontend:** Vue 3 (Composition API), Angular, TypeScript, Vite, Pinia, Vue Router, vue-i18n, PrimeVue, Angular Material, Chart.js
+
+**Demo hosting:** GitHub Pages; optional AWS S3 + CloudFront deployment
 
 **Quality:** xUnit, Moq, FluentAssertions, Testcontainers, WebApplicationFactory, Vitest, Playwright, .NET analyzers with warnings as errors, central package management
 

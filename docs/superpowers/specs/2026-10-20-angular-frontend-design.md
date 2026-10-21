@@ -51,7 +51,7 @@ Sahar's condition: it must stay professional and make sense to a recruiter. Noth
 
 ### My calls (Sahar can override)
 
-- **Component library: PrimeNG.** It is the Angular sibling of PrimeVue, which the Vue app uses, and both share the `@primeuix/themes` design tokens. The two apps then look like one product with little styling work, and the parallel is easy to explain ("PrimeVue in one, PrimeNG in the other"). Angular Material was the alternative. It is better known, but it would make the two apps look unrelated and add theming work.
+- **Component library: Angular Material** (changed during implementation). The original pick was PrimeNG, the sibling of PrimeVue. But PrimeNG 21 and 22 are now under the commercial PrimeUI license: they show a license notice without a key, and the free tier requires registering an account, which does not fit a public portfolio. Angular Material is MIT-licensed, maintained by the Angular team and commonly listed in Angular job ads. The apps share colors and layout through the app's own CSS tokens, not through a shared component library.
 - **State: Signals plus small injectable services** (`AuthService`, `LocaleService`). No NgRx. The app's state is small, and a junior portfolio with NgRx for this size would look over-engineered. The design doc and README should say this was a deliberate choice.
 - **Translations: a small `TranslateService` built on Signals** that reads the existing `en.ts` / `he.ts` dictionaries, with a `translate` pipe. The dictionaries use `{name}` placeholders and no plural forms, so this is a few dozen lines. `@angular/localize` compiles one build per language, which does not fit a runtime toggle. `ngx-translate` would mean converting the dictionaries to JSON and maintaining them twice.
 - **Live demo URL:** the Angular build is deployed to `https://saharhalili95.github.io/SalaryNet/angular/` by the existing Pages workflow, in the same artifact as Vue. The Vue URL does not change.
@@ -129,4 +129,4 @@ While only Phase 1 exists, the Angular app must look finished rather than missin
 - The shared-folder mechanics (path alias or workspace package) and the details of making Vite and the Angular builder both resolve it.
 - Component breakdown inside each feature.
 - How e2e selectors are made app-agnostic.
-- Whether PrimeNG's current major pairs with the `@primeuix/themes` version Vue uses, or each app uses the theme version its library needs. Shared colors matter, a shared package version does not.
+- The Material theme settings. Shared colors matter, a shared package version does not.

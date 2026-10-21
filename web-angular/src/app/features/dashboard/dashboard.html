@@ -1,0 +1,116 @@
+<div class="page-header">
+  <div>
+    <h1>{{ 'dashboard.title' | t }}</h1>
+    <p>{{ (auth.isAdmin() ? 'dashboard.subtitleAdmin' : 'dashboard.subtitleHr') | t }}</p>
+  </div>
+</div>
+
+@if (summary(); as s) {
+  <div class="tiles">
+    <app-stat-tile icon="group" [label]="'dashboard.activeEmployees' | t" [value]="'' + s.activeEmployees"
+      [caption]="'dashboard.totals' | t: { total: s.totalEmployees, departments: s.departmentCount }" />
+    @if (s.latestPeriod; as p) {
+      <app-stat-tile icon="payments" [label]="'dashboard.latestGross' | t" [value]="compact(p.grossTotal)"
+        [caption]="'dashboard.periodPayslips' | t: { period: period(p.year, p.month), count: p.payslips }" />
+      <app-stat-tile icon="percent" [label]="'dashboard.latestDeductions' | t" [value]="compact(p.deductionsTotal)"
+        [caption]="'dashboard.ofGross' | t: { percent: deductionShare() ?? '' }" />
+    } @else {
+      <app-stat-tile icon="payments" [label]="'dashboard.latestGross' | t" value="-" [caption]="'dashboard.noPayroll' | t" />
+      <app-stat-tile icon="percent" [label]="'dashboard.latestDeductions' | t" value="-" />
+    }
+    <app-stat-tile icon="schedule" [label]="'dashboard.checkedIn' | t" [value]="'' + s.currentlyCheckedIn"
+      [caption]="'dashboard.averageSalary' | t: { amount: compact(s.averageBaseSalary) }" />
+  </div>
+
+  <div class="grid">
+    <section class="panel wide">
+      <div class="panel-head">
+        <h2>{{ 'dashboard.trendTitle' | t: { count: s.monthlyTrend.length } }}</h2>
+        <button mat-button type="button" (click)="showTrendTable.set(!showTrendTable())">
+          <mat-icon>{{ showTrendTable() ? 'show_chart' : 'table' }}</mat-icon>
+          {{ (showTrendTable() ? 'common.chart' : 'common.table') | t }}
+        </button>
+      </div>
+      @if (showTrendTable()) {
+        <div class="table-scroll">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>{{ 'dashboard.period' | t }}</th><th>{{ 'dashboard.gross' | t }}</th><th>{{ 'dashboard.deductions' | t }}</th>
+                <th>{{ 'dashboard.net' | t }}</th><th>{{ 'dashboard.payslips' | t }}</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (p of s.monthlyTrend; track p.year + '-' + p.month) {
+                <tr>
+                  <td>{{ p.year | period: p.month }}</td>
+                  <td class="money">{{ p.grossTotal | money }}</td>
+                  <td class="money">{{ p.deductionsTotal | money }}</td>
+                  <td class="money">{{ p.netTotal | money }}</td>
+                  <td>{{ p.payslips }}</td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      } @else {
+        <app-chart-canvas [build]="trendChart()" [label]="'dashboard.trendLabel' | t" />
+      }
+    </section>
+
+    <section class="panel">
+      <h2>{{ 'dashboard.workforce' | t }}</h2>
+      <ul class="meters">
+        @for (et of s.employmentTypes; track et.employmentType) {
+          <li>
+            <div class="meter-label"><span>{{ 'employmentType.' + et.employmentType | t }}</span><strong>{{ et.count }}</strong></div>
+            <div class="meter"><div [style.width.%]="(et.count / typeTotal()) * 100"></div></div>
+          </li>
+        }
+      </ul>
+    </section>
+
+    <section class="panel full">
+      <div class="panel-head">
+        <h2>
+          {{ 'dashboard.byDepartment' | t }}@if (s.latestPeriod; as p) {, {{ p.year | period: p.month }}}
+        </h2>
+        <button mat-button type="button" (click)="showDeptTable.set(!showDeptTable())">
+          <mat-icon>{{ showDeptTable() ? 'bar_chart' : 'table' }}</mat-icon>
+          {{ (showDeptTable() ? 'common.chart' : 'common.table') | t }}
+        </button>
+      </div>
+      @if (showDeptTable()) {
+        <div class="table-scroll">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>{{ 'common.department' | t }}</th><th>{{ 'dashboard.payslips' | t }}</th>
+                <th>{{ 'dashboard.gross' | t }}</th><th>{{ 'dashboard.net' | t }}</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (d of s.payrollByDepartment; track d.departmentName) {
+                <tr>
+                  <td>{{ d.departmentName | term }}</td>
+                  <td>{{ d.headcount }}</td>
+                  <td class="money">{{ d.grossTotal | money }}</td>
+                  <td class="money">{{ d.netTotal | money }}</td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      } @else {
+        <app-chart-canvas [build]="departmentChart()" [label]="'dashboard.byDepartmentLabel' | t"
+          [height]="s.payrollByDepartment.length * 44 > 200 ? s.payrollByDepartment.length * 44 : 200" />
+      }
+    </section>
+  </div>
+} @else {
+  <div class="tiles" aria-busy="true">
+    @for (i of [1, 2, 3, 4]; track i) {
+      <div class="skeleton"></div>
+    }
+  </div>
+}

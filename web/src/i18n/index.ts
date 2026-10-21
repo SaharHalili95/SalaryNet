@@ -1,9 +1,10 @@
 import { watch } from 'vue'
 import { createI18n } from 'vue-i18n'
-import en from './en'
-import he from './he'
+import en from '@shared/i18n/en'
+import he from '@shared/i18n/he'
+import { intlLocale as intlLocaleFor, type Locale } from '@shared/i18n/locale'
 
-export type Locale = 'en' | 'he'
+export type { Locale }
 
 const STORAGE_KEY = 'salarynet.locale'
 
@@ -25,7 +26,7 @@ export const i18n = createI18n({
 export const currentLocale = () => i18n.global.locale.value as Locale
 
 /** Intl locale used for numbers and dates: Israeli formatting in Hebrew, British day-month order in English. */
-export const intlLocale = () => (currentLocale() === 'he' ? 'he-IL' : 'en-GB')
+export const intlLocale = () => intlLocaleFor(currentLocale())
 
 function applyDocumentLanguage(locale: Locale) {
   document.documentElement.lang = locale

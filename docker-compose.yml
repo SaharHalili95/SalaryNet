@@ -38,7 +38,9 @@ services:
       - "5080:8080"
 
   web:
-    build: ./web
+    build:
+      context: .
+      dockerfile: web/Dockerfile
     profiles: [full]
     depends_on:
       - api

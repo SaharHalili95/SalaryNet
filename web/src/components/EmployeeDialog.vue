@@ -7,7 +7,7 @@ import Select from 'primevue/select'
 import { computed, reactive, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { api } from '@/api'
-import type { Department, Employee, EmploymentType, SaveEmployeeRequest } from '@/api/types'
+import type { Department, Employee, EmploymentType, SaveEmployeeRequest } from '@shared/api/types'
 import { useLocalizedData } from '@/i18n/useLocalizedData'
 import { useApiError } from '@/utils/useApiError'
 

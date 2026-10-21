@@ -5,7 +5,7 @@ import { computed, onMounted, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRouter } from 'vue-router'
 import { api } from '@/api'
-import type { Employee } from '@/api/types'
+import type { Employee } from '@shared/api/types'
 import { useLocalizedData } from '@/i18n/useLocalizedData'
 import { formatDate, formatPeriod } from '@/utils/format'
 

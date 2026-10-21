@@ -2,6 +2,22 @@ import { expect, type Page } from '@playwright/test'
 
 export type Role = 'Admin' | 'HR' | 'Employee'
 export type Locale = 'en' | 'he'
+export type App = 'vue' | 'angular'
+
+export function appFor(page: Page): App {
+  return new URL(page.url()).port === '4174' ? 'angular' : 'vue'
+}
+
+export function pagesFor(app: App, role: Role): string[] {
+  if (app === 'angular') {
+    return role === 'Admin' ? ['/dashboard', '/employees', '/payroll', '/attendance']
+      : role === 'HR' ? ['/dashboard', '/employees', '/payroll', '/attendance']
+        : ['/me', '/payroll', '/attendance']
+  }
+  return role === 'Admin' ? ['/dashboard', '/employees', '/departments', '/payroll', '/attendance', '/users']
+    : role === 'HR' ? ['/dashboard', '/employees', '/departments', '/payroll', '/attendance']
+      : ['/me', '/payroll', '/attendance']
+}
 
 const roleLabel: Record<Locale, Record<Role, string>> = {
   en: { Admin: 'Admin', HR: 'HR', Employee: 'Employee' },
@@ -55,6 +71,10 @@ export async function expectNoHorizontalScroll(page: Page) {
   })
   expect(overflow.offenders, `elements wider than the ${overflow.width}px screen`).toEqual([])
   expect(overflow.scrollWidth).toBeLessThanOrEqual(overflow.width)
+}
+
+export function dialog(page: Page) {
+  return page.locator('.p-dialog, .mat-mdc-dialog-container').last()
 }
 
 export async function openMenu(page: Page) {
