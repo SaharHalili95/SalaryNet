@@ -12,6 +12,7 @@ import { environment } from '../../environments/environment';
 import { AuthService } from '../core/auth.service';
 import { startDemoSimulation } from '../core/demo-simulation';
 import { PersonPipe } from '../core/format.pipes';
+import { providePaginatorIntl } from '../core/paginator-intl';
 import { LocaleService } from '../core/locale.service';
 import { TranslatePipe } from '../core/translate.pipe';
 import { localizeName, localizeTerm } from '@shared/i18n/dataGlossary';
@@ -37,6 +38,8 @@ const NAV: NavItem[] = [
   imports: [RouterOutlet, RouterLink, RouterLinkActive, MatButtonModule, MatIconModule, MatTooltipModule, TranslatePipe, PersonPipe],
   templateUrl: './shell.html',
   styleUrl: './shell.css',
+  // Provided here rather than at the root so the paginator stays out of the initial bundle.
+  providers: [providePaginatorIntl()],
 })
 export class Shell {
   protected readonly auth = inject(AuthService);

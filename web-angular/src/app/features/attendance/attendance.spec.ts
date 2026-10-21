@@ -4,7 +4,7 @@ import { provideRouter } from '@angular/router';
 import type { AttendanceLog } from '@shared/api/types';
 import { SALARYNET_API } from '../../core/api';
 import { SESSION_KEY } from '../../core/auth.service';
-import { provideLocalization } from '../../core/locale.service';
+import { providePaginatorIntl } from '../../core/paginator-intl';
 import { Attendance } from './attendance';
 
 const openShift: AttendanceLog = { id: 'a1', employeeId: 'e1', employeeName: 'Noa Cohen', checkIn: new Date(Date.now() - 3_600_000).toISOString(), checkOut: null, totalHours: 0, isOpen: true };
@@ -19,7 +19,7 @@ async function setup(role: 'Admin' | 'HR' | 'Employee') {
   TestBed.configureTestingModule({
     imports: [Attendance],
     providers: [
-      provideLocalization(), provideRouter([]), { provide: MatSnackBar, useValue: { open: vi.fn() } },
+      providePaginatorIntl(), provideRouter([]), { provide: MatSnackBar, useValue: { open: vi.fn() } },
       { provide: SALARYNET_API, useValue: { attendance: { current: async () => current, checkIn, checkOut: async () => null, search: async () => ({ items: [], page: 1, pageSize: 10, totalCount: 0, totalPages: 0 }) } } },
     ],
   });

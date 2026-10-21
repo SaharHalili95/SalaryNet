@@ -2,7 +2,6 @@ import { TestBed } from '@angular/core/testing';
 import { ActivatedRoute, convertToParamMap, provideRouter, Router } from '@angular/router';
 import { ApiError } from '@shared/api/errors';
 import { AuthService } from '../../core/auth.service';
-import { provideLocalization } from '../../core/locale.service';
 import { Login } from './login';
 
 async function setup(login: (email: string, password: string) => Promise<void>, redirect?: string) {
@@ -10,7 +9,6 @@ async function setup(login: (email: string, password: string) => Promise<void>, 
   TestBed.configureTestingModule({
     imports: [Login],
     providers: [
-      provideLocalization(),
       provideRouter([]),
       { provide: AuthService, useValue: { login: vi.fn(login) } },
       {

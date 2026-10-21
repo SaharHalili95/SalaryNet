@@ -5,7 +5,7 @@ import type { PayrollRecord } from '@shared/api/types';
 import { of } from 'rxjs';
 import { SALARYNET_API } from '../../core/api';
 import { SESSION_KEY } from '../../core/auth.service';
-import { provideLocalization } from '../../core/locale.service';
+import { providePaginatorIntl } from '../../core/paginator-intl';
 import { page, payslip } from '../../shared/testing';
 import { Payroll } from './payroll';
 
@@ -22,7 +22,7 @@ async function setup(role: 'Admin' | 'HR' | 'Employee', records: PayrollRecord[]
   TestBed.configureTestingModule({
     imports: [Payroll],
     providers: [
-      provideLocalization(),
+      providePaginatorIntl(),
       provideRouter([]),
       { provide: MatDialog, useValue: { open } },
       { provide: SALARYNET_API, useValue: { payroll: { search }, departments: { list: async () => [] } } },

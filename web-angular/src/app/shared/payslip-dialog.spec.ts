@@ -1,6 +1,5 @@
 import { TestBed } from '@angular/core/testing';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
-import { provideLocalization } from '../core/locale.service';
 import { payslip } from './testing';
 import { PayslipDialog } from './payslip-dialog';
 
@@ -9,7 +8,7 @@ describe('PayslipDialog', () => {
     localStorage.setItem('salarynet.locale', 'en');
     TestBed.configureTestingModule({
       imports: [PayslipDialog],
-      providers: [provideLocalization(), { provide: MAT_DIALOG_DATA, useValue: { record: payslip } }, { provide: MatDialogRef, useValue: { close: vi.fn() } }],
+      providers: [{ provide: MAT_DIALOG_DATA, useValue: { record: payslip } }, { provide: MatDialogRef, useValue: { close: vi.fn() } }],
     });
     const fixture = TestBed.createComponent(PayslipDialog);
     fixture.detectChanges();

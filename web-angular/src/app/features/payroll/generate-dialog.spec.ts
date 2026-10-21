@@ -3,7 +3,6 @@ import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { ApiError } from '@shared/api/errors';
 import { SALARYNET_API } from '../../core/api';
-import { provideLocalization } from '../../core/locale.service';
 import { noa } from '../../shared/testing';
 import { GenerateDialog } from './generate-dialog';
 
@@ -14,7 +13,6 @@ describe('GenerateDialog', () => {
     TestBed.configureTestingModule({
       imports: [GenerateDialog],
       providers: [
-        provideLocalization(),
         { provide: MAT_DIALOG_DATA, useValue: { employees: [noa] } },
         { provide: MatDialogRef, useValue: { close } },
         { provide: MatSnackBar, useValue: { open } },

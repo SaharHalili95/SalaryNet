@@ -1,6 +1,5 @@
 import { DOCUMENT } from '@angular/common';
-import { computed, inject, Injectable, signal, type Provider } from '@angular/core';
-import { MatPaginatorIntl } from '@angular/material/paginator';
+import { computed, inject, Injectable, signal } from '@angular/core';
 import en from '@shared/i18n/en';
 import he from '@shared/i18n/he';
 import type { Locale } from '@shared/i18n/locale';
@@ -72,36 +71,4 @@ export class LocaleService {
     this.document.documentElement.lang = locale;
     this.document.documentElement.dir = locale === 'he' ? 'rtl' : 'ltr';
   }
-}
-
-/** Material's paginator texts, translated and refreshed on every language switch. */
-@Injectable()
-export class LocalizedPaginatorIntl extends MatPaginatorIntl {
-  private readonly i18n = inject(LocaleService);
-
-  constructor() {
-    super();
-    this.update();
-    this.i18n.changes.subscribe(() => this.update());
-  }
-
-  override getRangeLabel = (page: number, pageSize: number, length: number): string => {
-    if (length === 0) return this.i18n.t('paginator.empty', { total: 0 });
-    const start = page * pageSize + 1;
-    const end = Math.min(length, (page + 1) * pageSize);
-    return this.i18n.t('paginator.range', { start, end, total: length });
-  };
-
-  private update(): void {
-    this.itemsPerPageLabel = this.i18n.t('paginator.itemsPerPage');
-    this.firstPageLabel = this.i18n.t('paginator.firstPage');
-    this.previousPageLabel = this.i18n.t('paginator.previousPage');
-    this.nextPageLabel = this.i18n.t('paginator.nextPage');
-    this.lastPageLabel = this.i18n.t('paginator.lastPage');
-    this.changes.next();
-  }
-}
-
-export function provideLocalization(): Provider[] {
-  return [{ provide: MatPaginatorIntl, useClass: LocalizedPaginatorIntl }];
 }

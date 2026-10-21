@@ -5,7 +5,7 @@ import { provideRouter } from '@angular/router';
 import type { Employee, EmployeeQuery, PagedResult } from '@shared/api/types';
 import { of } from 'rxjs';
 import { SALARYNET_API } from '../../core/api';
-import { provideLocalization } from '../../core/locale.service';
+import { providePaginatorIntl } from '../../core/paginator-intl';
 import { noa, page } from '../../shared/testing';
 import { Employees } from './employees';
 
@@ -24,7 +24,7 @@ async function setup(search: (q: EmployeeQuery) => Promise<PagedResult<Employee>
   TestBed.configureTestingModule({
     imports: [Employees],
     providers: [
-      provideLocalization(),
+      providePaginatorIntl(),
       provideRouter([]),
       { provide: MatSnackBar, useValue: { open: vi.fn() } },
       { provide: MatDialog, useValue: { open } },
@@ -54,15 +54,15 @@ describe('Employees', () => {
   });
 
   it('sends one request after typing pauses', async () => {
-    const { el, searchSpy } = await setup(async () => page([noa]));
+    const { fixture, el, searchSpy } = await setup(async () => page([noa]));
     await vi.advanceTimersByTimeAsync(300);
     searchSpy.mockClear();
-    typeSearch(el, 'N');
-    await vi.advanceTimersByTimeAsync(100);
-    typeSearch(el, 'No');
-    await vi.advanceTimersByTimeAsync(100);
-    typeSearch(el, 'Noa');
-    await vi.advanceTimersByTimeAsync(300);
+    for (const text of ['N', 'No', 'Noa']) {
+      typeSearch(el, text);
+      fixture.detectChanges();
+      await vi.advanceTimersByTimeAsync(100);
+    }
+    await vi.advanceTimersByTimeAsync(200);
     expect(searchSpy).toHaveBeenCalledTimes(1);
     expect(searchSpy.mock.calls[0]![0]).toMatchObject({ search: 'Noa', page: 1 });
   });
@@ -70,12 +70,15 @@ describe('Employees', () => {
   it('never lets a slow, older response overwrite a newer one', async () => {
     const slow = deferred<PagedResult<Employee>>();
     const fast = deferred<PagedResult<Employee>>();
-    const { fixture, el } = await setup((q) => (q.search === 'Noa' ? slow.promise : q.search === 'Dana' ? fast.promise : Promise.resolve(page([]))));
+    const { fixture, el, searchSpy } = await setup((q) => (q.search === 'Noa' ? slow.promise : q.search === 'Dana' ? fast.promise : Promise.resolve(page([]))));
     await vi.advanceTimersByTimeAsync(300);
     typeSearch(el, 'Noa');
+    fixture.detectChanges();
     await vi.advanceTimersByTimeAsync(300);
     typeSearch(el, 'Dana');
+    fixture.detectChanges();
     await vi.advanceTimersByTimeAsync(300);
+    expect(searchSpy.mock.calls.map(([q]) => q.search)).toEqual([undefined, 'Noa', 'Dana']);
     fast.resolve(page([dana]));
     await vi.advanceTimersByTimeAsync(0);
     slow.resolve(page([noa]));

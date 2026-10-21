@@ -2,7 +2,6 @@ import { TestBed } from '@angular/core/testing';
 import { provideRouter } from '@angular/router';
 import { SALARYNET_API } from '../../core/api';
 import { AuthService } from '../../core/auth.service';
-import { provideLocalization } from '../../core/locale.service';
 import { CHART_FACTORY } from '../../shared/chart-canvas';
 import { fakeCharts, summary } from '../../shared/testing';
 import { Dashboard } from './dashboard';
@@ -13,7 +12,6 @@ async function setup() {
   TestBed.configureTestingModule({
     imports: [Dashboard],
     providers: [
-      provideLocalization(),
       provideRouter([]),
       { provide: CHART_FACTORY, useValue: charts.factory },
       { provide: SALARYNET_API, useValue: { dashboard: async () => summary } },

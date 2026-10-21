@@ -3,7 +3,6 @@ import { TestBed } from '@angular/core/testing';
 import { provideRouter, Router } from '@angular/router';
 import type { User, UserRole } from '@shared/api/types';
 import { AuthService } from '../core/auth.service';
-import { provideLocalization } from '../core/locale.service';
 import { Shell } from './shell';
 
 @Component({ template: '' })
@@ -16,7 +15,6 @@ async function setup(role: UserRole) {
   TestBed.configureTestingModule({
     imports: [Shell],
     providers: [
-      provideLocalization(),
       provideRouter([{ path: '**', component: Blank }]),
       {
         provide: AuthService,

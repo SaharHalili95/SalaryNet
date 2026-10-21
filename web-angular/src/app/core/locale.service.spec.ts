@@ -1,11 +1,12 @@
 import { TestBed } from '@angular/core/testing';
 import { MatPaginatorIntl } from '@angular/material/paginator';
-import { LocaleService, LOCALE_KEY, provideLocalization } from './locale.service';
+import { LocaleService, LOCALE_KEY } from './locale.service';
+import { providePaginatorIntl } from './paginator-intl';
 
 function setup(saved: string | null = null) {
   localStorage.clear();
   if (saved) localStorage.setItem(LOCALE_KEY, saved);
-  TestBed.configureTestingModule({ providers: [provideLocalization()] });
+  TestBed.configureTestingModule({ providers: [providePaginatorIntl()] });
   return TestBed.inject(LocaleService);
 }
 

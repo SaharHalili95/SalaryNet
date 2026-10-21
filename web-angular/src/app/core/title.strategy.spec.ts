@@ -2,7 +2,7 @@ import { Component } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 import { Title } from '@angular/platform-browser';
 import { provideRouter, Router, TitleStrategy } from '@angular/router';
-import { LocaleService, provideLocalization } from './locale.service';
+import { LocaleService } from './locale.service';
 import { TranslatedTitleStrategy } from './title.strategy';
 
 @Component({ template: '' })
@@ -13,7 +13,6 @@ describe('TranslatedTitleStrategy', () => {
     localStorage.clear();
     TestBed.configureTestingModule({
       providers: [
-        provideLocalization(),
         provideRouter([{ path: 'payroll', component: Blank, title: 'nav.payroll' }, { path: '', component: Blank }]),
         { provide: TitleStrategy, useClass: TranslatedTitleStrategy },
       ],

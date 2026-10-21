@@ -4,7 +4,6 @@ import { provideRouter, Router } from '@angular/router';
 import { ApiError } from '@shared/api/errors';
 import { ApiErrorService } from './api-error.service';
 import { AuthService } from './auth.service';
-import { provideLocalization } from './locale.service';
 
 function setup() {
   localStorage.clear();
@@ -13,7 +12,6 @@ function setup() {
   TestBed.configureTestingModule({
     providers: [
       provideRouter([]),
-      provideLocalization(),
       { provide: AuthService, useValue: { logout, isAuthenticated: () => true } },
       { provide: MatSnackBar, useValue: { open } },
     ],

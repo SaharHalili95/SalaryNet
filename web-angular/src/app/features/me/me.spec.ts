@@ -3,7 +3,6 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 import { provideRouter, Router } from '@angular/router';
 import type { AttendanceLog } from '@shared/api/types';
 import { SALARYNET_API } from '../../core/api';
-import { provideLocalization } from '../../core/locale.service';
 import { CHART_FACTORY } from '../../shared/chart-canvas';
 import { fakeCharts, noa, page, payslip } from '../../shared/testing';
 import { Me } from './me';
@@ -19,7 +18,6 @@ async function setup() {
   TestBed.configureTestingModule({
     imports: [Me],
     providers: [
-      provideLocalization(),
       provideRouter([]),
       { provide: CHART_FACTORY, useValue: fakeCharts().factory },
       { provide: MatSnackBar, useValue: { open: vi.fn() } },

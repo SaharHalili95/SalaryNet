@@ -1,12 +1,12 @@
 import { TestBed } from '@angular/core/testing';
 import { HoursPipe, MoneyPipe, PeriodPipe, TermPipe } from './format.pipes';
-import { LocaleService, provideLocalization } from './locale.service';
+import { LocaleService } from './locale.service';
 import { TranslatePipe } from './translate.pipe';
 
 function setup() {
   localStorage.clear();
   TestBed.configureTestingModule({
-    providers: [provideLocalization(), TranslatePipe, MoneyPipe, HoursPipe, PeriodPipe, TermPipe],
+    providers: [TranslatePipe, MoneyPipe, HoursPipe, PeriodPipe, TermPipe],
   });
   return TestBed.inject(LocaleService);
 }

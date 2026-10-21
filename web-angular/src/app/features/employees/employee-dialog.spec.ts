@@ -5,7 +5,6 @@ import { provideRouter } from '@angular/router';
 import { ApiError } from '@shared/api/errors';
 import type { SaveEmployeeRequest } from '@shared/api/types';
 import { SALARYNET_API } from '../../core/api';
-import { provideLocalization } from '../../core/locale.service';
 import { noa } from '../../shared/testing';
 import { EmployeeDialog, type EmployeeDialogData } from './employee-dialog';
 
@@ -18,7 +17,6 @@ async function setup(data: EmployeeDialogData, create: (r: SaveEmployeeRequest) 
   TestBed.configureTestingModule({
     imports: [EmployeeDialog],
     providers: [
-      provideLocalization(),
       provideRouter([]),
       { provide: MAT_DIALOG_DATA, useValue: data },
       { provide: MatDialogRef, useValue: { close } },
