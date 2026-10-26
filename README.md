@@ -6,7 +6,9 @@ It covers the core flows of a payroll product: employees and departments, monthl
 
 > All data in this project is fictional demo data.
 
-**Live demo:** https://saharhalili95.github.io/SalaryNet/ runs the front end on GitHub Pages in demo mode (the same business rules executed in the browser). Sign in with one click as Admin, HR or Employee, or open **How it works** to follow a request through every layer.
+**Live demos:** [Vue 3 version](https://saharhalili95.github.io/SalaryNet/) · [Angular version](https://saharhalili95.github.io/SalaryNet/angular/) · Code: [`web/`](web) (Vue) and [`web-angular/`](web-angular) (Angular)
+
+Both run on GitHub Pages in demo mode (the same business rules executed in the browser). Sign in with one click as Admin, HR or Employee, or open **How it works** to follow a request through every layer.
 
 | Sign in with test accounts | HR dashboard |
 | --- | --- |
