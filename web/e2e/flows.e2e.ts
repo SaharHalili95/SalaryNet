@@ -130,6 +130,8 @@ test.describe('employees', () => {
     await signIn(page, 'HR')
     await goTo(page, '/employees')
     const rows = page.locator('.p-datatable-tbody tr, tr.mat-mdc-row')
+    // Count only once the first page has loaded; a slow runner otherwise counts a half-drawn table.
+    await expect.poll(() => rows.count()).toBeGreaterThan(2)
     const before = await rows.count()
     await page.locator('.toolbar input').first().fill('Noa')
     await expect.poll(() => rows.count()).toBeLessThan(before)
