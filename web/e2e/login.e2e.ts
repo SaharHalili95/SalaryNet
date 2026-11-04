@@ -16,6 +16,14 @@ test('employee signs in with one tap and lands on their overview', async ({ page
   await expect(page).toHaveURL(/#\/me/)
 })
 
+test('the hero button signs in as HR from the first screen', async ({ page }) => {
+  await open(page, '/login')
+  const tryNow = page.getByRole('button', { name: 'Try it now as HR' })
+  await expect(tryNow).toBeInViewport()
+  await tryNow.tap()
+  await expect(page).toHaveURL(/#\/dashboard/)
+})
+
 test('one-tap sign in works in Hebrew', async ({ page }) => {
   await signIn(page, 'Employee', 'he')
   await expect(page).toHaveURL(/#\/me/)

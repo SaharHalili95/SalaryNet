@@ -51,8 +51,11 @@ export default {
   login: {
     title: 'Sign in',
     heroTitle: 'Payroll and HR management, end to end.',
-    heroText: 'A portfolio project: ASP.NET Core 8 Web API with Clean Architecture, EF Core on SQL Server, JWT role-based security, and this Vue 3 + TypeScript front end.',
-    heroTextAngular: 'A portfolio project: ASP.NET Core 8 Web API with Clean Architecture, EF Core on SQL Server, JWT role-based security, and this Angular front end, one of two UIs on the same API.',
+    heroText: 'Run payroll, payslips and attendance for a whole company, with each role seeing only what it should. Built on an ASP.NET Core 8 API with Clean Architecture, SQL Server and JWT security, and this Vue 3 front end.',
+    heroTextAngular: 'Run payroll, payslips and attendance for a whole company, with each role seeing only what it should. Built on an ASP.NET Core 8 API with Clean Architecture, SQL Server and JWT security, and this Angular front end.',
+    tryNow: 'Try it now as HR',
+    tryHint: 'One tap, no sign-up. A private demo company runs in your browser.',
+    proof: 'Clean Architecture · 160+ automated tests · Tested on iPhone and Android · English and Hebrew',
     bullet1: 'Tiered tax calculation with a full payslip breakdown',
     bullet2: 'Admin, HR and Employee roles with resource-level authorization',
     bullet3: 'Attendance tracking with server-calculated hours',

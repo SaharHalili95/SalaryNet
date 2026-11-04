@@ -3,11 +3,18 @@
     <div class="brand"><span class="logo">S</span> SalaryNet <span class="flavor">Angular</span></div>
     <h1>{{ 'login.heroTitle' | t }}</h1>
     <p>{{ 'login.heroTextAngular' | t }}</p>
+    <div class="try">
+      <button mat-flat-button type="button" class="try-button" [disabled]="loading()" (click)="signIn(accounts[1]!.email, accounts[1]!.password)">
+        {{ 'login.tryNow' | t }} <mat-icon iconPositionEnd aria-hidden="true">arrow_forward</mat-icon>
+      </button>
+      <span>{{ 'login.tryHint' | t }}</span>
+    </div>
     <ul>
       <li><mat-icon aria-hidden="true">check_circle</mat-icon> {{ 'login.bullet1' | t }}</li>
       <li><mat-icon aria-hidden="true">check_circle</mat-icon> {{ 'login.bullet2' | t }}</li>
       <li><mat-icon aria-hidden="true">check_circle</mat-icon> {{ 'login.bullet3' | t }}</li>
     </ul>
+    <p class="proof">{{ 'login.proof' | t }}</p>
     <div class="guides">
       <a class="guide-link" routerLink="/architecture"><mat-icon aria-hidden="true">share</mat-icon> {{ 'nav.architecture' | t }}</a>
       <a class="guide-link" routerLink="/about"><mat-icon aria-hidden="true">menu_book</mat-icon> {{ 'nav.about' | t }}</a>
