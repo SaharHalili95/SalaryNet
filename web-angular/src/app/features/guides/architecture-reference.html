@@ -1,0 +1,68 @@
+<section class="panel hosting">
+  <h2>{{ 'architecture.hostingTitle' | t }}</h2>
+  <p class="muted">{{ 'architecture.hostingIntro' | t }}</p>
+  <ol class="hosting-steps">
+    <li><span class="badge">1</span><span>{{ 'architecture.hostingStep1' | t }}</span></li>
+    <li><span class="badge">2</span><span>{{ 'angularGuide.hostingStep2' | t }}</span></li>
+    <li><span class="badge">3</span><span>{{ 'architecture.hostingStep3' | t }}</span></li>
+    <li><span class="badge">4</span><span>{{ 'architecture.hostingStep4' | t }}</span></li>
+  </ol>
+
+  <h3>{{ 'architecture.hostingDesignTitle' | t }}</h3>
+  <div class="impls">
+    <div class="impl iface"><code dir="ltr">SALARYNET_API</code></div>
+    <div class="impl-pair">
+      <div class="impl"><code dir="ltr">http-api.ts</code><span>{{ 'angularGuide.hostingHttp' | t }}</span></div>
+      <div class="impl demo"><code dir="ltr">demoApi.ts</code><span>{{ 'angularGuide.hostingDemo' | t }}</span></div>
+    </div>
+  </div>
+  <p class="muted">{{ 'angularGuide.hostingDesignNote' | t }}</p>
+  <p class="honest"><mat-icon aria-hidden="true">info</mat-icon> {{ 'architecture.hostingHonest' | t }}</p>
+
+  <h3>{{ 'architecture.dockerTitle' | t }}</h3>
+  <table class="docker">
+    <thead><tr><th>{{ 'architecture.dockerWhat' | t }}</th><th>{{ 'architecture.dockerNeeds' | t }}</th></tr></thead>
+    <tbody>
+      @for (row of dockerRows; track row.key) {
+        <tr>
+          <td>{{ 'architecture.dockerRows.' + row.key | t }}</td>
+          <td><span class="tag" [class.warn]="row.needs">{{ (row.needs ? 'architecture.dockerYes' : 'architecture.dockerNo') | t }}</span></td>
+        </tr>
+      }
+    </tbody>
+  </table>
+  <p class="muted">{{ 'architecture.dockerNote' | t }}</p>
+</section>
+
+<section class="panel catalog">
+  <h2>{{ 'architecture.catalogTitle' | t }}</h2>
+  <p class="muted">{{ 'architecture.catalogIntro' | t }}</p>
+  <div class="cards">
+    @for (n of nodes; track n.id) {
+      <article class="card">
+        <header>
+          <span class="lane-chip">{{ text(lanes[n.lane]!.title) }}</span>
+          <h3>{{ text(n.label) }}</h3>
+          <code dir="ltr">{{ details[n.id].tech }}</code>
+        </header>
+        <dl>
+          <dt>{{ 'architecture.detailJob' | t }}</dt><dd>{{ text(details[n.id].job) }}</dd>
+          <dt>{{ 'architecture.detailFrom' | t }}</dt><dd>{{ text(details[n.id].from) }}</dd>
+          <dt>{{ 'architecture.detailTo' | t }}</dt><dd>{{ text(details[n.id].to) }}</dd>
+          <dt>{{ 'architecture.detailHow' | t }}</dt><dd>{{ text(details[n.id].how) }}</dd>
+        </dl>
+      </article>
+    }
+  </div>
+</section>
+
+<section class="panel glossary">
+  <h2>{{ 'architecture.glossaryTitle' | t }}</h2>
+  <p class="muted">{{ 'architecture.glossaryIntro' | t }}</p>
+  <dl>
+    @for (g of glossary; track g.term) {
+      <dt dir="ltr">{{ g.term }}</dt>
+      <dd>{{ text(g.meaning) }}</dd>
+    }
+  </dl>
+</section>

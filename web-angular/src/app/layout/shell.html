@@ -13,8 +13,14 @@
         </a>
       }
     </nav>
+    <div class="nav-divider"></div>
+    @for (item of guides; track item.path) {
+      <a class="nav-link" [routerLink]="item.path">
+        <mat-icon aria-hidden="true">{{ item.icon }}</mat-icon>
+        <span>{{ item.label | t }}</span>
+      </a>
+    }
     @if (vueUrl) {
-      <div class="nav-divider"></div>
       <a class="nav-link version-link" [href]="vueUrl">
         <mat-icon aria-hidden="true">swap_horiz</mat-icon>
         <span>{{ 'layout.vueVersion' | t }}</span>

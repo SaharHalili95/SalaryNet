@@ -8,13 +8,13 @@
       <li><mat-icon aria-hidden="true">check_circle</mat-icon> {{ 'login.bullet2' | t }}</li>
       <li><mat-icon aria-hidden="true">check_circle</mat-icon> {{ 'login.bullet3' | t }}</li>
     </ul>
-    @if (vueUrl) {
-      <div class="guides">
-        <a class="guide-link" [href]="vueUrl + '#/architecture'"><mat-icon aria-hidden="true">share</mat-icon> {{ 'nav.architecture' | t }} · Vue</a>
-        <a class="guide-link" [href]="vueUrl + '#/about'"><mat-icon aria-hidden="true">menu_book</mat-icon> {{ 'nav.about' | t }} · Vue</a>
+    <div class="guides">
+      <a class="guide-link" routerLink="/architecture"><mat-icon aria-hidden="true">share</mat-icon> {{ 'nav.architecture' | t }}</a>
+      <a class="guide-link" routerLink="/about"><mat-icon aria-hidden="true">menu_book</mat-icon> {{ 'nav.about' | t }}</a>
+      @if (vueUrl) {
         <a class="guide-link version-link" [href]="vueUrl"><mat-icon aria-hidden="true">swap_horiz</mat-icon> {{ 'layout.vueVersion' | t }}</a>
-      </div>
-    }
+      }
+    </div>
   </section>
 
   <section class="form-side">

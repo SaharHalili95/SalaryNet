@@ -33,6 +33,12 @@ const NAV: NavItem[] = [
   { path: '/attendance', label: 'nav.attendance', icon: 'schedule' },
 ];
 
+/** Public guide pages; they open outside the shell, with their own header. */
+const GUIDES: NavItem[] = [
+  { path: '/architecture', label: 'nav.architecture', icon: 'share' },
+  { path: '/about', label: 'nav.about', icon: 'menu_book' },
+];
+
 @Component({
   selector: 'app-shell',
   imports: [RouterOutlet, RouterLink, RouterLinkActive, MatButtonModule, MatIconModule, MatTooltipModule, TranslatePipe, PersonPipe],
@@ -50,6 +56,7 @@ export class Shell {
 
   protected readonly demoMode = environment.demoMode;
   protected readonly vueUrl = environment.vueUrl;
+  protected readonly guides = GUIDES;
   protected readonly menuOpen = signal(false);
   protected readonly nav = computed(() => NAV.filter((item) => !item.roles || this.auth.hasRole(item.roles)));
   protected readonly initials = computed(() =>

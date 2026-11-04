@@ -330,6 +330,17 @@ const he: typeof en = {
     liveSite: 'האתר החי',
     code: 'קוד המקור ב-GitHub',
   },
+  angularGuide: {
+    featuresTitle: 'מה הגרסה הזו מראה על Angular',
+    featuresIntro: 'השרת, הכללים העסקיים והנתונים משותפים עם גרסת Vue. אלה החלקים של Angular בממשק, כל אחד עם הקובץ שעושה אותו.',
+    scopeTitle: 'גרסת Angular',
+    compareVue: 'אותו עמוד בגרסת Vue',
+    backToApp: 'חזרה לאפליקציה',
+    hostingStep2: 'אפליקציית Angular עולה בדפדפן ומזהה שהיא במצב דמו.',
+    hostingHttp: 'http-api.ts קורא ל-API האמיתי של ASP.NET Core דרך HttpClient וה-Interceptors שלו (מורץ מקומית עם Docker).',
+    hostingDemo: 'demoApi.ts המשותף מדמה אותו בדפדפן: אותו מנוע שגרסת Vue משתמשת בו.',
+    hostingDesignNote: 'הרכיבים מזריקים את ה-Token ‏SALARYNET_API, ולכן הם לא יודעים איזה מימוש רץ.',
+  },
   troubleshooting: {
     title: 'פתרון תקלות',
     subtitle: 'תקלות נפוצות, מה גורם להן ואיך פותרים אותן.',

@@ -328,6 +328,17 @@ export default {
     liveSite: 'Live site',
     code: 'Source code on GitHub',
   },
+  angularGuide: {
+    featuresTitle: 'What this version shows about Angular',
+    featuresIntro: 'The server, the business rules and the data are shared with the Vue version. These are the Angular parts of the front end, each with the file that does it.',
+    scopeTitle: 'The Angular version',
+    compareVue: 'Same page in the Vue version',
+    backToApp: 'Back to the app',
+    hostingStep2: 'The Angular app starts in your browser and sees it is in demo mode.',
+    hostingHttp: 'http-api.ts calls the real ASP.NET Core API through HttpClient and its interceptors (run locally with Docker).',
+    hostingDemo: 'The shared demoApi.ts emulates it in the browser: the same engine the Vue version uses.',
+    hostingDesignNote: 'Components inject the SALARYNET_API token, so they cannot tell which one is running.',
+  },
   troubleshooting: {
     title: 'Troubleshooting',
     subtitle: 'Common problems, what causes them and how to fix them.',

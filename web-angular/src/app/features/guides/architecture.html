@@ -1,0 +1,111 @@
+<main class="guide">
+  <app-guide-header page="architecture" />
+
+  <div class="page-header">
+    <div>
+      <h1>{{ 'architecture.title' | t }}</h1>
+      <p>{{ 'architecture.subtitle' | t }}</p>
+    </div>
+  </div>
+
+  <app-architecture-intro />
+
+  <section class="panel">
+    <h2>{{ 'architecture.flowsTitle' | t }}</h2>
+    <div class="flow-picker" role="radiogroup" [attr.aria-label]="'architecture.flowsTitle' | t">
+      @for (f of flows; track f.id) {
+        <button type="button" role="radio" [attr.aria-checked]="f.id === flowId()" [class.on]="f.id === flowId()"
+          (click)="chooseFlow(f.id)">{{ text(f.title) }}</button>
+      }
+    </div>
+
+    <div class="flow-head">
+      <code class="request" dir="ltr">{{ flow().request }}</code>
+      <p>{{ text(flow().summary) }}</p>
+    </div>
+
+    <div class="diagram-scroll">
+      <svg [attr.viewBox]="'0 0 ' + width + ' ' + height" role="img" [attr.aria-label]="'architecture.diagramLabel' | t" class="diagram">
+        <defs>
+          <marker id="arrowhead" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+            <path d="M0,0 L10,5 L0,10 z" class="arrowhead" />
+          </marker>
+        </defs>
+
+        @for (lane of lanes; track lane.id; let i = $index) {
+          <g>
+            <rect [attr.x]="laneX(i) + 4" y="4" [attr.width]="laneWidth - 8" [attr.height]="height - 8" rx="10" class="lane" />
+            <text [attr.x]="laneX(i) + laneWidth / 2" y="34" text-anchor="middle" class="lane-title">{{ text(lane.title) }}</text>
+          </g>
+        }
+
+        @if (arrow(); as a) {
+          <line [attr.x1]="a.x1" [attr.y1]="a.y1" [attr.x2]="a.x2" [attr.y2]="a.y2" class="edge" marker-end="url(#arrowhead)" />
+        }
+
+        @for (n of nodes; track n.id) {
+          <g role="button" tabindex="0" [attr.aria-label]="text(n.label)" class="node"
+            [class.active]="n.id === activeNode().id" [class.visited]="visited().has(n.id)"
+            [class.idle]="!involved().has(n.id)" [class.pinned]="n.id === pinned()"
+            (click)="pin(n.id)" (keydown.enter)="$event.preventDefault(); pin(n.id)" (keydown.space)="$event.preventDefault(); pin(n.id)">
+            <rect [attr.x]="box(n).x" [attr.y]="box(n).y" [attr.width]="nodeWidth" [attr.height]="nodeHeight" rx="8" />
+            <text [attr.x]="box(n).x + nodeWidth / 2" [attr.y]="box(n).y + nodeHeight / 2 + 5" text-anchor="middle">{{ text(n.label) }}</text>
+          </g>
+        }
+      </svg>
+    </div>
+
+    <p class="muted hint"><mat-icon aria-hidden="true">touch_app</mat-icon> {{ 'architecture.clickHint' | t }}</p>
+
+    <article class="detail" aria-live="polite">
+      <header>
+        <h3>{{ text(detailNode().label) }}</h3>
+        <code dir="ltr">{{ detail().tech }}</code>
+      </header>
+      <dl>
+        <dt>{{ 'architecture.detailJob' | t }}</dt><dd>{{ text(detail().job) }}</dd>
+        <dt>{{ 'architecture.detailFrom' | t }}</dt><dd>{{ text(detail().from) }}</dd>
+        <dt>{{ 'architecture.detailTo' | t }}</dt><dd>{{ text(detail().to) }}</dd>
+        <dt>{{ 'architecture.detailHow' | t }}</dt><dd>{{ text(detail().how) }}</dd>
+        <dt>{{ 'architecture.code' | t }}</dt><dd><code class="path" dir="ltr">{{ detailNode().code }}</code></dd>
+      </dl>
+    </article>
+
+    <div class="controls">
+      <button mat-button type="button" [disabled]="stepIndex() === 0" (click)="go(-1)">
+        <mat-icon>{{ rtl() ? 'chevron_right' : 'chevron_left' }}</mat-icon> {{ 'architecture.previous' | t }}
+      </button>
+      <button mat-flat-button type="button" class="play" (click)="togglePlay()">
+        <mat-icon>{{ playing() ? 'pause' : 'play_arrow' }}</mat-icon> {{ (playing() ? 'architecture.pause' : 'architecture.play') | t }}
+      </button>
+      <button mat-button type="button" [disabled]="stepIndex() === flow().steps.length - 1" (click)="go(1)">
+        {{ 'architecture.next' | t }} <mat-icon iconPositionEnd>{{ rtl() ? 'chevron_left' : 'chevron_right' }}</mat-icon>
+      </button>
+      <span class="muted step-count">{{ 'architecture.step' | t: { current: stepIndex() + 1, total: flow().steps.length } }}</span>
+    </div>
+
+    <ol class="steps">
+      @for (s of flow().steps; track $index; let i = $index) {
+        <li [class.current]="i === stepIndex()" [class.done]="i < stepIndex()">
+          <button type="button" (click)="select(i)">
+            <span class="badge">{{ i + 1 }}</span>
+            <span class="step-text">
+              <strong>{{ text(node(s.node).label) }}</strong>
+              <span>{{ text(s.text) }}</span>
+              @if (i === stepIndex()) {
+                <span class="plain-note"><mat-icon aria-hidden="true">info</mat-icon> {{ 'architecture.whatIsIt' | t }} {{ text(node(s.node).plain) }}</span>
+                <code class="code-path" dir="ltr">{{ 'architecture.code' | t }}: {{ node(s.node).code }}</code>
+              }
+            </span>
+          </button>
+        </li>
+      }
+    </ol>
+
+    @if (demoMode) {
+      <p class="muted demo-note"><span class="tag">Demo</span> {{ 'architecture.demoNote' | t }}</p>
+    }
+  </section>
+
+  <app-architecture-reference />
+</main>

@@ -1,0 +1,38 @@
+.glossary { margin-top: 1rem; }
+.glossary > p { margin: 0 0 0.75rem; }
+.glossary dl { margin: 0; display: grid; grid-template-columns: max-content 1fr; gap: 0.625rem 1.25rem; line-height: 1.6; }
+.glossary dt { font-weight: 650; text-align: start; }
+.glossary dd { margin: 0; }
+@media (max-width: 640px) { .glossary dl { grid-template-columns: 1fr; } .glossary dd { margin-bottom: 0.5rem; } }
+.card header { display: flex; flex-wrap: wrap; align-items: baseline; gap: 0.5rem 0.75rem; margin-bottom: 0.5rem; }
+.card h3 { margin: 0; font-size: 1rem; }
+.card header code { font-size: 0.75rem; color: var(--app-text-muted); }
+.card dl { margin: 0; display: grid; grid-template-columns: 1fr; gap: 0.125rem; line-height: 1.55; }
+.card dt { font-weight: 600; color: var(--app-text-muted); }
+.card dd { margin: 0 0 0.375rem; }
+.hosting { margin-top: 1rem; }
+.hosting > p { margin: 0 0 0.75rem; line-height: 1.6; }
+.hosting h3 { margin: 1.25rem 0 0.5rem; font-size: 0.95rem; }
+.hosting-steps { list-style: none; margin: 0; padding: 0; display: grid; gap: 0.5rem; }
+.hosting-steps li { display: flex; gap: 0.75rem; align-items: flex-start; line-height: 1.55; }
+.impls { display: flex; flex-direction: column; align-items: center; gap: 0.5rem; margin-bottom: 0.5rem; }
+.impl-pair { display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; width: 100%; }
+.impl { display: flex; flex-direction: column; gap: 0.25rem; padding: 0.625rem 0.75rem; border: 1px solid var(--app-border); border-radius: 8px; background: var(--app-bg); line-height: 1.5; }
+.impl.iface { border-color: var(--chart-series-1); padding: 0.375rem 1rem; }
+.impl.demo { border-style: dashed; }
+.honest { display: flex; gap: 0.5rem; align-items: flex-start; padding: 0.625rem 0.75rem; border-radius: 8px; background: color-mix(in srgb, var(--chart-series-1) 8%, transparent); line-height: 1.6; }
+.docker { width: 100%; border-collapse: collapse; margin-bottom: 0.5rem; }
+.docker th, .docker td { text-align: start; padding: 0.4rem 0.5rem; border-bottom: 1px solid var(--app-border); }
+.docker th { color: var(--app-text-muted); font-weight: 550; font-size: 0.8125rem; }
+@media (max-width: 640px) { .impl-pair { grid-template-columns: 1fr; } }
+.catalog { margin-top: 1rem; }
+.catalog > p { margin: 0 0 0.75rem; }
+.cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(320px, 100%), 1fr)); gap: 0.75rem; }
+.card { border: 1px solid var(--app-border); border-radius: 10px; padding: 0.875rem 1rem; background: var(--app-bg); }
+.lane-chip { font-size: 0.6875rem; text-transform: uppercase; letter-spacing: 0.04em; color: var(--chart-series-1); width: 100%; }
+.tag {
+  display: inline-block; font-size: 0.75rem; font-weight: 600; padding: 0.125rem 0.5rem; border-radius: 6px;
+  background: color-mix(in srgb, #16a34a 14%, transparent); color: #15803d;
+}
+.tag.warn { background: color-mix(in srgb, #f59e0b 18%, transparent); color: #b45309; }
+.honest mat-icon { font-size: 18px; width: 18px; height: 18px; flex-shrink: 0; }
