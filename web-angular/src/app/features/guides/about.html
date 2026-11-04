@@ -1,0 +1,48 @@
+<main class="guide">
+  <app-guide-header page="about" />
+
+  <div class="page-header">
+    <div>
+      <h1>{{ 'about.title' | t }}</h1>
+      <p>{{ 'about.subtitle' | t }}</p>
+    </div>
+  </div>
+
+  <section class="panel links">
+    <a href="https://saharhalili95.github.io/SalaryNet/" target="_blank" rel="noopener"><mat-icon aria-hidden="true">public</mat-icon> {{ 'about.liveSite' | t }}</a>
+    <a href="https://github.com/SaharHalili95/SalaryNet/tree/main/web-angular" target="_blank" rel="noopener"><mat-icon aria-hidden="true">code</mat-icon> {{ 'about.code' | t }}</a>
+  </section>
+
+  <section class="panel angular">
+    <h2><mat-icon aria-hidden="true">change_history</mat-icon> {{ 'angularGuide.scopeTitle' | t }} <code class="tech" dir="ltr">Angular 22 · TypeScript · Angular Material · RxJS</code></h2>
+    <ul>
+      @for (item of scope; track $index) {
+        <li>{{ text(item) }}</li>
+      }
+    </ul>
+    <h3>{{ 'angularGuide.featuresTitle' | t }}</h3>
+    <ul class="feature-list">
+      @for (feature of features; track feature.id) {
+        <li><strong>{{ text(feature.title) }}:</strong> {{ text(feature.text) }}</li>
+      }
+    </ul>
+  </section>
+
+  <div class="sections">
+    @for (section of sections; track section.id) {
+      <section class="panel">
+        <h2>
+          <mat-icon aria-hidden="true">{{ icons[section.id] ?? 'info' }}</mat-icon> {{ text(section.title) }}
+          @if (section.tech) {
+            <code class="tech" dir="ltr">{{ section.tech }}</code>
+          }
+        </h2>
+        <ul>
+          @for (item of section.items; track $index) {
+            <li>{{ text(item) }}</li>
+          }
+        </ul>
+      </section>
+    }
+  </div>
+</main>

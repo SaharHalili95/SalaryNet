@@ -87,7 +87,7 @@ test('@full-app signed-out visitor can open the guides from the menu', async ({ 
   await expect(page).toHaveURL(/#\/troubleshooting/)
 })
 
-test('@full-app guide links on the login page work', async ({ page }) => {
+test('guide links on the login page work', async ({ page }) => {
   await open(page, '/login')
   await page.locator('.guide-link').first().tap()
   await expect(page).toHaveURL(/#\/architecture/)

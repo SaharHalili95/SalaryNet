@@ -12,6 +12,17 @@ export const routes: Routes = [
     canActivate: [loginGuard],
     loadComponent: () => import('./features/login/login').then((m) => m.Login),
   },
+  // The guides are public, like in the Vue app, so a visitor can read them before signing in.
+  {
+    path: 'architecture',
+    title: 'nav.architecture',
+    loadComponent: () => import('./features/guides/architecture').then((m) => m.Architecture),
+  },
+  {
+    path: 'about',
+    title: 'nav.about',
+    loadComponent: () => import('./features/guides/about').then((m) => m.About),
+  },
   {
     path: '',
     loadComponent: () => import('./layout/shell').then((m) => m.Shell),

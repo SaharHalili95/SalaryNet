@@ -1,6 +1,7 @@
 import { existsSync } from 'node:fs'
 import { resolve } from 'node:path'
 import { describe, expect, it } from 'vitest'
+import { angularFeatures, angularFlows, angularLanes, angularNodes, angularScope } from '../angular'
 import { flows, nodes } from '../architecture'
 import type { Localized } from '../localized'
 import { componentDetails } from '../components'
@@ -63,5 +64,24 @@ describe('project summary content', () => {
       expect(bothLanguages(section.title), section.id).toBe(true)
       expect(section.items.every(bothLanguages), section.id).toBe(true)
     }
+  })
+})
+
+describe('angular guide content', () => {
+  it('keeps the shared diagram and flows, changing only the browser side', () => {
+    expect(angularNodes.map((n) => n.id)).toEqual(nodes.map((n) => n.id))
+    expect(angularFlows.map((f) => f.steps.length)).toEqual(flows.map((f) => f.steps.length))
+    expect(angularLanes[0]!.title.en).toContain('Angular')
+  })
+
+  it('is fully written in English and Hebrew', () => {
+    for (const feature of angularFeatures) expect(bothLanguages(feature.title) && bothLanguages(feature.text), feature.id).toBe(true)
+    expect(angularScope.every(bothLanguages)).toBe(true)
+    for (const flow of angularFlows) for (const step of flow.steps) expect(bothLanguages(step.text), flow.id).toBe(true)
+  })
+
+  it('only cites code paths that exist in the repository', () => {
+    for (const node of angularNodes) expect(existsSync(resolve(repoRoot, node.code)), node.code).toBe(true)
+    for (const feature of angularFeatures) expect(existsSync(resolve(repoRoot, feature.code)), feature.code).toBe(true)
   })
 })

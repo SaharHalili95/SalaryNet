@@ -67,11 +67,17 @@ async function signIn(withEmail = email.value, withPassword = password.value) {
       <div class="brand"><span class="logo">S</span> SalaryNet</div>
       <h1>{{ t('login.heroTitle') }}</h1>
       <p>{{ t('login.heroText') }}</p>
+      <div class="try">
+        <Button :label="t('login.tryNow')" icon="pi pi-arrow-right" icon-pos="right" size="large" :loading="loading"
+          class="try-button" @click="signIn(demoAccounts[1]!.email, demoAccounts[1]!.password)" />
+        <span>{{ t('login.tryHint') }}</span>
+      </div>
       <ul>
         <li><i class="pi pi-check-circle" /> {{ t('login.bullet1') }}</li>
         <li><i class="pi pi-check-circle" /> {{ t('login.bullet2') }}</li>
         <li><i class="pi pi-check-circle" /> {{ t('login.bullet3') }}</li>
       </ul>
+      <p class="proof">{{ t('login.proof') }}</p>
       <div class="guides">
         <RouterLink :to="{ name: 'architecture' }" class="guide-link"><i class="pi pi-share-alt" /> {{ t('nav.architecture') }}</RouterLink>
         <RouterLink :to="{ name: 'troubleshooting' }" class="guide-link"><i class="pi pi-wrench" /> {{ t('nav.troubleshooting') }}</RouterLink>
@@ -155,6 +161,10 @@ async function signIn(withEmail = email.value, withPassword = password.value) {
 .hero ul { list-style: none; padding: 0; margin: 0.5rem 0 0; display: grid; gap: 0.625rem; }
 .hero li { display: flex; gap: 0.625rem; align-items: center; }
 .hero li i { color: #6ee7b7; }
+.try { display: flex; flex-wrap: wrap; align-items: center; gap: 0.5rem 1rem; }
+.try span { font-size: 0.875rem; opacity: 0.8; max-width: 22rem; }
+.try-button:active { transform: scale(0.97); }
+.hero .proof { font-size: 0.8125rem; letter-spacing: 0.01em; opacity: 0.7; }
 .guides { display: flex; gap: 0.75rem; flex-wrap: wrap; margin-top: 0.75rem; }
 .guide-link {
   display: inline-flex; align-items: center; gap: 0.5rem; padding: 0.5rem 0.875rem; border-radius: 8px;

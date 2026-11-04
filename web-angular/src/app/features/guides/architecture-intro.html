@@ -1,0 +1,49 @@
+<section class="panel features">
+  <h2>{{ 'angularGuide.featuresTitle' | t }}</h2>
+  <p class="muted">{{ 'angularGuide.featuresIntro' | t }}</p>
+  <div class="feature-grid">
+    @for (feature of features; track feature.id) {
+      <article class="feature">
+        <mat-icon aria-hidden="true">{{ feature.icon }}</mat-icon>
+        <div>
+          <h3>{{ text(feature.title) }}</h3>
+          <p>{{ text(feature.text) }}</p>
+          <code class="path" dir="ltr">{{ feature.code }}</code>
+        </div>
+      </article>
+    }
+  </div>
+</section>
+
+<section class="panel plain">
+  <h2>{{ 'architecture.plainTitle' | t }}</h2>
+  <p class="muted">{{ 'architecture.plainIntro' | t }}</p>
+  <ol class="analogy">
+    @for (lane of lanes; track lane.id; let i = $index) {
+      <li>
+        <span class="badge">{{ i + 1 }}</span>
+        <span>
+          <strong>{{ text(lane.title) }}</strong>
+          <span class="muted">{{ text(lane.analogy) }}</span>
+        </span>
+      </li>
+    }
+  </ol>
+</section>
+
+<section class="panel layers">
+  <h2>{{ 'architecture.layersTitle' | t }}</h2>
+  <div class="chain">
+    @for (lane of layerChain; track lane.id; let last = $last) {
+      <div class="layer" [class.core]="lane.id === 'domain'">{{ text(lane.title) }}</div>
+      @if (!last) {
+        <mat-icon aria-hidden="true">{{ rtl() ? 'arrow_back' : 'arrow_forward' }}</mat-icon>
+      }
+    }
+    <div class="layer infra">
+      {{ text(lanes[4]!.title) }}
+      <small>{{ 'architecture.implements' | t }} {{ text(lanes[2]!.title) }}</small>
+    </div>
+  </div>
+  <p class="muted">{{ 'architecture.layersText' | t }}</p>
+</section>
